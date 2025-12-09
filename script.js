@@ -346,7 +346,7 @@ function updateStatsDisplay() {
         const statLabel = timeStat.querySelector('.stat-label');
         
         if (statValue && statLabel) {
-            statValue.textContent = '24H';
+            statValue.textContent = '24 Jam';
             statLabel.textContent = 'Akses';
         }
     }
