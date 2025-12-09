@@ -86,7 +86,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
+    gap: 15px;
     margin: 0 auto;
 }
 
@@ -94,7 +94,7 @@ body {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
     border-radius: 24px;
-    padding: 25px;
+    padding: 20px;
     box-shadow: 
         0 20px 40px rgba(0, 0, 0, 0.15),
         0 15px 30px rgba(0, 0, 0, 0.12),
@@ -105,7 +105,7 @@ body {
     position: relative;
     overflow: hidden;
     width: 100%;
-    max-width: 480px;
+    max-width: 100%;
 }
 
 .card-3d::before {
@@ -134,13 +134,13 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
 .logo {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
 }
 
 .logo i {
@@ -205,8 +205,8 @@ h1 {
 .info-card-3d {
     background: linear-gradient(135deg, #f8fafc, #f1f5f9);
     border-radius: 18px;
-    padding: 20px;
-    margin-bottom: 20px;
+    padding: 18px;
+    margin-bottom: 15px;
     border: 1px solid rgba(226, 232, 240, 0.8);
     box-shadow: 
         0 10px 25px rgba(0, 0, 0, 0.08),
@@ -241,7 +241,7 @@ h1 {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     color: #64748b;
     font-size: 0.9rem;
     font-weight: 600;
@@ -257,8 +257,8 @@ h1 {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    margin-bottom: 15px;
-    min-height: 60px;
+    margin-bottom: 12px;
+    min-height: 50px;
     flex-wrap: wrap;
 }
 
@@ -270,7 +270,7 @@ h1 {
 }
 
 .amount {
-    font-size: 2.2rem;
+    font-size: 2rem;
     font-weight: 800;
     color: #1e293b;
     letter-spacing: -0.5px;
@@ -283,6 +283,7 @@ h1 {
     overflow: hidden;
     text-align: center;
     position: relative;
+    line-height: 1.2;
 }
 
 /* Efek kilau pada angka saldo */
@@ -316,7 +317,7 @@ h1 {
 }
 
 .amount.error {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: #ef4444;
     background: none;
     -webkit-text-fill-color: #ef4444;
@@ -325,7 +326,7 @@ h1 {
 }
 
 .amount.empty {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: #f59e0b;
     background: none;
     -webkit-text-fill-color: #f59e0b;
@@ -338,13 +339,13 @@ h1 {
     20%, 40%, 60%, 80% { transform: translateX(5px); }
 }
 
-/* REVISI: Background time-card silver terang */
+/* Background time-card */
 .time-card-3d {
     background: linear-gradient(145deg, #f0f0f0, #e0e0e0);
     color: #1f2937;
     border-radius: 16px;
-    padding: 16px;
-    margin-bottom: 20px;
+    padding: 15px;
+    margin-bottom: 15px;
     box-shadow: 
         0 12px 30px rgba(0, 0, 0, 0.15),
         inset 0 1px 1px rgba(255, 255, 255, 0.8),
@@ -406,7 +407,7 @@ h1 {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     color: #4b5563;
     font-size: 0.85rem;
     font-weight: 600;
@@ -422,28 +423,29 @@ h1 {
 }
 
 .time-display {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
     text-align: center;
     color: #111827;
     letter-spacing: 0.5px;
     font-variant-numeric: tabular-nums;
-    min-height: 30px;
+    min-height: 25px;
     display: flex;
     align-items: center;
     justify-content: center;
-    line-height: 1.4;
+    line-height: 1.3;
     text-shadow: 
         0 1px 3px rgba(255, 255, 255, 0.8),
         0 0 15px rgba(255, 255, 255, 0.4);
 }
+
 .stats {
     display: flex;
     justify-content: space-around;
     background: rgba(241, 245, 249, 0.8);
     border-radius: 14px;
     padding: 15px;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     backdrop-filter: blur(10px);
     border: 1px solid rgba(226, 232, 240, 0.5);
 }
@@ -451,21 +453,21 @@ h1 {
 .stat-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    min-width: 100px;
+    gap: 8px;
+    min-width: 90px;
     justify-content: center;
 }
 
 .stat-icon {
-    width: 40px;
-    height: 40px;
+    width: 35px;
+    height: 35px;
     background: linear-gradient(135deg, #667eea, #764ba2);
     border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 1rem;
+    font-size: 0.9rem;
     box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
 }
 
@@ -477,13 +479,13 @@ h1 {
 }
 
 .stat-value {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     font-weight: 700;
     color: #1e293b;
 }
 
 .stat-label {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: #64748b;
     font-weight: 500;
     margin-top: 2px;
@@ -492,7 +494,7 @@ h1 {
 .stat-divider {
     width: 1px;
     background: rgba(203, 213, 224, 0.5);
-    margin: 0 8px;
+    margin: 0 5px;
 }
 
 .footer-3d {
@@ -503,7 +505,7 @@ h1 {
 }
 
 .footer-3d p {
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -513,7 +515,7 @@ h1 {
 
 .watermark {
     text-align: center;
-    margin-top: 25px;
+    margin-top: 20px;
     color: rgba(255, 255, 255, 0.8);
     display: flex;
     align-items: center;
@@ -549,14 +551,15 @@ h1 {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    margin-top: 12px;
-    font-size: 0.8rem;
+    margin-top: 10px;
+    font-size: 0.75rem;
     color: #64748b;
     opacity: 0.8;
+    text-align: center;
 }
 
 .connection-status i {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
 }
 
 .connection-status.online i {
@@ -579,13 +582,13 @@ h1 {
     align-items: center;
     justify-content: center;
     gap: 4px;
-    height: 40px;
+    height: 35px;
 }
 
 .loading-dots-container span {
     display: inline-block;
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
     background: #667eea;
     animation: dotBounce 1.4s infinite ease-in-out both;
@@ -612,123 +615,203 @@ h1 {
     }
 }
 
-/* ==================== RESPONSIVE DESIGN TANPA SCALING ==================== */
+/* ==================== RESPONSIVE DESIGN - FIXED FOR PHONE ==================== */
 
 /* Responsive Design - PHONE OPTIMIZATION */
 @media (max-width: 480px) {
     body {
-        padding: 15px;
+        padding: 15px 10px;
         justify-content: center;
         align-items: center;
         min-height: 100vh;
         display: flex;
+        overflow-y: auto;
     }
     
     .background-3d {
-        justify-content: center;
+        justify-content: flex-start;
         align-items: center;
         display: flex;
         flex-direction: column;
+        padding: 10px;
+    }
+    
+    .floating-shapes {
+        display: none; /* Sembunyikan untuk performa mobile */
     }
     
     .app-container {
-        margin-top: 0;
+        margin: 0;
         width: 100%;
         max-width: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-start;
+        gap: 12px;
         padding: 0;
-        transform: none; /* HAPUS SCALING */
     }
     
     .card-3d {
-        padding: 20px;
-        margin: 0 auto;
+        padding: 15px;
+        margin: 0;
         width: 100%;
         max-width: 100%;
         min-height: auto;
         box-sizing: border-box;
+        border-radius: 20px;
     }
     
-    /* Atur floating shapes untuk mobile */
-    .floating-shapes {
-        display: none;
+    .card-header {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+        align-items: center;
+        margin-bottom: 15px;
     }
     
     h1 {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
         text-align: center;
+        line-height: 1.3;
     }
     
     .logo {
         justify-content: center;
         width: 100%;
-        flex-direction: column;
-        gap: 8px;
+        flex-direction: row;
+        gap: 10px;
     }
     
     .logo i {
-        font-size: 1.8rem;
-    }
-    
-    .amount {
-        font-size: 1.8rem;
-        text-align: center;
-        word-break: break-all;
-        overflow-wrap: break-word;
-        padding: 0 10px;
-        line-height: 1.2;
-    }
-    
-    .amount.error,
-    .amount.empty {
-        font-size: 1rem;
-    }
-    
-    .currency {
         font-size: 1.5rem;
-        margin-bottom: 5px;
+    }
+    
+    .connection-signal {
+        font-size: 0.7rem;
+        padding: 5px 10px;
+        margin-top: 5px;
+        width: auto;
+    }
+    
+    .info-card-3d {
+        padding: 15px;
+        margin-bottom: 12px;
+        border-radius: 15px;
+    }
+    
+    .card-label {
+        font-size: 0.85rem;
+        margin-bottom: 10px;
     }
     
     .saldo-display {
         flex-direction: column;
         gap: 5px;
+        margin-bottom: 10px;
+        min-height: 45px;
+    }
+    
+    .currency {
+        font-size: 1.5rem;
+        margin-bottom: 2px;
+    }
+    
+    .amount {
+        font-size: 1.6rem;
+        line-height: 1.1;
+        padding: 0 5px;
+    }
+    
+    .amount.error,
+    .amount.empty {
+        font-size: 0.9rem;
+    }
+    
+    .time-card-3d {
+        padding: 12px;
+        margin-bottom: 12px;
+        border-radius: 15px;
+    }
+    
+    .time-label {
+        font-size: 0.8rem;
+        margin-bottom: 6px;
     }
     
     .time-display {
-        font-size: 0.95rem;
-        line-height: 1.3;
-        text-align: center;
+        font-size: 0.85rem;
+        line-height: 1.2;
+        min-height: 20px;
         padding: 0 5px;
     }
     
     .stats {
         flex-direction: column;
-        gap: 15px;
+        gap: 12px;
         padding: 12px;
-        width: 100%;
-    }
-    
-    .stat-divider {
-        width: 100%;
-        height: 1px;
-        margin: 5px 0;
+        margin-bottom: 12px;
+        border-radius: 12px;
     }
     
     .stat-item {
         justify-content: center;
         min-width: auto;
         width: 100%;
+        gap: 10px;
     }
     
-    .connection-signal {
+    .stat-icon {
+        width: 30px;
+        height: 30px;
+        font-size: 0.8rem;
+    }
+    
+    .stat-value {
+        font-size: 1rem;
+    }
+    
+    .stat-label {
+        font-size: 0.75rem;
+    }
+    
+    .stat-divider {
+        width: 100%;
+        height: 1px;
+        margin: 3px 0;
+    }
+    
+    .footer-3d {
+        font-size: 0.75rem;
+        padding: 0 5px;
+    }
+    
+    .footer-3d p {
         font-size: 0.7rem;
-        padding: 4px 8px;
-        position: static;
-        margin-top: 10px;
-        width: auto;
+        text-align: center;
+        flex-direction: column;
+        gap: 3px;
+        margin-bottom: 8px;
+    }
+    
+    .connection-status {
+        font-size: 0.7rem;
+        flex-direction: column;
+        gap: 5px;
+        margin-top: 8px;
+    }
+    
+    .watermark {
+        margin-top: 15px;
+        font-size: 0.7rem;
+        padding: 0 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+        text-align: center;
+    }
+    
+    .signal-bars {
+        height: 12px;
     }
     
     .signal-bar {
@@ -740,55 +823,22 @@ h1 {
     .signal-bar:nth-child(3) { height: 7px; }
     .signal-bar:nth-child(4) { height: 9px; }
     
-    /* Pastikan card header responsif */
-    .card-header {
-        position: relative;
-        flex-direction: column;
-        gap: 15px;
-        text-align: center;
-        align-items: center;
+    /* Perbaikan khusus untuk teks waktu yang panjang */
+    .time-display {
+        word-break: break-word;
+        overflow-wrap: break-word;
+        hyphens: auto;
     }
     
-    /* Watermark mobile */
-    .watermark {
-        margin-top: 20px;
-        font-size: 0.75rem;
-        text-align: center;
-        width: 100%;
-        padding: 0 20px;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-    
-    /* Footer mobile */
-    .footer-3d {
-        font-size: 0.75rem;
-        padding: 0 10px;
-    }
-    
-    .footer-3d p {
-        text-align: center;
-        flex-direction: column;
-        gap: 5px;
-    }
-    
-    /* Connection status mobile */
-    .connection-status {
-        font-size: 0.7rem;
-        text-align: center;
-        flex-direction: column;
-        gap: 5px;
-    }
-    
-    /* Animasi khusus untuk mobile - TANPA SCALING */
+    /* Animasi khusus untuk mobile */
     @keyframes cardEntranceMobile {
         from {
             opacity: 0;
-            transform: translateY(30px); /* HAPUS SCALING */
+            transform: translateY(30px);
         }
         to {
             opacity: 1;
-            transform: translateY(0); /* HAPUS SCALING */
+            transform: translateY(0);
         }
     }
     
@@ -799,6 +849,10 @@ h1 {
 
 /* Untuk tablet kecil */
 @media (min-width: 481px) and (max-width: 767px) {
+    body {
+        padding: 20px;
+    }
+    
     .app-container {
         max-width: 90%;
         margin: 0 auto;
@@ -806,7 +860,7 @@ h1 {
     
     .card-3d {
         max-width: 100%;
-        padding: 25px;
+        padding: 20px;
     }
     
     .amount {
@@ -823,35 +877,18 @@ h1 {
     
     .card-3d {
         max-width: 600px;
-        padding: 30px;
+        padding: 25px;
     }
     
     .amount {
-        font-size: 2.5rem;
+        font-size: 2.2rem;
     }
 }
 
 /* Untuk desktop besar */
-@media (min-width: 1200px) {
+@media (min-width: 1025px) {
     .app-container {
-        max-width: 520px;
-    }
-}
-
-/* Pastikan konten selalu di tengah di semua device */
-@media (max-height: 700px) {
-    body {
-        padding-top: 10px;
-        padding-bottom: 10px;
-        justify-content: flex-start;
-    }
-    
-    .app-container {
-        margin-top: 10px;
-    }
-    
-    .card-3d {
-        padding: 15px;
+        max-width: 500px;
     }
 }
 
@@ -864,12 +901,11 @@ h1 {
     
     .app-container {
         margin-top: 5px;
-        transform: none; /* HAPUS SCALING */
     }
     
     .card-3d {
-        padding: 15px;
-        max-height: 90vh;
+        padding: 12px;
+        max-height: 95vh;
         overflow-y: auto;
     }
     
@@ -881,7 +917,48 @@ h1 {
     
     .stat-divider {
         width: 1px;
-        height: 100%;
+        height: 30px;
         margin: 0 5px;
+    }
+    
+    .saldo-display {
+        flex-direction: row;
+    }
+    
+    .time-display {
+        font-size: 0.8rem;
+    }
+}
+
+/* Perangkat dengan layar sangat kecil */
+@media (max-width: 360px) {
+    .card-3d {
+        padding: 12px;
+    }
+    
+    h1 {
+        font-size: 1.1rem;
+    }
+    
+    .amount {
+        font-size: 1.4rem;
+    }
+    
+    .time-display {
+        font-size: 0.75rem;
+    }
+    
+    .stat-item {
+        gap: 6px;
+    }
+    
+    .stat-icon {
+        width: 25px;
+        height: 25px;
+        font-size: 0.7rem;
+    }
+    
+    .stat-value {
+        font-size: 0.9rem;
     }
 }
