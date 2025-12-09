@@ -612,16 +612,15 @@ h1 {
     }
 }
 
-/* ==================== RESPONSIVE DESIGN - REVISI ==================== */
+/* ==================== RESPONSIVE DESIGN TANPA SCALING ==================== */
 
 /* Responsive Design - PHONE OPTIMIZATION */
 @media (max-width: 480px) {
     body {
         padding: 15px;
-        justify-content: center; /* Ubah dari flex-start ke center */
+        justify-content: center;
         align-items: center;
         min-height: 100vh;
-        overflow: hidden; /* Hindari scroll berlebihan */
         display: flex;
     }
     
@@ -633,9 +632,7 @@ h1 {
     }
     
     .app-container {
-        margin-top: 0; /* Hapus margin top */
-        transform: scale(0.95); /* Sedikit scaling untuk memastikan pas */
-        transform-origin: center;
+        margin-top: 0;
         width: 100%;
         max-width: 100%;
         display: flex;
@@ -643,20 +640,21 @@ h1 {
         align-items: center;
         justify-content: center;
         padding: 0;
+        transform: none; /* HAPUS SCALING */
     }
     
     .card-3d {
         padding: 20px;
         margin: 0 auto;
-        width: 95vw; /* Gunakan viewport width */
-        max-width: 95vw;
+        width: 100%;
+        max-width: 100%;
         min-height: auto;
         box-sizing: border-box;
     }
     
     /* Atur floating shapes untuk mobile */
     .floating-shapes {
-        display: none; /* Sembunyikan di mobile untuk performa */
+        display: none;
     }
     
     h1 {
@@ -782,15 +780,15 @@ h1 {
         gap: 5px;
     }
     
-    /* Animasi khusus untuk mobile */
+    /* Animasi khusus untuk mobile - TANPA SCALING */
     @keyframes cardEntranceMobile {
         from {
             opacity: 0;
-            transform: translateY(30px) scale(0.95);
+            transform: translateY(30px); /* HAPUS SCALING */
         }
         to {
             opacity: 1;
-            transform: translateY(0) scale(0.95);
+            transform: translateY(0); /* HAPUS SCALING */
         }
     }
     
@@ -837,7 +835,6 @@ h1 {
 @media (min-width: 1200px) {
     .app-container {
         max-width: 520px;
-        transform: scale(1);
     }
 }
 
@@ -866,8 +863,8 @@ h1 {
     }
     
     .app-container {
-        transform: scale(0.85);
         margin-top: 5px;
+        transform: none; /* HAPUS SCALING */
     }
     
     .card-3d {
