@@ -17,7 +17,7 @@ async function fetchSaldo() {
     updateConnectionStatus('connecting');
     
     try {
-        console.log("📡 Mengambil data dari Google Sheets...");
+        console.log("📡 Mengambil data dari server...");
         
         // Update UI ke loading state
         showLoadingState();
@@ -221,7 +221,7 @@ function updateConnectionStatus(status) {
             signalElement.classList.add('offline');
             signalText.textContent = 'Error';
             // PERBAIKAN: Ganti teks error
-            statusElement.innerHTML = '<i class="fas fa-circle" style="color:#ef4444"></i> <span>Offline • Menyambungkan ke server</span>';
+            statusElement.innerHTML = '<i class="fas fa-circle" style="color:#ef4444"></i> <span>Offline • Menyambungkan...</span>';
             statusElement.classList.add('offline');
             break;
     }
@@ -346,8 +346,8 @@ function updateStatsDisplay() {
         const statLabel = timeStat.querySelector('.stat-label');
         
         if (statValue && statLabel) {
-            statValue.textContent = '24/7';
-            statLabel.textContent = 'Online';
+            statValue.textContent = '24H';
+            statLabel.textContent = 'Akses';
         }
     }
 }
