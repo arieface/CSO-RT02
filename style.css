@@ -228,7 +228,7 @@ h1 {
 }
 
 .info-card-3d:hover::after {
-    animation: shine 1.5s; /* Efek shine ini tetap ada saat hover */
+    animation: shine 1.5s;
 }
 
 @keyframes shine {
@@ -252,6 +252,7 @@ h1 {
     font-size: 1rem;
 }
 
+/* PERBAIKAN: Rp dan Saldo 1 baris */
 .saldo-display {
     display: flex;
     align-items: baseline;
@@ -290,37 +291,6 @@ h1 {
     max-width: 100%;
     overflow-x: auto;
     overflow-y: hidden;
-    position: relative;
-}
-
-/* Efek kilau (shimmer) pada angka saldo hanya sekali di awal */
-.amount::after {
-    content: '';
-    position: absolute;
-    top: -10%;
-    left: -10%;
-    right: -10%;
-    bottom: -10%;
-    background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.3) 20%,
-        rgba(255, 255, 255, 0.6) 50%,
-        rgba(255, 255, 255, 0.3) 80%,
-        transparent
-    );
-    transform: translateX(-100%);
-    animation: shimmer 1.5s 1; /* Hanya dijalankan sekali */
-    pointer-events: none;
-}
-
-@keyframes shimmer {
-    0% {
-        transform: translateX(-100%);
-    }
-    100% {
-        transform: translateX(100%);
-    }
 }
 
 .amount.error {
@@ -385,7 +355,6 @@ h1 {
         0 0 25px rgba(255, 255, 255, 0.4);
 }
 
-/* PERBAIKAN: Hapus animasi shine yang berulang pada time-card */
 .time-card-3d::after {
     content: '';
     position: absolute;
@@ -401,7 +370,16 @@ h1 {
     );
     pointer-events: none;
     opacity: 0.3;
-    /* animation: shine 3s infinite linear; DIHAPUS */
+    animation: shine 3s infinite linear;
+}
+
+@keyframes shine {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
 }
 
 .time-label {
@@ -440,6 +418,7 @@ h1 {
         0 0 15px rgba(255, 255, 255, 0.4);
 }
 
+/* PERBAIKAN: Stats align center */
 .stats {
     display: flex;
     justify-content: space-around;
@@ -554,21 +533,36 @@ h1 {
     50% { opacity: 1; }
 }
 
-/* Status koneksi yang lebih baik */
+/* PERBAIKAN: Status koneksi - alignment dot hijau dengan teks */
 .connection-status {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
     margin-top: 10px;
     font-size: 0.75rem;
     color: #64748b;
     opacity: 0.8;
     text-align: center;
+    line-height: 1.2;
 }
 
 .connection-status i {
     font-size: 0.65rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    position: relative;
+    top: 0;
+}
+
+.connection-status span {
+    line-height: 1.2;
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
 }
 
 .connection-status.online i {
@@ -629,8 +623,8 @@ h1 {
 /* Responsive Design - PHONE OPTIMIZATION */
 @media (max-width: 480px) {
     body {
-        padding: 40px 10px;
-        justify-content: flex-start;
+        padding: 15px 10px;
+        justify-content: center;
         align-items: center;
         min-height: 100vh;
         display: flex;
@@ -672,23 +666,22 @@ h1 {
     }
     
     .card-header {
-        flex-direction: row;
+        flex-direction: column;
         gap: 12px;
-        text-align: left;
+        text-align: center;
         align-items: center;
         margin-bottom: 15px;
-        justify-content: flex-start;
     }
     
     h1 {
         font-size: 1.2rem;
-        text-align: left;
+        text-align: center;
         line-height: 1.3;
     }
     
     .logo {
-        justify-content: flex-start;
-        width: auto;
+        justify-content: center;
+        width: 100%;
         flex-direction: row;
         gap: 10px;
     }
@@ -700,8 +693,7 @@ h1 {
     .connection-signal {
         font-size: 0.7rem;
         padding: 5px 10px;
-        margin-top: 0;
-        margin-left: auto;
+        margin-top: 5px;
         width: auto;
     }
     
@@ -716,19 +708,20 @@ h1 {
         margin-bottom: 10px;
     }
     
+    /* PERBAIKAN: Rp dan Saldo untuk mobile */
     .saldo-display {
         flex-direction: row;
-        gap: 6px;
+        gap: 2px;
         margin-bottom: 10px;
         min-height: 40px;
-        align-items: flex-end;
+        align-items: center;
         justify-content: center;
     }
     
     .currency {
         font-size: 1.5rem;
         margin-top: 0;
-        align-self: flex-end;
+        align-self: center;
     }
     
     .amount {
@@ -740,7 +733,7 @@ h1 {
         overflow-y: hidden;
         text-overflow: ellipsis;
         max-width: calc(100% - 35px);
-        align-self: flex-end;
+        align-self: center;
     }
     
     .amount.error,
@@ -767,6 +760,7 @@ h1 {
         padding: 0 5px;
     }
     
+    /* PERBAIKAN: Stats untuk mobile */
     .stats {
         flex-direction: row;
         gap: 5px;
@@ -842,11 +836,26 @@ h1 {
         margin-bottom: 8px;
     }
     
+    /* PERBAIKAN: Connection status untuk mobile */
     .connection-status {
         font-size: 0.7rem;
-        flex-direction: column;
+        flex-direction: row;
         gap: 5px;
         margin-top: 8px;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .connection-status i {
+        font-size: 0.6rem;
+        margin-bottom: 0;
+        flex-shrink: 0;
+    }
+    
+    .connection-status span {
+        line-height: 1.2;
+        text-align: center;
     }
     
     .watermark {
@@ -877,6 +886,7 @@ h1 {
         hyphens: auto;
     }
     
+    /* Animasi khusus untuk mobile */
     @keyframes cardEntranceMobile {
         from {
             opacity: 0;
@@ -909,16 +919,17 @@ h1 {
         padding: 20px;
     }
     
+    /* Perbaikan alignment untuk tablet */
     .saldo-display {
-        align-items: flex-end;
+        align-items: center;
     }
     
     .currency {
-        align-self: flex-end;
+        align-self: center;
     }
     
     .amount {
-        align-self: flex-end;
+        align-self: center;
     }
     
     .stats {
@@ -948,16 +959,17 @@ h1 {
         padding: 25px;
     }
     
+    /* Perbaikan alignment untuk desktop tablet */
     .saldo-display {
-        align-items: flex-end;
+        align-items: center;
     }
     
     .currency {
-        align-self: flex-end;
+        align-self: center;
     }
     
     .amount {
-        align-self: flex-end;
+        align-self: center;
     }
     
     .stats {
@@ -981,16 +993,17 @@ h1 {
         max-width: 500px;
     }
     
+    /* Perbaikan alignment untuk desktop */
     .saldo-display {
-        align-items: flex-end;
+        align-items: center;
     }
     
     .currency {
-        align-self: flex-end;
+        align-self: center;
     }
     
     .amount {
-        align-self: flex-end;
+        align-self: center;
     }
     
     .stats {
@@ -1026,7 +1039,6 @@ h1 {
     
     .saldo-display {
         flex-direction: row;
-        align-items: flex-end;
     }
     
     .stats {
@@ -1067,7 +1079,7 @@ h1 {
     }
     
     .saldo-display {
-        gap: 4px;
+        gap: 1px;
     }
     
     .currency {
