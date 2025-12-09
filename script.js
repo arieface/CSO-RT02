@@ -261,7 +261,7 @@ function updateTime() {
     const namaBulanSekarang = namaBulan[bulanIndex];
     
     // Format: Selasa, 10 Desember 2024 ~ 14:30:45 WIB
-    const timeString = `${namaHariSekarang}, ${hari} ${namaBulanSekarang} ${tahun} ⏱️ ${jam}:${menit}:${detik} WIB`;
+    const timeString = `${namaHariSekarang}, ${hari} ${namaBulanSekarang} ${tahun} | ${jam}:${menit}:${detik} WIB`;
     
     const waktuElement = document.getElementById('waktu');
     if (waktuElement) {
