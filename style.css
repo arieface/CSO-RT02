@@ -252,29 +252,30 @@ h1 {
     font-size: 1rem;
 }
 
-/* ==================== PERBAIKAN 1: Rp dan Saldo 1 baris ==================== */
+/* ==================== PERBAIKAN 1 & 2: Hapus Loading Bar & Perbaiki Alignment Rp ==================== */
 .saldo-display {
     display: flex;
-    align-items: baseline; /* Ini penting untuk sejajar */
+    align-items: baseline; /* Untuk alignment yang tepat */
     justify-content: center;
-    gap: 5px;
+    gap: 4px; /* Kurangi gap */
     margin-bottom: 12px;
     min-height: 50px;
-    flex-wrap: nowrap; /* Jangan wrap ke bawah */
-    white-space: nowrap; /* Jangan wrap teks */
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    position: relative;
 }
 
 .currency {
-    font-size: 1.6rem;
+    font-size: 1.8rem;
     font-weight: 700;
     color: #667eea;
     text-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
-    align-self: flex-start; /* Sejajarkan dengan bagian atas angka */
+    line-height: 1;
     margin-top: 0.2rem; /* Sesuaikan vertikal */
 }
 
 .amount {
-    font-size: 1.8rem;
+    font-size: 2rem;
     font-weight: 800;
     color: #1e293b;
     letter-spacing: -0.5px;
@@ -282,18 +283,19 @@ h1 {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     text-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-    word-break: keep-all; /* Jangan pecah kata */
+    word-break: keep-all;
     overflow: hidden;
     text-align: center;
-    position: relative;
     line-height: 1;
-    white-space: nowrap; /* Jangan wrap */
+    white-space: nowrap;
     max-width: 100%;
-    overflow-x: auto; /* Scroll horizontal jika perlu */
+    overflow-x: auto;
     overflow-y: hidden;
+    /* HAPUS efek loading bar/shimmer */
 }
 
-/* Efek kilau pada angka saldo */
+/* HAPUS shimmer effect yang menyebabkan loading bar */
+/*
 .amount::after {
     content: '';
     position: absolute;
@@ -322,6 +324,7 @@ h1 {
         transform: translateX(100%);
     }
 }
+*/
 
 .amount.error {
     font-size: 1.1rem;
@@ -330,7 +333,7 @@ h1 {
     -webkit-text-fill-color: #ef4444;
     font-weight: 600;
     animation: shake 0.5s ease;
-    white-space: normal; /* Untuk error boleh wrap */
+    white-space: normal;
 }
 
 .amount.empty {
@@ -339,7 +342,7 @@ h1 {
     background: none;
     -webkit-text-fill-color: #f59e0b;
     font-weight: 600;
-    white-space: normal; /* Untuk empty boleh wrap */
+    white-space: normal;
 }
 
 @keyframes shake {
@@ -448,7 +451,7 @@ h1 {
         0 0 15px rgba(255, 255, 255, 0.4);
 }
 
-/* ==================== PERBAIKAN 2 & 3: Stats Horizontal ==================== */
+/* ==================== PERBAIKAN 3: Stats align center untuk phone ==================== */
 .stats {
     display: flex;
     justify-content: space-around;
@@ -458,7 +461,7 @@ h1 {
     margin-bottom: 15px;
     backdrop-filter: blur(10px);
     border: 1px solid rgba(226, 232, 240, 0.5);
-    flex-wrap: nowrap; /* Jangan wrap ke bawah */
+    flex-wrap: nowrap;
 }
 
 .stat-item {
@@ -467,7 +470,7 @@ h1 {
     gap: 8px;
     min-width: auto;
     justify-content: center;
-    flex-direction: row; /* Pastikan horizontal */
+    flex-direction: row;
 }
 
 .stat-icon {
@@ -481,15 +484,15 @@ h1 {
     color: white;
     font-size: 0.9rem;
     box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
-    flex-shrink: 0; /* Jangan mengecil */
+    flex-shrink: 0;
 }
 
 .stat-info {
     display: flex;
     flex-direction: column;
-    align-items: flex-start; /* Rata kiri untuk 1 baris */
+    align-items: flex-start;
     text-align: left;
-    white-space: nowrap; /* Jangan wrap */
+    white-space: nowrap;
 }
 
 .stat-value {
@@ -509,10 +512,10 @@ h1 {
 
 .stat-divider {
     width: 1px;
-    height: 35px; /* Tinggi sesuai dengan stat-item */
+    height: 35px;
     background: rgba(203, 213, 224, 0.5);
     margin: 0 5px;
-    align-self: center; /* Tengah secara vertikal */
+    align-self: center;
 }
 
 .footer-3d {
@@ -633,7 +636,7 @@ h1 {
     }
 }
 
-/* ==================== RESPONSIVE DESIGN - FIXED FOR PHONE ==================== */
+/* ==================== RESPONSIVE DESIGN ==================== */
 
 /* Responsive Design - PHONE OPTIMIZATION */
 @media (max-width: 480px) {
@@ -723,32 +726,37 @@ h1 {
         margin-bottom: 10px;
     }
     
-    /* ==================== PERBAIKAN 1 UNTUK MOBILE ==================== */
+    /* ==================== PERBAIKAN 1 & 2 UNTUK MOBILE ==================== */
     .saldo-display {
-        flex-direction: row; /* Pastikan horizontal */
-        gap: 3px;
+        flex-direction: row;
+        gap: 2px; /* Lebih rapat */
         margin-bottom: 10px;
         min-height: 40px;
-        flex-wrap: nowrap;
+        align-items: center; /* Center vertikal */
         justify-content: center;
-        align-items: baseline;
     }
     
     .currency {
-        font-size: 1.4rem;
-        align-self: baseline;
+        font-size: 1.5rem;
         margin-top: 0;
+        align-self: center; /* Center dengan angka */
     }
     
     .amount {
-        font-size: 1.5rem;
+        font-size: 1.6rem;
         line-height: 1;
         padding: 0;
         white-space: nowrap;
         overflow-x: auto;
         overflow-y: hidden;
         text-overflow: ellipsis;
-        max-width: calc(100% - 40px); /* Ruang untuk "Rp" */
+        max-width: calc(100% - 35px); /* Ruang untuk "Rp" */
+        align-self: center; /* Center vertikal */
+    }
+    
+    /* HAPUS shimmer effect untuk mobile juga */
+    .amount::after {
+        display: none;
     }
     
     .amount.error,
@@ -775,40 +783,45 @@ h1 {
         padding: 0 5px;
     }
     
-    /* ==================== PERBAIKAN 2 & 3 UNTUK MOBILE ==================== */
+    /* ==================== PERBAIKAN 3: Stats align center untuk phone ==================== */
     .stats {
-        flex-direction: row; /* Tetap horizontal di mobile */
+        flex-direction: row;
         gap: 5px;
         padding: 10px;
         margin-bottom: 12px;
         border-radius: 12px;
-        justify-content: space-between; /* Sebar merata */
+        justify-content: space-between;
         flex-wrap: nowrap;
-        overflow-x: auto; /* Scroll jika terlalu kecil */
+        overflow-x: auto;
         overflow-y: hidden;
         -webkit-overflow-scrolling: touch;
+        align-items: center; /* TAMBAHAN: Center vertikal */
     }
     
     .stat-item {
-        flex-direction: row; /* Horizontal */
+        flex-direction: row;
         gap: 5px;
         min-width: auto;
-        justify-content: flex-start;
-        flex: 1; /* Sama rata */
+        justify-content: center; /* Center horizontal */
+        flex: 1;
         padding: 0 3px;
+        align-items: center; /* Center vertikal di dalam item */
     }
     
     .stat-icon {
-        width: 28px;
-        height: 28px;
+        width: 30px;
+        height: 30px;
         font-size: 0.8rem;
         flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     
     .stat-info {
         flex-direction: column;
-        align-items: flex-start;
-        text-align: left;
+        align-items: center; /* PERUBAHAN: Center untuk phone */
+        text-align: center; /* PERUBAHAN: Center untuk phone */
         white-space: nowrap;
         overflow: hidden;
     }
@@ -816,18 +829,21 @@ h1 {
     .stat-value {
         font-size: 0.95rem;
         line-height: 1.1;
+        text-align: center; /* Center teks */
     }
     
     .stat-label {
         font-size: 0.7rem;
         line-height: 1;
         margin-top: 1px;
+        text-align: center; /* Center teks */
     }
     
     .stat-divider {
         width: 1px;
         height: 25px;
         margin: 0 3px;
+        align-self: center;
     }
     
     .footer-3d {
@@ -872,7 +888,6 @@ h1 {
     .signal-bar:nth-child(3) { height: 7px; }
     .signal-bar:nth-child(4) { height: 9px; }
     
-    /* Perbaikan khusus untuk teks waktu yang panjang */
     .time-display {
         word-break: break-word;
         overflow-wrap: break-word;
@@ -912,12 +927,35 @@ h1 {
         padding: 20px;
     }
     
+    /* Perbaikan alignment untuk tablet */
+    .saldo-display {
+        align-items: center;
+    }
+    
+    .currency {
+        align-self: center;
+    }
+    
     .amount {
-        font-size: 2rem;
+        align-self: center;
+    }
+    
+    .amount::after {
+        display: none; /* Juga hapus untuk tablet */
     }
     
     .stats {
         padding: 12px;
+        align-items: center; /* Center untuk tablet juga */
+    }
+    
+    .stat-item {
+        justify-content: center;
+    }
+    
+    .stat-info {
+        align-items: center;
+        text-align: center;
     }
 }
 
@@ -933,12 +971,35 @@ h1 {
         padding: 25px;
     }
     
+    /* Perbaikan alignment untuk desktop tablet */
+    .saldo-display {
+        align-items: center;
+    }
+    
+    .currency {
+        align-self: center;
+    }
+    
     .amount {
-        font-size: 2.2rem;
+        align-self: center;
+    }
+    
+    .amount::after {
+        display: none; /* Juga hapus untuk desktop tablet */
     }
     
     .stats {
         padding: 15px;
+        align-items: center;
+    }
+    
+    .stat-item {
+        justify-content: center;
+    }
+    
+    .stat-info {
+        align-items: center;
+        text-align: center;
     }
 }
 
@@ -946,6 +1007,36 @@ h1 {
 @media (min-width: 1025px) {
     .app-container {
         max-width: 500px;
+    }
+    
+    /* Perbaikan alignment untuk desktop */
+    .saldo-display {
+        align-items: center;
+    }
+    
+    .currency {
+        align-self: center;
+    }
+    
+    .amount {
+        align-self: center;
+    }
+    
+    .amount::after {
+        display: none; /* Juga hapus untuk desktop */
+    }
+    
+    .stats {
+        align-items: center;
+    }
+    
+    .stat-item {
+        justify-content: center;
+    }
+    
+    .stat-info {
+        align-items: center;
+        text-align: center;
     }
 }
 
@@ -966,20 +1057,30 @@ h1 {
         overflow-y: auto;
     }
     
+    .saldo-display {
+        flex-direction: row;
+    }
+    
     .stats {
         flex-direction: row;
         gap: 8px;
         padding: 8px;
+        align-items: center;
+    }
+    
+    .stat-item {
+        justify-content: center;
+    }
+    
+    .stat-info {
+        align-items: center;
+        text-align: center;
     }
     
     .stat-divider {
         width: 1px;
         height: 25px;
         margin: 0 4px;
-    }
-    
-    .saldo-display {
-        flex-direction: row;
     }
     
     .time-display {
@@ -997,17 +1098,16 @@ h1 {
         font-size: 1.1rem;
     }
     
-    /* Perbaikan untuk layar sangat kecil */
     .saldo-display {
-        gap: 2px;
+        gap: 1px;
     }
     
     .currency {
-        font-size: 1.2rem;
+        font-size: 1.3rem;
     }
     
     .amount {
-        font-size: 1.3rem;
+        font-size: 1.4rem;
     }
     
     .time-display {
@@ -1024,8 +1124,8 @@ h1 {
     }
     
     .stat-icon {
-        width: 24px;
-        height: 24px;
+        width: 25px;
+        height: 25px;
         font-size: 0.7rem;
     }
     
