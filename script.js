@@ -221,7 +221,7 @@ function updateConnectionStatus(status) {
             signalElement.classList.add('offline');
             signalText.textContent = 'Error';
             // PERBAIKAN: Ganti teks error
-            statusElement.innerHTML = '<i class="fas fa-circle" style="color:#ef4444"></i> <span>Offline • Coba lagi nanti</span>';
+            statusElement.innerHTML = '<i class="fas fa-circle" style="color:#ef4444"></i> <span>Offline • Menyambungkan ke server</span>';
             statusElement.classList.add('offline');
             break;
     }
