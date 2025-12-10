@@ -2,77 +2,34 @@
 // GANTI DENGAN LINK PUBLIKASI GOOGLE SHEETS ANDA
 const DATABASE_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbLFk69seIMkTsx5xGSLyOHM4Iou1uTQMNNpTnwSoWX5Yu2JBgs71Lbd9OH2Xdgq6GKR0_OiTo9shV/pub?gid=236846195&range=A100:A100&single=true&output=csv";
 
-// ==================== TEMA WARNA ====================
-const THEMES = {
-    red: {
-        name: 'Red Theme',
-        gradientStart: '#dc2626',
-        gradientEnd: '#991b1b',
-        primary: '#dc2626',
-        primaryLight: 'rgba(220, 38, 38, 0.3)',
-        shimmerMid: '#fca5a5',
-        iconShadow: 'rgba(220, 38, 38, 0.3)'
-    },
-    orange: {
-        name: 'Orange Theme',
-        gradientStart: '#f97316',
-        gradientEnd: '#ea580c',
-        primary: '#f97316',
-        primaryLight: 'rgba(249, 115, 22, 0.3)',
-        shimmerMid: '#fdba74',
-        iconShadow: 'rgba(249, 115, 22, 0.3)'
-    },
-    teal: {
-        name: 'Teal Theme',
-        gradientStart: '#14b8a6',
-        gradientEnd: '#0d9488',
-        primary: '#14b8a6',
-        primaryLight: 'rgba(20, 184, 166, 0.3)',
-        shimmerMid: '#5eead4',
-        iconShadow: 'rgba(20, 184, 166, 0.3)'
-    }
-};
-
 // ==================== VARIABEL GLOBAL ====================
 let isRefreshing = false;
 let retryCount = 0;
 const MAX_RETRIES = 3;
 let lastSuccessfulFetch = null;
 let isOnline = navigator.onLine;
-let currentTheme = 'teal';
 
-// ==================== FUNGSI TEMA ====================
-function applyTheme(themeName) {
-    const theme = THEMES[themeName];
-    if (!theme) return;
+// ==================== FUNGSI TEMA (BARU) ====================
+/**
+ * Menerapkan kelas tema pada <body> berdasarkan nilai saldo.
+ * @param {number} saldoValue - Nilai saldo numerik.
+ */
+function applyThemeBasedOnSaldo(saldoValue) {
+    const body = document.body;
     
-    const root = document.documentElement;
-    root.style.setProperty('--theme-gradient-start', theme.gradientStart);
-    root.style.setProperty('--theme-gradient-end', theme.gradientEnd);
-    root.style.setProperty('--theme-primary', theme.primary);
-    root.style.setProperty('--theme-primary-light', theme.primaryLight);
-    root.style.setProperty('--theme-shimmer-mid', theme.shimmerMid);
-    root.style.setProperty('--theme-icon-shadow', theme.iconShadow);
+    // Hapus semua kelas tema yang ada untuk menghindari konflik
+    body.classList.remove('red-theme', 'orange-theme', 'teal-theme');
     
-    currentTheme = themeName;
-    
-    // Update theme badge
-    const themeBadge = document.getElementById('theme-indicator');
-    if (themeBadge) {
-        themeBadge.textContent = theme.name;
-        themeBadge.style.color = theme.primary;
-    }
-    
-    console.log(`🎨 Tema berubah ke: ${theme.name}`);
-}
-
-function determineTheme(saldoValue) {
+    // Terapkan tema berdasarkan nilai saldo
     if (saldoValue < 500000) {
-        return 'red';
+        body.classList.add('red-theme');
+        console.log("🔴 Tema Merah Diterapkan (Saldo < 500.000)");
     } else if (saldoValue >= 500000 && saldoValue < 1000000) {
-        return 'orange';
-    } else {
-        return 'teal';
+        body.classList.add('orange-theme');
+        console.log("🟠 Tema Oranye Diterapkan (Saldo 500.000 - 999.999)");
+    } else { // saldo >= 1.000.000
+        body.classList.add('teal-theme');
+        console.log("🟢 Tema Teal Diterapkan (Saldo >= 1.000.000)");
     }
 }
 
@@ -113,12 +70,6 @@ async function fetchSaldo() {
         
         // Process data
         const processedData = processSaldoData(text);
-        
-        // ✨ APPLY THEME BERDASARKAN SALDO
-        const newTheme = determineTheme(processedData.numeric);
-        if (newTheme !== currentTheme) {
-            applyTheme(newTheme);
-        }
         
         // Update display
         updateSaldoDisplay(processedData);
@@ -212,16 +163,20 @@ function processSaldoData(rawData) {
     };
 }
 
-// ==================== FUNGSI UI ====================
+// ==================== FUNGSI UI (DIMODIFIKASI) ====================
 function updateSaldoDisplay(data) {
     const saldoElement = document.getElementById('saldo');
     if (!saldoElement) return;
     
-    // Hapus semua class
+    // Hapus semua class kecuali 'amount'
     saldoElement.className = 'amount';
     
     // Update teks
     saldoElement.textContent = data.formatted;
+    
+    // !!! PEMANGGILAN FUNGSI TEMA (BARU) !!!
+    // Terapkan tema berdasarkan nilai saldo numerik
+    applyThemeBasedOnSaldo(data.numeric);
     
     // Efek update halus
     saldoElement.style.opacity = '0.8';
@@ -302,7 +257,6 @@ function showError(message) {
     const saldoElement = document.getElementById('saldo');
     if (!saldoElement) return;
     
-    // Ganti "Gagal" dengan "Coba" dan "Error" dengan "Offline"
     let displayMessage = message;
     
     if (message.includes('Gagal')) {
@@ -327,21 +281,17 @@ function updateTime() {
     const now = new Date();
     const gmt7Time = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Jakarta"}));
 
-    // Format hari
     const hari = gmt7Time.getDate();
     const bulanIndex = gmt7Time.getMonth();
     const tahun = gmt7Time.getFullYear();
     
-    // Format waktu
     const jam = String(gmt7Time.getHours()).padStart(2, '0');
     const menit = String(gmt7Time.getMinutes()).padStart(2, '0');
     const detik = String(gmt7Time.getSeconds()).padStart(2, '0');
     
-    // Nama hari dalam bahasa Indonesia
     const namaHari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
     const namaHariSekarang = namaHari[gmt7Time.getDay()];
     
-    // Nama bulan dalam bahasa Indonesia
     const namaBulan = [
         "Januari", "Februari", "Maret", "April", 
         "Mei", "Juni", "Juli", "Agustus", 
@@ -349,7 +299,6 @@ function updateTime() {
     ];
     const namaBulanSekarang = namaBulan[bulanIndex];
     
-    // Format: Selasa, 10 Desember 2024 ~ 14:30:45 WIB
     const timeString = `${namaHariSekarang}, ${hari} ${namaBulanSekarang} ${tahun} • ${jam}:${menit}:${detik} WIB`;
     
     const waktuElement = document.getElementById('waktu');
@@ -364,7 +313,6 @@ function checkConnection() {
     
     if (isOnline) {
         updateConnectionStatus('online');
-        // Jika baru online, fetch data
         if (!lastSuccessfulFetch || (Date.now() - lastSuccessfulFetch) > 300000) {
             fetchSaldo();
         }
@@ -378,44 +326,46 @@ function checkConnection() {
 document.addEventListener('DOMContentLoaded', function() {
     console.log("🚀 Aplikasi Kas RT02-RW18 dimulai...");
     
-    // Set tema default
-    applyTheme('teal');
+    updateStatsDisplay();
     
-    // Cek koneksi awal
     checkConnection();
     
-    // Setup event listeners untuk koneksi
     window.addEventListener('online', checkConnection);
     window.addEventListener('offline', checkConnection);
     
-    // Fetch data pertama
     setTimeout(fetchSaldo, 500);
     
-    // Update waktu setiap detik
     updateTime();
     setInterval(updateTime, 1000);
     
-    // Auto-refresh setiap 5 menit
     setInterval(() => {
         if (isOnline) {
             fetchSaldo();
         }
     }, 300000);
     
-    // Cek koneksi secara berkala
     setInterval(checkConnection, 30000);
 });
+
+// ==================== FUNGSI TAMBAHAN ====================
+function updateStatsDisplay() {
+    const statItems = document.querySelectorAll('.stat-item');
+    if (statItems.length >= 2) {
+        const timeStat = statItems[1];
+        const statValue = timeStat.querySelector('.stat-value');
+        const statLabel = timeStat.querySelector('.stat-label');
+        
+        if (statValue && statLabel) {
+            statValue.textContent = '24 Jam';
+            statLabel.textContent = 'Akses';
+        }
+    }
+}
 
 // ==================== FUNGSI DEBUG (untuk console) ====================
 window.debugFetch = function() {
     console.log("🔧 Debug: Manual fetch");
     fetchSaldo();
-};
-
-window.testTheme = function(saldo) {
-    console.log("🎨 Testing theme with saldo:", saldo);
-    const theme = determineTheme(saldo);
-    applyTheme(theme);
 };
 
 window.debugCheckData = function() {
@@ -424,23 +374,41 @@ window.debugCheckData = function() {
     console.log("Retry Count:", retryCount);
     console.log("Last Fetch:", lastSuccessfulFetch);
     console.log("Is Online:", isOnline);
-    console.log("Current Theme:", currentTheme);
     console.log("Database URL:", DATABASE_URL);
 };
 
-// Fungsi untuk testing tema
-window.testAllThemes = function() {
-    console.log("🎨 Testing all themes...");
-    console.log("Red Theme (< 500k):");
-    testTheme(300000);
+window.manualUpdateTime = function() {
+    console.log("🔧 Debug: Manual update time");
+    updateTime();
+};
+
+window.testError = function(type) {
+    const saldoElement = document.getElementById('saldo');
+    if (!saldoElement) return;
     
-    setTimeout(() => {
-        console.log("Orange Theme (500k - 1jt):");
-        testTheme(750000);
-    }, 2000);
-    
-    setTimeout(() => {
-        console.log("Teal Theme (> 1jt):");
-        testTheme(1500000);
-    }, 4000);
+    switch(type) {
+        case 'offline':
+            showError('Offline - cek koneksi internet');
+            updateConnectionStatus('offline');
+            break;
+        case 'timeout':
+            showError('Coba lagi - server lambat');
+            updateConnectionStatus('timeout');
+            break;
+        case 'error':
+            showError('Offline • mencoba menghubungkan');
+            updateConnectionStatus('error');
+            break;
+        case 'loading':
+            showLoadingState();
+            break;
+        case 'success':
+            updateSaldoDisplay({
+                raw: "Rp 15.000.000",
+                numeric: 15000000,
+                formatted: "15.000.000"
+            });
+            updateConnectionStatus('online');
+            break;
+    }
 };
