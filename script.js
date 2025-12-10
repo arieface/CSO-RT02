@@ -2,12 +2,79 @@
 // GANTI DENGAN LINK PUBLIKASI GOOGLE SHEETS ANDA
 const DATABASE_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbLFk69seIMkTsx5xGSLyOHM4Iou1uTQMNNpTnwSoWX5Yu2JBgs71Lbd9OH2Xdgq6GKR0_OiTo9shV/pub?gid=236846195&range=A100:A100&single=true&output=csv";
 
+// ==================== TEMA WARNA ====================
+const THEMES = {
+    red: {
+        name: 'Red Theme',
+        gradientStart: '#dc2626',
+        gradientEnd: '#991b1b',
+        primary: '#dc2626',
+        primaryLight: 'rgba(220, 38, 38, 0.3)',
+        shimmerMid: '#fca5a5',
+        iconShadow: 'rgba(220, 38, 38, 0.3)'
+    },
+    orange: {
+        name: 'Orange Theme',
+        gradientStart: '#f97316',
+        gradientEnd: '#ea580c',
+        primary: '#f97316',
+        primaryLight: 'rgba(249, 115, 22, 0.3)',
+        shimmerMid: '#fdba74',
+        iconShadow: 'rgba(249, 115, 22, 0.3)'
+    },
+    teal: {
+        name: 'Teal Theme',
+        gradientStart: '#14b8a6',
+        gradientEnd: '#0d9488',
+        primary: '#14b8a6',
+        primaryLight: 'rgba(20, 184, 166, 0.3)',
+        shimmerMid: '#5eead4',
+        iconShadow: 'rgba(20, 184, 166, 0.3)'
+    }
+};
+
 // ==================== VARIABEL GLOBAL ====================
 let isRefreshing = false;
 let retryCount = 0;
 const MAX_RETRIES = 3;
 let lastSuccessfulFetch = null;
 let isOnline = navigator.onLine;
+let currentTheme = 'teal';
+
+// ==================== FUNGSI TEMA ====================
+function applyTheme(themeName) {
+    const theme = THEMES[themeName];
+    if (!theme) return;
+    
+    const root = document.documentElement;
+    root.style.setProperty('--theme-gradient-start', theme.gradientStart);
+    root.style.setProperty('--theme-gradient-end', theme.gradientEnd);
+    root.style.setProperty('--theme-primary', theme.primary);
+    root.style.setProperty('--theme-primary-light', theme.primaryLight);
+    root.style.setProperty('--theme-shimmer-mid', theme.shimmerMid);
+    root.style.setProperty('--theme-icon-shadow', theme.iconShadow);
+    
+    currentTheme = themeName;
+    
+    // Update theme badge
+    const themeBadge = document.getElementById('theme-indicator');
+    if (themeBadge) {
+        themeBadge.textContent = theme.name;
+        themeBadge.style.color = theme.primary;
+    }
+    
+    console.log(`🎨 Tema berubah ke: ${theme.name}`);
+}
+
+function determineTheme(saldoValue) {
+    if (saldoValue < 500000) {
+        return 'red';
+    } else if (saldoValue >= 500000 && saldoValue < 1000000) {
+        return 'orange';
+    } else {
+        return 'teal';
+    }
+}
 
 // ==================== FUNGSI UTAMA ====================
 async function fetchSaldo() {
@@ -46,6 +113,12 @@ async function fetchSaldo() {
         
         // Process data
         const processedData = processSaldoData(text);
+        
+        // ✨ APPLY THEME BERDASARKAN SALDO
+        const newTheme = determineTheme(processedData.numeric);
+        if (newTheme !== currentTheme) {
+            applyTheme(newTheme);
+        }
         
         // Update display
         updateSaldoDisplay(processedData);
@@ -156,31 +229,8 @@ function updateSaldoDisplay(data) {
         saldoElement.style.opacity = '1';
     }, 300);
     
-    // Update tema warna berdasarkan saldo
-    updateThemeBySaldo(data.numeric);
-    
     // Update waktu
     updateTime();
-}
-
-// Fungsi untuk mengubah tema warna berdasarkan saldo
-function updateThemeBySaldo(saldo) {
-    const body = document.body;
-    
-    // Hapus semua class tema
-    body.classList.remove('low-balance', 'medium-balance', 'high-balance');
-    
-    // Tambahkan class tema sesuai dengan nilai saldo
-    if (saldo < 500000) {
-        body.classList.add('low-balance');
-        console.log('Tema: Saldo Rendah (Merah dan Hitam)');
-    } else if (saldo >= 500000 && saldo < 1000000) {
-        body.classList.add('medium-balance');
-        console.log('Tema: Saldo Sedang (Merah dan Orange)');
-    } else {
-        body.classList.add('high-balance');
-        console.log('Tema: Saldo Tinggi (Hijau Tosca dan Biru Turki)');
-    }
 }
 
 function showLoadingState() {
@@ -201,7 +251,6 @@ function showLoadingState() {
     }
 }
 
-// PERBAIKAN: Update connection status text
 function updateConnectionStatus(status) {
     const signalElement = document.getElementById('connection-signal');
     const signalText = document.getElementById('signal-text');
@@ -243,14 +292,12 @@ function updateConnectionStatus(status) {
         case 'error':
             signalElement.classList.add('offline');
             signalText.textContent = 'Error';
-            // PERBAIKAN: Ganti teks error
             statusElement.innerHTML = '<i class="fas fa-circle" style="color:#ef4444"></i> <span>Offline • Menyambungkan...</span>';
             statusElement.classList.add('offline');
             break;
     }
 }
 
-// PERBAIKAN: Ganti teks error
 function showError(message) {
     const saldoElement = document.getElementById('saldo');
     if (!saldoElement) return;
@@ -331,8 +378,8 @@ function checkConnection() {
 document.addEventListener('DOMContentLoaded', function() {
     console.log("🚀 Aplikasi Kas RT02-RW18 dimulai...");
     
-    // Update stat "24 Jam Online" (PERBAIKAN 5)
-    updateStatsDisplay();
+    // Set tema default
+    applyTheme('teal');
     
     // Cek koneksi awal
     checkConnection();
@@ -359,26 +406,16 @@ document.addEventListener('DOMContentLoaded', function() {
     setInterval(checkConnection, 30000);
 });
 
-// ==================== FUNGSI TAMBAHAN ====================
-function updateStatsDisplay() {
-    // PERBAIKAN 5: Update stat "24 Jam Online"
-    const statItems = document.querySelectorAll('.stat-item');
-    if (statItems.length >= 2) {
-        const timeStat = statItems[1];
-        const statValue = timeStat.querySelector('.stat-value');
-        const statLabel = timeStat.querySelector('.stat-label');
-        
-        if (statValue && statLabel) {
-            statValue.textContent = '24 Jam';
-            statLabel.textContent = 'Akses';
-        }
-    }
-}
-
 // ==================== FUNGSI DEBUG (untuk console) ====================
 window.debugFetch = function() {
     console.log("🔧 Debug: Manual fetch");
     fetchSaldo();
+};
+
+window.testTheme = function(saldo) {
+    console.log("🎨 Testing theme with saldo:", saldo);
+    const theme = determineTheme(saldo);
+    applyTheme(theme);
 };
 
 window.debugCheckData = function() {
@@ -387,48 +424,23 @@ window.debugCheckData = function() {
     console.log("Retry Count:", retryCount);
     console.log("Last Fetch:", lastSuccessfulFetch);
     console.log("Is Online:", isOnline);
+    console.log("Current Theme:", currentTheme);
     console.log("Database URL:", DATABASE_URL);
 };
 
-window.manualUpdateTime = function() {
-    console.log("🔧 Debug: Manual update time");
-    updateTime();
-};
-
-// Fungsi untuk testing error messages
-window.testError = function(type) {
-    const saldoElement = document.getElementById('saldo');
-    if (!saldoElement) return;
+// Fungsi untuk testing tema
+window.testAllThemes = function() {
+    console.log("🎨 Testing all themes...");
+    console.log("Red Theme (< 500k):");
+    testTheme(300000);
     
-    switch(type) {
-        case 'offline':
-            showError('Offline - cek koneksi internet');
-            updateConnectionStatus('offline');
-            break;
-        case 'timeout':
-            showError('Coba lagi - server lambat');
-            updateConnectionStatus('timeout');
-            break;
-        case 'error':
-            showError('Offline • mencoba menghubungkan');
-            updateConnectionStatus('error');
-            break;
-        case 'loading':
-            showLoadingState();
-            break;
-        case 'success':
-            updateSaldoDisplay({
-                raw: "Rp 15.000.000",
-                numeric: 15000000,
-                formatted: "15,000.000"
-            });
-            updateConnectionStatus('online');
-            break;
-    }
-};
-
-// Fungsi untuk testing tema warna
-window.testTheme = function(saldo) {
-    updateThemeBySaldo(saldo);
-    console.log(`Tema diubah untuk saldo: Rp ${saldo.toLocaleString('id-ID')}`);
+    setTimeout(() => {
+        console.log("Orange Theme (500k - 1jt):");
+        testTheme(750000);
+    }, 2000);
+    
+    setTimeout(() => {
+        console.log("Teal Theme (> 1jt):");
+        testTheme(1500000);
+    }, 4000);
 };
