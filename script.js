@@ -26,7 +26,33 @@ function updateThemeBasedOnSaldo(saldo) {
     // Hanya ubah theme jika berbeda
     if (newTheme !== currentTheme) {
         currentTheme = newTheme;
+        
+        // Tambahkan transisi halus untuk perubahan tema
+        document.body.style.transition = 'background 0.8s ease-in-out';
+        
+        // Terapkan tema baru
         document.body.setAttribute('data-theme', currentTheme);
+        
+        // Efek transisi untuk elemen-elemen penting
+        const elementsToTransition = [
+            document.querySelector('.card-3d'),
+            document.querySelector('.info-card-3d'),
+            document.querySelector('.stat-icon'),
+            document.querySelector('.card-label i'),
+            document.querySelector('.currency')
+        ];
+        
+        elementsToTransition.forEach(el => {
+            if (el) {
+                el.style.transition = 'all 0.8s ease-in-out';
+                // Efek visual kecil untuk menandakan perubahan
+                el.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    el.style.transform = 'scale(1)';
+                }, 400);
+            }
+        });
+        
         console.log(`🎨 Theme berubah ke: ${currentTheme} (Saldo: ${saldo})`);
     }
 }
@@ -334,7 +360,8 @@ function checkConnection() {
 document.addEventListener('DOMContentLoaded', function() {
     console.log("🚀 Aplikasi Kas RT02-RW18 dimulai...");
     
-    // Set theme default
+    // Set theme default dengan transisi halus
+    document.body.style.transition = 'background 0.8s ease-in-out';
     document.body.setAttribute('data-theme', 'default');
     
     // Update stat "24 Jam Online"
