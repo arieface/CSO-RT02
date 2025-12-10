@@ -142,10 +142,11 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
-    justify-content: flex-start;
-    flex: 1;
+    justify-content: flex-start; /* Align kiri */
+    flex: 1; /* Ambil ruang yang tersedia */
 }
 
+/* Ganti icon dengan bank (university) */
 .logo i {
     font-size: 2rem;
     color: #667eea;
@@ -160,9 +161,10 @@ h1 {
     font-size: 1.5rem;
     font-weight: 700;
     letter-spacing: -0.3px;
-    text-align: left;
+    text-align: left; /* Align kiri */
 }
 
+/* Ganti badge dengan connection signal */
 .connection-signal {
     display: flex;
     align-items: center;
@@ -175,7 +177,7 @@ h1 {
     color: #475569;
     border: 1px solid rgba(226, 232, 240, 0.8);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    margin-left: 10px;
+    margin-left: 10px; /* Spacing dari logo */
 }
 
 .signal-bars {
@@ -261,7 +263,7 @@ h1 {
     display: flex;
     align-items: baseline;
     justify-content: center;
-    gap: 8px;
+    gap: 8px; /* Ditambah dari 4px ke 8px */
     margin-bottom: 12px;
     min-height: 50px;
     flex-wrap: nowrap;
@@ -277,7 +279,7 @@ h1 {
     line-height: 1;
 }
 
-/* VERSI LASER SUPER TIPIS DENGAN EFEK PULSE */
+/* ==== REVISI: Efek kilau angka saldo dari kiri ke kanan ==== */
 .amount {
     font-size: 2rem;
     font-weight: 800;
@@ -292,84 +294,42 @@ h1 {
     overflow-x: auto;
     overflow-y: hidden;
     position: relative;
-    /* LASER SUPER TIPIS (hanya 0.2%) */
-background: linear-gradient(
-    90deg,
-    #667eea 0%,           /* WARNA DASAR: abu-abu gelap */
-    #1e293b 49.9%,        /* BATAS AWAL: 49.9% - area sebelum laser */
-    rgba(255, 255, 255, 1) 50%,  /* LASER INTI: 50% - warna putih solid */
-    #1e293b 50.25%,        /* BATAS AKHIR: 50.1% - area setelah laser */
-    #667eea 100%          /* WARNA DASAR: abu-abu gelap */
-);
-    background-size: 150% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    /* ANIMASI DENGAN EFEK BERDENYUT */
-    animation: laser-super-thin-pulse 8s infinite ease-in-out;
-}
-
-/* EFEK GLOW UNTUK LASER SUPER TIPIS */
-.amount::after {
-    content: attr(data-content);
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    /* GLOW YANG LEBIH TIPIS */
+    /* Gradient dasar + kilau */
     background: linear-gradient(
         90deg,
-        transparent 0%,
-        transparent 49.95%,
-        rgba(255, 255, 255, 0.5) 50%,
-        transparent 50.05%,
-        transparent 100%
+        #1e293b 0%,
+        #475569 40%,
+        #a5b4fc 50%, /* puncak kilau */
+        #475569 60%,
+        #1e293b 100%
     );
-    background-size: 150% 100%;
+    background-size: 200% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: laser-super-thin-pulse 8s infinite ease-in-out;
-    z-index: 1;
-    pointer-events: none;
-    opacity: 0.7;
+    /* Animasi benar-benar dari kiri ke kanan */
+    animation: shimmer-left-to-right 3s infinite linear;
 }
 
-/* ANIMASI LASER SUPER TIPIS DENGAN PULSE */
-@keyframes laser-super-thin-pulse {
+/* REVISI UTAMA: kilau bergerak dari kiri ke kanan */
+@keyframes shimmer-left-to-right {
     0% {
-        background-position: 150% 0;
-        opacity: 0.9;
-    }
-    20% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.95;
-    }
-    80% {
-        opacity: 1;
+        background-position: 0% 0;    /* start di kiri */
     }
     100% {
-        background-position: -50% 0;
-        opacity: 0.9;
+        background-position: 200% 0;  /* geser ke kanan */
     }
 }
 
 /* PERBAIKAN 3: Ganti warna error menjadi orange untuk "Coba" */
 .amount.error {
     font-size: 1.1rem;
-    color: #f97316;
+    color: #f97316; /* Orange untuk "Coba" */
     background: none;
     -webkit-text-fill-color: #f97316;
     font-weight: 600;
     animation: shake 0.5s ease;
     white-space: normal;
-}
-
-.amount.error::after {
-    display: none;
 }
 
 .amount.empty {
@@ -379,10 +339,6 @@ background: linear-gradient(
     -webkit-text-fill-color: #f59e0b;
     font-weight: 600;
     white-space: normal;
-}
-
-.amount.empty::after {
-    display: none;
 }
 
 @keyframes shake {
@@ -569,12 +525,13 @@ background: linear-gradient(
 .footer-3d p {
     margin-bottom: 10px;
     display: flex;
-    align-items: center;
+    align-items: center; /* Icon sejajar dengan teks */
     justify-content: center;
     gap: 6px;
     font-size: 0.8rem;
 }
 
+/* PERBAIKAN 2: Icon di footer sejajar vertikal */
 .footer-3d p i {
     font-size: 0.9rem;
     vertical-align: middle;
@@ -649,6 +606,7 @@ background: linear-gradient(
     color: #10b981;
 }
 
+/* PERBAIKAN 3: Ganti error menjadi offline */
 .connection-status.offline i {
     color: #ef4444;
     animation: blink 1s infinite;
@@ -704,6 +662,7 @@ background: linear-gradient(
 @media (max-width: 480px) {
     body {
         padding: 15px 10px;
+        /* PERBAIKAN 2: Posisi Y axis untuk center di phone */
         justify-content: center;
         align-items: center;
         min-height: 100vh;
@@ -745,6 +704,7 @@ background: linear-gradient(
         border-radius: 20px;
     }
     
+    /* PERBAIKAN 1: Header mobile */
     .card-header {
         flex-direction: column;
         gap: 12px;
@@ -754,7 +714,7 @@ background: linear-gradient(
     }
     
     .logo {
-        justify-content: center;
+        justify-content: center; /* Center di mobile */
         width: 100%;
         flex-direction: row;
         gap: 10px;
@@ -762,7 +722,7 @@ background: linear-gradient(
     
     h1 {
         font-size: 1.2rem;
-        text-align: center;
+        text-align: center; /* Center di mobile */
         line-height: 1.3;
     }
     
@@ -775,33 +735,35 @@ background: linear-gradient(
         padding: 5px 10px;
         margin-top: 5px;
         width: auto;
-        margin-left: 0;
+        margin-left: 0; /* Reset untuk mobile */
     }
     
+    /* PERBAIKAN: Info card dan saldo display di tengah */
     .info-card-3d {
         padding: 15px;
         margin-bottom: 12px;
         border-radius: 15px;
         display: flex;
         flex-direction: column;
-        align-items: center;
+        align-items: center; /* Center semua konten */
         text-align: center;
     }
     
     .card-label {
         font-size: 0.85rem;
         margin-bottom: 10px;
-        justify-content: center;
+        justify-content: center; /* Center icon dan label */
         width: 100%;
     }
     
+    /* PERBAIKAN: Saldo display di tengah */
     .saldo-display {
         flex-direction: row;
         gap: 6px;
         margin-bottom: 10px;
         min-height: 40px;
         align-items: center;
-        justify-content: center;
+        justify-content: center; /* Center horizontal */
         width: 100%;
     }
     
@@ -810,7 +772,6 @@ background: linear-gradient(
         align-self: center;
     }
     
-    /* LASER SUPER TIPIS UNTUK MOBILE */
     .amount {
         font-size: 1.6rem;
         line-height: 1;
@@ -821,46 +782,7 @@ background: linear-gradient(
         text-overflow: ellipsis;
         max-width: calc(100% - 40px);
         align-self: center;
-        text-align: center;
-        /* Laser super tipis untuk mobile */
-        background: linear-gradient(
-            90deg,
-            #1e293b 0%,
-            #1e293b 49.9%,
-            rgba(255, 255, 255, 1) 50%,
-            #1e293b 50.1%,
-            #1e293b 100%
-        );
-        background-size: 120% 100%;
-        -webkit-background-clip: text;
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
-        animation: laser-super-thin-mobile 10s infinite ease-in-out;
-    }
-    
-    /* Sembunyikan efek ::after di mobile */
-    .amount::after {
-        display: none;
-    }
-    
-    @keyframes laser-super-thin-mobile {
-        0% {
-            background-position: 120% 0;
-            opacity: 0.9;
-        }
-        20% {
-            opacity: 1;
-        }
-        50% {
-            opacity: 0.95;
-        }
-        80% {
-            opacity: 1;
-        }
-        100% {
-            background-position: -20% 0;
-            opacity: 0.9;
-        }
+        text-align: center; /* Center text */
     }
     
     .amount.error {
@@ -875,6 +797,7 @@ background: linear-gradient(
         text-align: center;
     }
     
+    /* PERBAIKAN: Connection status di tengah */
     .connection-status {
         font-size: 0.7rem;
         flex-direction: row;
@@ -893,13 +816,13 @@ background: linear-gradient(
         border-radius: 15px;
         display: flex;
         flex-direction: column;
-        align-items: center;
+        align-items: center; /* Center konten */
     }
     
     .time-label {
         font-size: 0.8rem;
         margin-bottom: 6px;
-        justify-content: center;
+        justify-content: center; /* Center icon dan label */
         width: 100%;
     }
     
@@ -911,12 +834,15 @@ background: linear-gradient(
         text-align: center;
     }
     
-    /* STATS LAYOUT GRID UNTUK MOBILE */
+    /* =============== REVISI UTAMA UNTUK STATS DI PHONE VIEW =============== */
+    /* Menggunakan CSS Grid untuk memisahkan icon dan deskripsi menjadi 2 baris */
     .stats {
         display: grid;
+        /* 3 kolom dengan lebar sama */
         grid-template-columns: repeat(3, 1fr);
+        /* 2 baris otomatis */
         grid-template-rows: auto auto;
-        gap: 8px 15px;
+        gap: 8px 15px; /* Jarak vertikal 8px, horizontal 15px */
         padding: 15px;
         margin-bottom: 12px;
         border-radius: 12px;
@@ -924,27 +850,31 @@ background: linear-gradient(
         box-sizing: border-box;
     }
     
+    /* Menghilangkan container .stat-item dari layout grid */
     .stat-item {
         display: contents; 
     }
     
+    /* Menempatkan semua icon di baris pertama (grid-row: 1) */
     .stat-icon {
         grid-row: 1;
-        justify-self: center;
+        justify-self: center; /* Center icon di dalam kolomnya */
         align-self: center;
         width: 40px;
         height: 40px;
         font-size: 1rem;
     }
     
+    /* Menempatkan semua info (deskripsi) di baris kedua (grid-row: 2) */
     .stat-info {
         grid-row: 2;
-        text-align: center;
+        text-align: center; /* Center teks di dalam kolomnya */
         align-items: center;
         justify-content: center;
-        white-space: normal;
+        white-space: normal; /* Biarkan text wrap jika perlu */
     }
     
+    /* Hapus divider karena tidak relevan dengan layout grid */
     .stat-divider {
         display: none;
     }
@@ -963,7 +893,9 @@ background: linear-gradient(
         margin-top: 2px;
         line-height: 1.1;
     }
+    /* =============== END REVISI STATS =============== */
     
+    /* PERBAIKAN 2: Footer untuk mobile */
     .footer-3d {
         font-size: 0.75rem;
         padding: 0 5px;
@@ -1024,6 +956,7 @@ background: linear-gradient(
         hyphens: auto;
     }
     
+    /* Animasi khusus untuk mobile */
     @keyframes cardEntranceMobile {
         from {
             opacity: 0;
@@ -1040,7 +973,7 @@ background: linear-gradient(
     }
 }
 
-/* Untuk tablet kecil */
+/* Untuk tablet kecil - TIDAK DIUBAH */
 @media (min-width: 481px) and (max-width: 767px) {
     body {
         padding: 20px;
@@ -1096,7 +1029,7 @@ background: linear-gradient(
     }
 }
 
-/* Untuk tablet landscape */
+/* Untuk tablet landscape - TIDAK DIUBAH */
 @media (min-width: 768px) and (max-width: 1024px) {
     .app-container {
         max-width: 600px;
@@ -1148,7 +1081,7 @@ background: linear-gradient(
     }
 }
 
-/* Untuk desktop besar */
+/* Untuk desktop besar - TIDAK DIUBAH */
 @media (min-width: 1025px) {
     .app-container {
         max-width: 500px;
@@ -1193,7 +1126,7 @@ background: linear-gradient(
     }
 }
 
-/* Landscape mode untuk mobile */
+/* Landscape mode untuk mobile - Disesuaikan dengan layout baru */
 @media (max-width: 480px) and (orientation: landscape) {
     body {
         padding: 10px;
@@ -1243,7 +1176,7 @@ background: linear-gradient(
     }
 }
 
-/* Perangkat dengan layar sangat kecil */
+/* Perangkat dengan layar sangat kecil - Disesuaikan dengan layout baru */
 @media (max-width: 360px) {
     .card-3d {
         padding: 12px;
