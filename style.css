@@ -293,87 +293,77 @@ h1 {
     overflow-x: auto;
     overflow-y: hidden;
     position: relative;
-    /* EFEK SCAN LASER */
+    /* EFEK LASER CYAN FUTURISTIK */
     background: linear-gradient(
         90deg,
         #1e293b 0%,
-        #1e293b 45%,
-        transparent 47%,
-        rgba(255, 255, 255, 0.9) 50%,     /* INTI LASER */
-        transparent 53%,
-        #1e293b 55%,
+        #1e293b 35%,
+        transparent 40%,
+        #00ffff 45%,      /* CYAN TERANG */
+        #00ffff 50%,      /* INTI LASER */
+        #00ffff 55%,      /* CYAN TERANG */
+        transparent 60%,
+        #1e293b 65%,
         #1e293b 100%
     );
-    background-size: 200% 100%;
+    background-size: 250% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    /* ANIMASI LASER SCAN DARI KIRI KE KANAN */
-    animation: laser-scan 3s infinite linear;
+    animation: laser-cyber 2.5s infinite linear;
 }
 
-.amount {
-    font-size: 2rem;
-    font-weight: 800;
-    color: #1e293b;
-    letter-spacing: -0.5px;
-    word-break: keep-all;
-    overflow: hidden;
-    text-align: center;
-    line-height: 1;
-    white-space: nowrap;
-    max-width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
-    position: relative;
-    /* EFEK SCAN LASER MERAH */
-    background: linear-gradient(
-        90deg,
-        #1e293b 0%,
-        #1e293b 40%,
-        transparent 48%,
-        #ff0000 50%,               /* LASER MERAH */
-        #ff4444 51%,              /* LASER ORANGE */
-        transparent 52%,
-        #1e293b 60%,
-        #1e293b 100%
-    );
-    background-size: 300% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: laser-scan-red 4s infinite linear;
-    text-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
-}
-
-/* GLOW LASER MERAH */
+/* PULSE EFFECT */
 .amount::before {
     content: '';
     position: absolute;
-    top: -2px;
+    top: 0;
     left: 0;
     width: 100%;
-    height: calc(100% + 4px);
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        transparent 45%,
+        rgba(0, 255, 255, 0.4) 50%,
+        transparent 55%,
+        transparent 100%
+    );
+    background-size: 250% 100%;
+    animation: laser-cyber 2.5s infinite linear;
+    z-index: -1;
+    filter: blur(8px);
+}
+
+/* GLOW TEXT EFFECT */
+.amount::after {
+    content: attr(data-content);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background: linear-gradient(
         90deg,
         transparent 0%,
         transparent 48%,
-        rgba(255, 0, 0, 0.8) 50%,
+        rgba(0, 255, 255, 0.7) 50%,
         transparent 52%,
         transparent 100%
     );
-    background-size: 300% 100%;
-    animation: laser-scan-red 4s infinite linear;
-    z-index: -1;
-    filter: blur(3px);
+    background-size: 250% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: laser-cyber 2.5s infinite linear;
+    z-index: 1;
 }
 
-@keyframes laser-scan-red {
+@keyframes laser-cyber {
     0% {
-        background-position: 300% 0;
+        background-position: 250% 0;
     }
     100% {
-        background-position: -300% 0;
+        background-position: -250% 0;
     }
 }
 
