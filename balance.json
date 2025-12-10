@@ -1,0 +1,11 @@
+{
+    "success": true,
+    "data": {
+        "raw": "Rp 1.500.000",
+        "numeric": 1500000,
+        "formatted": "1.500.000"
+    },
+    "timestamp": "2024-12-10 14:30:45",
+    "timestamp_unix": 1733823045,
+    "server": "Kas RT02-RW18"
+}
