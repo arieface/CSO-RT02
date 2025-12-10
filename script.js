@@ -2,7 +2,7 @@
 [file content begin]
 // ==================== KONFIGURASI ====================
 // URL utama (cache server) - GANTI DENGAN URL ANDA
-const CACHE_SERVER_URL = "https://your-cache-server.vercel.app/api/saldo";
+const CACHE_SERVER_URL = const CACHE_SERVER_URL = FALLBACK_SERVER_URL;
 
 // URL fallback langsung ke sumber data
 const FALLBACK_SERVER_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbLFk69seIMkTsx5xGSLyOHM4Iou1uTQMNNpTnwSoWX5Yu2JBgs71Lbd9OH2Xdgq6GKR0_OiTo9shV/pub?gid=236846195&range=A100:A100&single=true&output=csv";
