@@ -173,7 +173,7 @@ function updateThemeBySaldo(saldo) {
     // Tambahkan class tema sesuai dengan nilai saldo
     if (saldo < 500000) {
         body.classList.add('low-balance');
-        console.log('Tema: Saldo Rendah (Merah dan Brown)');
+        console.log('Tema: Saldo Rendah (Merah dan Hitam)');
     } else if (saldo >= 500000 && saldo < 1000000) {
         body.classList.add('medium-balance');
         console.log('Tema: Saldo Sedang (Merah dan Orange)');
