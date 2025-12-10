@@ -17,15 +17,14 @@
     --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Red Theme - STRAWBERRY DARK RED (Saldo < 500.000) */
+/* Red Theme (Saldo < 500.000) */
 [data-theme="red"] {
-    --primary-color: #dc2626;
-    --secondary-color: #e11d48; /* Warna lebih terang untuk icon */
+    --primary-color: #ef4444;
+    --secondary-color: #dc2626;
     --accent-color: #fca5a5;
-    --background-gradient: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-    --stat-icon-gradient: linear-gradient(135deg, #dc2626, #e11d48); /* Gradient lebih terang */
-    --danger-color: #b91c1c;
-    --warning-color: #ea580c;
+    --background-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    --stat-icon-gradient: linear-gradient(135deg, #ef4444, #dc2626);
+    --danger-color: #dc2626;
 }
 
 /* Yellow-Orange Theme (Saldo 500.000 - 1.000.000) */
@@ -85,7 +84,6 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    overflow: hidden;
 }
 
 .floating-shapes {
@@ -93,7 +91,6 @@ body {
     width: 100%;
     height: 100%;
     pointer-events: none;
-    z-index: -1;
 }
 
 .shape {
@@ -103,10 +100,6 @@ body {
     backdrop-filter: blur(5px);
     animation: float 15s infinite ease-in-out;
     pointer-events: none;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 
-        inset 0 0 20px rgba(255, 255, 255, 0.1),
-        0 0 40px rgba(255, 255, 255, 0.1);
 }
 
 .shape-1 {
@@ -151,7 +144,6 @@ body {
     align-items: center;
     gap: 15px;
     margin: 0 auto;
-    z-index: 1;
 }
 
 .card-3d {
@@ -170,7 +162,6 @@ body {
     overflow: hidden;
     width: 100%;
     max-width: 100%;
-    z-index: 2;
 }
 
 .card-3d::before {
@@ -324,7 +315,7 @@ h1 {
     font-size: 1rem;
 }
 
-/* Saldo display - EFEK KILAU YANG DIOPTIMALKAN */
+/* Saldo display */
 .saldo-display {
     display: flex;
     align-items: baseline;
@@ -345,7 +336,7 @@ h1 {
     line-height: 1;
 }
 
-/* EFEK KILAU YANG DIOPTIMALKAN - NO LAG */
+/* Efek kilau saldo */
 .amount {
     font-size: 2rem;
     font-weight: 800;
@@ -360,89 +351,31 @@ h1 {
     overflow-x: auto;
     overflow-y: hidden;
     position: relative;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Efek kilau dengan pseudo-element untuk performance yang lebih baik */
-.amount::before {
-    content: attr(data-text);
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    /* Efek kilau untuk seluruh view */
     background: linear-gradient(
         90deg,
-        transparent 0%,
-        var(--accent-color) 20%,
-        var(--accent-color) 30%,
-        transparent 40%
+        var(--text-color) 0%,
+        var(--text-secondary) 45%,
+        var(--accent-color) 50%,
+        var(--text-secondary) 55%,
+        var(--text-color) 100%
     );
+    background-size: 200% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    background-size: 200% 100%;
-    animation: shimmer-optimized 3s infinite linear;
-    z-index: 1;
-    pointer-events: none;
+    animation: shimmer-left-to-right 3s infinite linear;
 }
 
-.amount::after {
-    content: attr(data-text);
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    color: var(--text-color);
-    z-index: 0;
-}
-
-/* Animasi kilau yang lebih smooth untuk mencegah lag */
-@keyframes shimmer-optimized {
+/* CATATAN: background-position bergerak berlawanan dengan arah visual
+   Untuk membuat kilau BERGERAK dari kiri ke kanan, posisi background
+   justru dianimasi dari 100% ke -100% */
+@keyframes shimmer-left-to-right {
     0% {
-        background-position: -200% 0;
-        opacity: 0.8;
-    }
-    50% {
-        background-position: 200% 0;
-        opacity: 1;
+        background-position: 100% 0;
     }
     100% {
-        background-position: -200% 0;
-        opacity: 0.8;
-    }
-}
-
-/* Alternatif: Efek kilau sederhana untuk device yang lebih lemah */
-.amount.simple-shimmer {
-    position: relative;
-    overflow: hidden;
-}
-
-.amount.simple-shimmer::after {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -60%;
-    width: 20%;
-    height: 200%;
-    background: linear-gradient(
-        to right,
-        transparent 0%,
-        rgba(255, 255, 255, 0.4) 50%,
-        transparent 100%
-    );
-    transform: rotate(30deg);
-    animation: simple-shimmer 2.5s infinite;
-}
-
-@keyframes simple-shimmer {
-    0% {
-        left: -60%;
-    }
-    100% {
-        left: 140%;
+        background-position: -100% 0;
     }
 }
 
@@ -663,7 +596,6 @@ h1 {
     gap: 8px;
     font-size: 0.85rem;
     font-weight: 500;
-    z-index: 2;
 }
 
 /* Loading dots (text) */
@@ -774,16 +706,14 @@ h1 {
 
 /* ==================== RESPONSIVE DESIGN ==================== */
 
-/* ==================== MOBILE VIEW (Phone) ==================== */
 @media (max-width: 480px) {
     body {
-        padding: 10px;
+        padding: 15px 10px;
         justify-content: center;
         align-items: center;
         min-height: 100vh;
         display: flex;
         overflow-y: auto;
-        overflow-x: hidden;
     }
     
     .background-3d {
@@ -792,121 +722,12 @@ h1 {
         display: flex;
         flex-direction: column;
         padding: 10px;
-        position: fixed;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
     }
     
-    /* Bubble animasi yang jelas terlihat di phone view */
     .floating-shapes {
-        display: block !important;
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: 0;
+        display: none;
     }
     
-    /* Bubble lebih besar dan jelas terlihat dengan posisi Y yang keluar card */
-    .shape {
-        opacity: 0.4;
-        backdrop-filter: blur(3px);
-        filter: brightness(1.3) contrast(1.2);
-        border: 2px solid rgba(255, 255, 255, 0.5);
-        box-shadow: 
-            inset 0 0 50px rgba(255, 255, 255, 0.4),
-            0 0 100px rgba(255, 255, 255, 0.3),
-            0 0 150px rgba(255, 255, 255, 0.2);
-        animation: float-mobile 25s infinite ease-in-out;
-        z-index: 0;
-    }
-    
-    /* BUBBLE 1 - Kiri atas, keluar dari card di bagian atas */
-    .shape-1 {
-        width: 200px;
-        height: 200px;
-        top: -50px !important;
-        left: -40px !important;
-        animation-delay: 0s;
-        animation-duration: 30s;
-        background: radial-gradient(circle at 30% 30%, 
-            rgba(255, 255, 255, 0.35), 
-            rgba(255, 255, 255, 0.15) 70%);
-    }
-    
-    /* BUBBLE 2 - Kanan bawah, keluar dari card di bagian bawah */
-    .shape-2 {
-        width: 160px;
-        height: 160px;
-        bottom: -40px !important;
-        right: -30px !important;
-        animation-delay: 8s;
-        animation-duration: 35s;
-        background: radial-gradient(circle at 70% 70%, 
-            rgba(255, 255, 255, 0.35), 
-            rgba(255, 255, 255, 0.15) 70%);
-    }
-    
-    /* BUBBLE 3 - Tengah kanan, jelas terlihat di luar card */
-    .shape-3 {
-        width: 120px;
-        height: 120px;
-        top: 40% !important;
-        left: 90% !important;
-        animation-delay: 16s;
-        animation-duration: 40s;
-        background: radial-gradient(circle at 50% 50%, 
-            rgba(255, 255, 255, 0.4), 
-            rgba(255, 255, 255, 0.2) 70%);
-    }
-    
-    /* Animasi khusus untuk mobile dengan lebih banyak gerakan Y axis */
-    @keyframes float-mobile {
-        0%, 100% {
-            transform: translateY(0) rotate(0deg) scale(1);
-        }
-        20% {
-            transform: translateY(-25px) rotate(72deg) scale(1.08);
-        }
-        40% {
-            transform: translateY(15px) rotate(144deg) scale(0.95);
-        }
-        60% {
-            transform: translateY(-15px) rotate(216deg) scale(1.05);
-        }
-        80% {
-            transform: translateY(20px) rotate(288deg) scale(0.98);
-        }
-    }
-    
-    /* Efek pulsasi dengan pergerakan Y yang lebih jelas */
-    @keyframes pulse-mobile {
-        0%, 100% {
-            opacity: 0.4;
-            transform: translateY(0);
-            box-shadow: 
-                inset 0 0 50px rgba(255, 255, 255, 0.4),
-                0 0 100px rgba(255, 255, 255, 0.3),
-                0 0 150px rgba(255, 255, 255, 0.2);
-        }
-        50% {
-            opacity: 0.5;
-            transform: translateY(-10px);
-            box-shadow: 
-                inset 0 0 60px rgba(255, 255, 255, 0.5),
-                0 0 120px rgba(255, 255, 255, 0.4),
-                0 0 180px rgba(255, 255, 255, 0.3);
-        }
-    }
-    
-    .shape {
-        animation: 
-            float-mobile 25s infinite ease-in-out,
-            pulse-mobile 10s infinite ease-in-out;
-    }
-    
-    /* Pastikan card memiliki background semi-transparan agar bubble terlihat */
     .app-container {
         margin: 0;
         width: 100%;
@@ -917,8 +738,6 @@ h1 {
         justify-content: center;
         gap: 12px;
         padding: 0;
-        z-index: 1;
-        position: relative;
     }
     
     .card-3d {
@@ -929,159 +748,49 @@ h1 {
         min-height: auto;
         box-sizing: border-box;
         border-radius: 20px;
-        background: rgba(255, 255, 255, 0.85);
-        backdrop-filter: blur(15px) saturate(180%);
-        z-index: 2;
-        position: relative;
-        border: 1px solid rgba(255, 255, 255, 0.5);
-        box-shadow: 
-            0 20px 40px rgba(0, 0, 0, 0.12),
-            0 8px 20px rgba(0, 0, 0, 0.08),
-            inset 0 1px 0 rgba(255, 255, 255, 0.9);
-        margin-top: 30px;
-        margin-bottom: 30px;
-    }
-    
-    /* Tambahkan efek border glowing pada card */
-    .card-3d::after {
-        content: '';
-        position: absolute;
-        top: -2px;
-        left: -2px;
-        right: -2px;
-        bottom: -2px;
-        background: linear-gradient(
-            45deg,
-            transparent,
-            rgba(255, 255, 255, 0.4),
-            transparent
-        );
-        border-radius: 22px;
-        z-index: -1;
-        opacity: 0.7;
-        animation: border-glow 4s infinite linear;
-    }
-    
-    @keyframes border-glow {
-        0%, 100% {
-            opacity: 0.5;
-        }
-        50% {
-            opacity: 0.8;
-        }
-    }
-    
-    /* Overlay untuk meningkatkan visibilitas bubble di belakang card */
-    .background-3d::before {
-        content: '';
-        position: absolute;
-        top: -50px;
-        left: -50px;
-        right: -50px;
-        bottom: -50px;
-        background: 
-            radial-gradient(
-                circle at 15% -10%,
-                rgba(255, 255, 255, 0.2) 0%,
-                transparent 60%
-            ),
-            radial-gradient(
-                circle at 85% 110%,
-                rgba(255, 255, 255, 0.18) 0%,
-                transparent 60%
-            ),
-            radial-gradient(
-                circle at 95% 40%,
-                rgba(255, 255, 255, 0.15) 0%,
-                transparent 50%
-            );
-        pointer-events: none;
-        z-index: -1;
-    }
-    
-    /* Efek highlight di sekitar card untuk bubble yang keluar */
-    .card-3d::before {
-        content: '';
-        position: absolute;
-        top: -50px;
-        left: -50px;
-        right: -50px;
-        bottom: -50px;
-        background: 
-            radial-gradient(
-                circle at -30px -50px,
-                rgba(var(--primary-color-rgb, 102, 126, 234), 0.15) 0%,
-                transparent 150px
-            ),
-            radial-gradient(
-                circle at calc(100% + 40px) calc(100% + 50px),
-                rgba(var(--secondary-color-rgb, 118, 75, 162), 0.15) 0%,
-                transparent 150px
-            );
-        z-index: -2;
-        pointer-events: none;
-        border-radius: 50px;
-        opacity: 0.6;
     }
     
     .card-header {
         flex-direction: column;
-        gap: 10px;
+        gap: 12px;
         text-align: center;
         align-items: center;
         margin-bottom: 15px;
-        position: relative;
-        z-index: 3;
     }
     
     .logo {
         justify-content: center;
         width: 100%;
         flex-direction: row;
-        gap: 8px;
+        gap: 10px;
     }
     
     h1 {
         font-size: 1.2rem;
         text-align: center;
         line-height: 1.3;
-        color: var(--text-color);
-        text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
     }
     
     .logo i {
         font-size: 1.5rem;
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.1));
     }
     
     .connection-signal {
         font-size: 0.7rem;
         padding: 5px 10px;
-        margin-top: 0;
+        margin-top: 5px;
         width: auto;
         margin-left: 0;
-        background: rgba(248, 250, 252, 0.85);
-        backdrop-filter: blur(5px);
-        z-index: 3;
-        border: 1px solid rgba(226, 232, 240, 0.6);
     }
     
     .info-card-3d {
         padding: 15px;
         margin-bottom: 12px;
-        border-radius: 16px;
+        border-radius: 15px;
         display: flex;
         flex-direction: column;
         align-items: center;
         text-align: center;
-        background: rgba(248, 250, 252, 0.85);
-        backdrop-filter: blur(8px);
-        position: relative;
-        z-index: 3;
-        border: 1px solid rgba(226, 232, 240, 0.6);
     }
     
     .card-label {
@@ -1106,7 +815,6 @@ h1 {
         align-self: center;
     }
     
-    /* EFEK KILAU MOBILE YANG DIOPTIMALKAN */
     .amount {
         font-size: 1.6rem;
         line-height: 1;
@@ -1118,86 +826,6 @@ h1 {
         max-width: calc(100% - 40px);
         align-self: center;
         text-align: center;
-        color: var(--text-color);
-        position: relative;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    }
-    
-    /* Gunakan efek kilau yang lebih ringan untuk mobile */
-    .amount::before {
-        content: attr(data-text);
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(
-            90deg,
-            transparent 0%,
-            var(--accent-color) 25%,
-            var(--accent-color) 35%,
-            transparent 45%
-        );
-        -webkit-background-clip: text;
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-size: 300% 100%;
-        animation: shimmer-mobile 4s infinite linear;
-        opacity: 0.7;
-        z-index: 1;
-        pointer-events: none;
-    }
-    
-    .amount::after {
-        content: attr(data-text);
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        color: var(--text-color);
-        z-index: 0;
-    }
-    
-    /* Animasi yang lebih lambat dan smooth untuk mobile */
-    @keyframes shimmer-mobile {
-        0% {
-            background-position: -300% 0;
-        }
-        100% {
-            background-position: 300% 0;
-        }
-    }
-    
-    /* Alternatif efek kilau yang sangat ringan untuk device lemah */
-    .amount.light-shimmer {
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .amount.light-shimmer::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 50%;
-        height: 100%;
-        background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(255, 255, 255, 0.3),
-            transparent
-        );
-        animation: light-shimmer 2s infinite;
-    }
-    
-    @keyframes light-shimmer {
-        0% {
-            left: -100%;
-        }
-        100% {
-            left: 200%;
-        }
     }
     
     .amount.error {
@@ -1231,11 +859,6 @@ h1 {
         display: flex;
         flex-direction: column;
         align-items: center;
-        background: rgba(240, 240, 240, 0.85);
-        backdrop-filter: blur(8px);
-        position: relative;
-        z-index: 3;
-        border: 1px solid rgba(200, 200, 200, 0.5);
     }
     
     .time-label {
@@ -1256,22 +879,17 @@ h1 {
         hyphens: auto;
     }
     
-    /* Stats mobile */
+    /* Stats mobile: grid 2 baris (icon atas, teks bawah) */
     .stats {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         grid-template-rows: auto auto;
-        gap: 8px 10px;
+        gap: 8px 15px;
         padding: 15px;
         margin-bottom: 12px;
         border-radius: 12px;
         width: 100%;
         box-sizing: border-box;
-        background: rgba(241, 245, 249, 0.82);
-        backdrop-filter: blur(8px);
-        position: relative;
-        z-index: 3;
-        border: 1px solid rgba(226, 232, 240, 0.5);
     }
     
     .stat-item {
@@ -1285,9 +903,6 @@ h1 {
         width: 40px;
         height: 40px;
         font-size: 1rem;
-        background: var(--stat-icon-gradient);
-        backdrop-filter: blur(5px);
-        border: 1px solid rgba(255, 255, 255, 0.3);
     }
     
     .stat-info {
@@ -1322,8 +937,6 @@ h1 {
         padding: 0 5px;
         width: 100%;
         text-align: center;
-        position: relative;
-        z-index: 3;
     }
     
     .footer-3d p {
@@ -1358,12 +971,6 @@ h1 {
         flex-wrap: wrap;
         justify-content: center;
         text-align: center;
-        color: rgba(255, 255, 255, 0.95);
-        text-shadow: 
-            0 1px 3px rgba(0, 0, 0, 0.4),
-            0 0 10px rgba(255, 255, 255, 0.2);
-        position: relative;
-        z-index: 2;
     }
     
     .signal-bars {
@@ -1395,172 +1002,6 @@ h1 {
     }
 }
 
-/* Mobile landscape - Optimalkan bubble posisi */
-@media (max-width: 480px) and (orientation: landscape) {
-    body {
-        padding: 5px;
-        justify-content: flex-start;
-        min-height: 100vh;
-    }
-    
-    .app-container {
-        margin-top: 10px;
-        max-height: 90vh;
-        overflow-y: auto;
-    }
-    
-    .card-3d {
-        padding: 12px;
-        max-height: 90vh;
-        overflow-y: auto;
-        margin-top: 20px;
-        margin-bottom: 20px;
-    }
-    
-    /* Adjust bubble untuk landscape dengan posisi Y yang keluar */
-    .shape-1 {
-        width: 150px;
-        height: 150px;
-        top: -30px !important;
-        left: -25px !important;
-    }
-    
-    .shape-2 {
-        width: 120px;
-        height: 120px;
-        bottom: -25px !important;
-        right: -20px !important;
-    }
-    
-    .shape-3 {
-        width: 100px;
-        height: 100px;
-        top: 50% !important;
-        left: 95% !important;
-    }
-    
-    .saldo-display {
-        flex-direction: row;
-        gap: 6px;
-    }
-    
-    .stats {
-        flex-direction: row;
-        gap: 8px;
-        padding: 10px;
-        align-items: center;
-        grid-template-columns: repeat(3, 1fr);
-        grid-template-rows: auto;
-        display: grid;
-    }
-    
-    .stat-item {
-        display: contents;
-    }
-    
-    .stat-icon {
-        grid-row: 1;
-        grid-column: span 1;
-        width: 35px;
-        height: 35px;
-    }
-    
-    .stat-info {
-        grid-row: 2;
-        grid-column: span 1;
-        align-items: center;
-        text-align: center;
-        flex-direction: column;
-    }
-    
-    .stat-divider {
-        display: none;
-    }
-    
-    .time-display {
-        font-size: 0.8rem;
-    }
-}
-
-/* Layar sangat kecil (< 360px) */
-@media (max-width: 360px) {
-    .card-3d {
-        padding: 12px;
-        margin-top: 25px;
-        margin-bottom: 25px;
-    }
-    
-    h1 {
-        font-size: 1.1rem;
-    }
-    
-    /* Adjust bubble untuk layar sangat kecil dengan posisi Y keluar */
-    .shape-1 {
-        width: 170px;
-        height: 170px;
-        top: -40px !important;
-        left: -35px !important;
-    }
-    
-    .shape-2 {
-        width: 130px;
-        height: 130px;
-        bottom: -35px !important;
-        right: -25px !important;
-    }
-    
-    .shape-3 {
-        width: 110px;
-        height: 110px;
-        top: 45% !important;
-        left: 85% !important;
-    }
-    
-    .saldo-display {
-        gap: 4px;
-        justify-content: center;
-    }
-    
-    .currency {
-        font-size: 1.3rem;
-    }
-    
-    .amount {
-        font-size: 1.4rem;
-        text-align: center;
-    }
-    
-    .time-display {
-        font-size: 0.75rem;
-        text-align: center;
-    }
-    
-    .stats {
-        gap: 8px;
-        padding: 10px;
-    }
-    
-    .stat-item {
-        gap: 6px;
-    }
-    
-    .stat-icon {
-        width: 35px;
-        height: 35px;
-        font-size: 1rem;
-    }
-    
-    .stat-value {
-        font-size: 1rem;
-        text-align: center;
-    }
-    
-    .stat-label {
-        font-size: 0.7rem;
-        text-align: center;
-    }
-}
-
 /* Tablet kecil */
 @media (min-width: 481px) and (max-width: 767px) {
     body {
@@ -1575,28 +1016,6 @@ h1 {
     .card-3d {
         max-width: 100%;
         padding: 20px;
-    }
-    
-    /* Adjust bubbles untuk tablet */
-    .shape-1 {
-        width: 200px;
-        height: 200px;
-        top: 10%;
-        left: 5%;
-    }
-    
-    .shape-2 {
-        width: 150px;
-        height: 150px;
-        bottom: 15%;
-        right: 5%;
-    }
-    
-    .shape-3 {
-        width: 120px;
-        height: 120px;
-        top: 70%;
-        left: 80%;
     }
     
     .saldo-display {
@@ -1733,5 +1152,110 @@ h1 {
     .stat-divider {
         display: block;
         height: 40px;
+    }
+}
+
+/* Mobile landscape */
+@media (max-width: 480px) and (orientation: landscape) {
+    body {
+        padding: 10px;
+        justify-content: center;
+    }
+    
+    .app-container {
+        margin-top: 5px;
+    }
+    
+    .card-3d {
+        padding: 12px;
+        max-height: 95vh;
+        overflow-y: auto;
+    }
+    
+    .saldo-display {
+        flex-direction: row;
+        gap: 6px;
+    }
+    
+    .stats {
+        flex-direction: row;
+        gap: 10px;
+        padding: 10px;
+        align-items: center;
+    }
+    
+    .stat-item {
+        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .stat-info {
+        align-items: center;
+        text-align: center;
+        flex-direction: column;
+    }
+    
+    .stat-divider {
+        display: none;
+    }
+    
+    .time-display {
+        font-size: 0.8rem;
+    }
+}
+
+/* Layar sangat kecil */
+@media (max-width: 360px) {
+    .card-3d {
+        padding: 12px;
+    }
+    
+    h1 {
+        font-size: 1.1rem;
+    }
+    
+    .saldo-display {
+        gap: 4px;
+        justify-content: center;
+    }
+    
+    .currency {
+        font-size: 1.3rem;
+    }
+    
+    .amount {
+        font-size: 1.4rem;
+        text-align: center;
+    }
+    
+    .time-display {
+        font-size: 0.75rem;
+        text-align: center;
+    }
+    
+    .stats {
+        gap: 12px;
+        padding: 10px;
+    }
+    
+    .stat-item {
+        gap: 6px;
+    }
+    
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    .stat-value {
+        font-size: 1rem;
+        text-align: center;
+    }
+    
+    .stat-label {
+        font-size: 0.8rem;
+        text-align: center;
     }
 }
