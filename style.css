@@ -1,13 +1,67 @@
+/* ==================== VARIABEL CSS UNTUK THEME ==================== */
+:root {
+    /* Default theme (purple) */
+    --primary-color: #667eea;
+    --secondary-color: #764ba2;
+    --accent-color: #a5b4fc;
+    --danger-color: #ef4444;
+    --warning-color: #f59e0b;
+    --success-color: #10b981;
+    --background-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --card-gradient: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    --stat-icon-gradient: linear-gradient(135deg, #667eea, #764ba2);
+    --text-color: #1e293b;
+    --text-secondary: #64748b;
+    --card-border: rgba(226, 232, 240, 0.8);
+    --transition-speed: 0.5s;
+    --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Red Theme (Saldo < 500.000) */
+[data-theme="red"] {
+    --primary-color: #ef4444;
+    --secondary-color: #dc2626;
+    --accent-color: #fca5a5;
+    --background-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    --stat-icon-gradient: linear-gradient(135deg, #ef4444, #dc2626);
+    --danger-color: #dc2626;
+}
+
+/* Yellow-Orange Theme (Saldo 500.000 - 1.000.000) */
+[data-theme="yellow-orange"] {
+    --primary-color: #f59e0b;
+    --secondary-color: #ea580c;
+    --accent-color: #fdba74;
+    --background-gradient: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+    --stat-icon-gradient: linear-gradient(135deg, #f59e0b, #ea580c);
+    --warning-color: #ea580c;
+}
+
+/* Teal Theme (Saldo > 1.000.000) */
+[data-theme="teal"] {
+    --primary-color: #0d9488;
+    --secondary-color: #0f766e;
+    --accent-color: #5eead4;
+    --background-gradient: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+    --stat-icon-gradient: linear-gradient(135deg, #0d9488, #0f766e);
+    --success-color: #0f766e;
+}
+
+/* ==================== TRANSISI GLOBAL ==================== */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    transition: background-color var(--transition-speed) var(--transition-timing),
+                color var(--transition-speed) var(--transition-timing),
+                border-color var(--transition-speed) var(--transition-timing),
+                box-shadow var(--transition-speed) var(--transition-timing),
+                background-image var(--transition-speed) var(--transition-timing);
 }
 
-/* MODIFIKASI: Tambahkan transisi untuk background body */
 body {
     font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--background-gradient);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -15,47 +69,7 @@ body {
     align-items: center;
     overflow-x: hidden;
     padding: 20px;
-    /* Transisi untuk background */
-    transition: background 0.6s ease-in-out;
-}
-
-/* ==================== MODIFIKASI: KELAS TEMA & VARIABEL CSS ==================== */
-/* Tema Merah untuk saldo < 500.000 */
-.theme-red {
-    --primary-color: #ef4444;
-    --secondary-color: #dc2626;
-    --accent-color: #f87171;
-    --bg-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    --shimmer-color-1: #7f1d1d;
-    --shimmer-color-2: #ef4444;
-    --shimmer-color-3: #fca5a5;
-}
-
-/* Tema Kuning-Orange untuk 500.000 < saldo < 1.000.000 */
-.theme-yellow-orange {
-    --primary-color: #f59e0b;
-    --secondary-color: #d97706;
-    --accent-color: #fbbf24;
-    --bg-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    --shimmer-color-1: #78350f;
-    --shimmer-color-2: #f59e0b;
-    --shimmer-color-3: #fcd34d;
-}
-
-/* Tema Teal untuk saldo > 1.000.000 */
-.theme-teal {
-    --primary-color: #14b8a6;
-    --secondary-color: #0d9488;
-    --accent-color: #5eead4;
-    --bg-gradient: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
-    --shimmer-color-1: #134e4a;
-    --shimmer-color-2: #14b8a6;
-    --shimmer-color-3: #5eead4;
-}
-
-/* Terapkan variabel ke elemen yang relevan */
-body {
-    background: var(--bg-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+    transition: background var(--transition-speed) var(--transition-timing);
 }
 
 .background-3d {
@@ -121,6 +135,7 @@ body {
     }
 }
 
+/* Container utama untuk centering */
 .app-container {
     width: 100%;
     max-width: 500px;
@@ -149,7 +164,6 @@ body {
     max-width: 100%;
 }
 
-/* MODIFIKASI: Tambahkan transisi untuk border atas */
 .card-3d::before {
     content: '';
     position: absolute;
@@ -157,9 +171,9 @@ body {
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, var(--primary-color, #667eea), var(--secondary-color, #764ba2));
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
     border-radius: 24px 24px 0 0;
-    transition: background 0.6s ease-in-out;
+    transition: background var(--transition-speed) var(--transition-timing);
 }
 
 @keyframes cardEntrance {
@@ -173,6 +187,7 @@ body {
     }
 }
 
+/* Header */
 .card-header {
     display: flex;
     justify-content: space-between;
@@ -188,15 +203,13 @@ body {
     flex: 1;
 }
 
-/* MODIFIKASI: Terapkan variabel dan transisi untuk ikon logo */
 .logo i {
     font-size: 2rem;
-    color: var(--primary-color, #667eea);
-    background: linear-gradient(135deg, var(--primary-color, #667eea), var(--secondary-color, #764ba2));
+    color: var(--primary-color);
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 2px 4px rgba(102, 126, 234, 0.3));
-    transition: all 0.6s ease-in-out;
+    filter: drop-shadow(0 2px 4px rgba(var(--primary-color-rgb), 0.3));
 }
 
 h1 {
@@ -207,6 +220,7 @@ h1 {
     text-align: left;
 }
 
+/* Connection signal */
 .connection-signal {
     display: flex;
     align-items: center;
@@ -229,13 +243,11 @@ h1 {
     height: 14px;
 }
 
-/* MODIFIKASI: Terapkan variabel dan transisi untuk signal bar */
 .signal-bar {
     width: 3px;
-    background: var(--primary-color, #22c55e);
+    background: var(--success-color);
     border-radius: 1px;
     animation: signalPulse 2s infinite ease-in-out;
-    transition: background 0.6s ease-in-out;
 }
 
 .signal-bar:nth-child(1) { height: 4px; animation-delay: 0s; }
@@ -249,15 +261,16 @@ h1 {
 }
 
 .connection-signal.offline .signal-bar {
-    background: #ef4444;
+    background: var(--danger-color);
 }
 
+/* Info card */
 .info-card-3d {
-    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    background: var(--card-gradient);
     border-radius: 18px;
     padding: 18px;
     margin-bottom: 15px;
-    border: 1px solid rgba(226, 232, 240, 0.8);
+    border: 1px solid var(--card-border);
     box-shadow: 
         0 10px 25px rgba(0, 0, 0, 0.08),
         inset 0 1px 0 rgba(255, 255, 255, 0.8);
@@ -292,17 +305,17 @@ h1 {
     align-items: center;
     gap: 8px;
     margin-bottom: 12px;
-    color: #64748b;
+    color: var(--text-secondary);
     font-size: 0.9rem;
     font-weight: 600;
 }
 
 .card-label i {
-    color: var(--primary-color, #667eea);
+    color: var(--primary-color);
     font-size: 1rem;
-    transition: color 0.6s ease-in-out;
 }
 
+/* Saldo display */
 .saldo-display {
     display: flex;
     align-items: baseline;
@@ -315,20 +328,19 @@ h1 {
     position: relative;
 }
 
-/* MODIFIKASI: Terapkan variabel dan transisi untuk teks mata uang */
 .currency {
     font-size: 1.8rem;
     font-weight: 700;
-    color: var(--primary-color, #667eea);
-    text-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
+    color: var(--primary-color);
+    text-shadow: 0 2px 4px rgba(var(--primary-color-rgb), 0.2);
     line-height: 1;
-    transition: all 0.6s ease-in-out;
 }
 
-/* MODIFIKASI: Terapkan variabel untuk efek kilau (shimmer) dan tambahkan transisi */
+/* Efek kilau saldo */
 .amount {
     font-size: 2rem;
     font-weight: 800;
+    color: var(--text-color);
     letter-spacing: -0.5px;
     word-break: keep-all;
     overflow: hidden;
@@ -339,22 +351,25 @@ h1 {
     overflow-x: auto;
     overflow-y: hidden;
     position: relative;
+    /* Efek kilau untuk seluruh view */
     background: linear-gradient(
         90deg,
-        var(--shimmer-color-1, #1e293b) 0%,
-        var(--shimmer-color-2, #475569) 45%,
-        var(--shimmer-color-3, #a5b4fc) 50%,
-        var(--shimmer-color-2, #475569) 55%,
-        var(--shimmer-color-1, #1e293b) 100%
+        var(--text-color) 0%,
+        var(--text-secondary) 45%,
+        var(--accent-color) 50%,
+        var(--text-secondary) 55%,
+        var(--text-color) 100%
     );
     background-size: 200% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     animation: shimmer-left-to-right 3s infinite linear;
-    transition: background 0.6s ease-in-out;
 }
 
+/* CATATAN: background-position bergerak berlawanan dengan arah visual
+   Untuk membuat kilau BERGERAK dari kiri ke kanan, posisi background
+   justru dianimasi dari 100% ke -100% */
 @keyframes shimmer-left-to-right {
     0% {
         background-position: 100% 0;
@@ -364,11 +379,12 @@ h1 {
     }
 }
 
+/* Error & empty state */
 .amount.error {
     font-size: 1.1rem;
-    color: #f97316;
+    color: var(--warning-color);
     background: none;
-    -webkit-text-fill-color: #f97316;
+    -webkit-text-fill-color: var(--warning-color);
     font-weight: 600;
     animation: shake 0.5s ease;
     white-space: normal;
@@ -376,9 +392,9 @@ h1 {
 
 .amount.empty {
     font-size: 1.1rem;
-    color: #f59e0b;
+    color: var(--warning-color);
     background: none;
-    -webkit-text-fill-color: #f59e0b;
+    -webkit-text-fill-color: var(--warning-color);
     font-weight: 600;
     white-space: normal;
 }
@@ -389,6 +405,7 @@ h1 {
     20%, 40%, 60%, 80% { transform: translateX(5px); }
 }
 
+/* Time card */
 .time-card-3d {
     background: linear-gradient(145deg, #f0f0f0, #e0e0e0);
     color: #1f2937;
@@ -397,7 +414,7 @@ h1 {
     margin-bottom: 15px;
     box-shadow: 
         0 12px 30px rgba(0, 0, 0, 0.15),
-        inset 0 1px 1px rgba(255, 255, 255, 0.8),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8),
         inset 0 -1px 1px rgba(0, 0, 0, 0.1),
         0 0 0 1px rgba(220, 220, 220, 0.8);
     border: 1px solid rgba(200, 200, 200, 0.6);
@@ -479,6 +496,7 @@ h1 {
         0 0 15px rgba(255, 255, 255, 0.4);
 }
 
+/* Stats */
 .stats {
     display: flex;
     justify-content: space-around;
@@ -500,20 +518,18 @@ h1 {
     flex-direction: row;
 }
 
-/* MODIFIKASI: Terapkan variabel dan transisi untuk ikon statistik */
 .stat-icon {
     width: 35px;
     height: 35px;
-    background: linear-gradient(135deg, var(--primary-color, #667eea), var(--secondary-color, #764ba2));
+    background: var(--stat-icon-gradient);
     border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     font-size: 0.9rem;
-    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 8px rgba(var(--primary-color-rgb), 0.3);
     flex-shrink: 0;
-    transition: all 0.6s ease-in-out;
 }
 
 .stat-info {
@@ -527,13 +543,13 @@ h1 {
 .stat-value {
     font-size: 1.1rem;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--text-color);
     line-height: 1.2;
 }
 
 .stat-label {
     font-size: 0.8rem;
-    color: #64748b;
+    color: var(--text-secondary);
     font-weight: 500;
     margin-top: 2px;
     line-height: 1.1;
@@ -547,9 +563,10 @@ h1 {
     align-self: center;
 }
 
+/* Footer */
 .footer-3d {
     text-align: center;
-    color: #64748b;
+    color: var(--text-secondary);
     font-size: 0.85rem;
     width: 100%;
 }
@@ -581,6 +598,7 @@ h1 {
     font-weight: 500;
 }
 
+/* Loading dots (text) */
 .loading-dots {
     display: inline-flex;
     gap: 3px;
@@ -601,6 +619,7 @@ h1 {
     50% { opacity: 1; }
 }
 
+/* Connection status */
 .connection-status {
     display: flex;
     align-items: center;
@@ -608,7 +627,7 @@ h1 {
     gap: 6px;
     margin-top: 10px;
     font-size: 0.75rem;
-    color: #64748b;
+    color: var(--text-secondary);
     opacity: 0.8;
     text-align: center;
     line-height: 1.2;
@@ -633,11 +652,11 @@ h1 {
 }
 
 .connection-status.online i {
-    color: #10b981;
+    color: var(--success-color);
 }
 
 .connection-status.offline i {
-    color: #ef4444;
+    color: var(--danger-color);
     animation: blink 1s infinite;
 }
 
@@ -646,6 +665,7 @@ h1 {
     50% { opacity: 0.3; }
 }
 
+/* Loading dots (circle) */
 .loading-dots-container {
     display: inline-flex;
     align-items: center;
@@ -659,9 +679,8 @@ h1 {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: var(--primary-color, #667eea);
+    background: var(--primary-color);
     animation: dotBounce 1.4s infinite ease-in-out both;
-    transition: background 0.6s ease-in-out;
 }
 
 .loading-dots-container span:nth-child(1) { 
@@ -860,6 +879,7 @@ h1 {
         hyphens: auto;
     }
     
+    /* Stats mobile: grid 2 baris (icon atas, teks bawah) */
     .stats {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -900,13 +920,13 @@ h1 {
     .stat-value {
         font-size: 1rem;
         font-weight: 700;
-        color: #1e293b;
+        color: var(--text-color);
         line-height: 1.2;
     }
     
     .stat-label {
         font-size: 0.7rem;
-        color: #64748b;
+        color: var(--text-secondary);
         font-weight: 500;
         margin-top: 2px;
         line-height: 1.1;
