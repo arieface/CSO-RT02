@@ -9,30 +9,6 @@ const MAX_RETRIES = 3;
 let lastSuccessfulFetch = null;
 let isOnline = navigator.onLine;
 
-// ==================== FUNGSI TEMA (BARU) ====================
-/**
- * Menerapkan kelas tema pada <body> berdasarkan nilai saldo.
- * @param {number} saldoValue - Nilai saldo numerik.
- */
-function applyThemeBasedOnSaldo(saldoValue) {
-    const body = document.body;
-    
-    // Hapus semua kelas tema yang ada untuk menghindari konflik
-    body.classList.remove('red-theme', 'orange-theme', 'teal-theme');
-    
-    // Terapkan tema berdasarkan nilai saldo
-    if (saldoValue < 500000) {
-        body.classList.add('red-theme');
-        console.log("🔴 Tema Merah Diterapkan (Saldo < 500.000)");
-    } else if (saldoValue >= 500000 && saldoValue < 1000000) {
-        body.classList.add('orange-theme');
-        console.log("🟠 Tema Oranye Diterapkan (Saldo 500.000 - 999.999)");
-    } else { // saldo >= 1.000.000
-        body.classList.add('teal-theme');
-        console.log("🟢 Tema Teal Diterapkan (Saldo >= 1.000.000)");
-    }
-}
-
 // ==================== FUNGSI UTAMA ====================
 async function fetchSaldo() {
     if (isRefreshing) return;
@@ -163,20 +139,41 @@ function processSaldoData(rawData) {
     };
 }
 
-// ==================== FUNGSI UI (DIMODIFIKASI) ====================
+// ==================== FUNGSI UI ====================
+
+// MODIFIKASI: Fungsi untuk menerapkan tema berdasarkan saldo
+function applyTheme(balance) {
+    const body = document.body;
+    
+    // Hapus semua kelas tema yang ada
+    body.classList.remove('theme-red', 'theme-yellow-orange', 'theme-teal');
+    
+    // Terapkan kelas tema berdasarkan saldo
+    if (balance < 500000) {
+        body.classList.add('theme-red');
+        console.log("Tema Merah Diterapkan: Saldo < 500.000");
+    } else if (balance >= 500000 && balance < 1000000) {
+        body.classList.add('theme-yellow-orange');
+        console.log("Tema Kuning-Orange Diterapkan: 500.000 ≤ Saldo < 1.000.000");
+    } else {
+        body.classList.add('theme-teal');
+        console.log("Tema Teal Diterapkan: Saldo ≥ 1.000.000");
+    }
+}
+
+// MODIFIKASI: Panggil fungsi applyTheme di dalam updateSaldoDisplay
 function updateSaldoDisplay(data) {
     const saldoElement = document.getElementById('saldo');
     if (!saldoElement) return;
     
-    // Hapus semua class kecuali 'amount'
+    // Hapus semua class
     saldoElement.className = 'amount';
     
     // Update teks
     saldoElement.textContent = data.formatted;
     
-    // !!! PEMANGGILAN FUNGSI TEMA (BARU) !!!
-    // Terapkan tema berdasarkan nilai saldo numerik
-    applyThemeBasedOnSaldo(data.numeric);
+    // Terapkan tema berdasarkan saldo
+    applyTheme(data.numeric);
     
     // Efek update halus
     saldoElement.style.opacity = '0.8';
@@ -382,33 +379,17 @@ window.manualUpdateTime = function() {
     updateTime();
 };
 
-window.testError = function(type) {
-    const saldoElement = document.getElementById('saldo');
-    if (!saldoElement) return;
+// MODIFIKASI: Fungsi untuk testing tema dan transisi
+window.testTheme = function(balance) {
+    const data = {
+        raw: `Rp ${balance}`,
+        numeric: balance,
+        formatted: new Intl.NumberFormat('id-ID', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(balance)
+    };
     
-    switch(type) {
-        case 'offline':
-            showError('Offline - cek koneksi internet');
-            updateConnectionStatus('offline');
-            break;
-        case 'timeout':
-            showError('Coba lagi - server lambat');
-            updateConnectionStatus('timeout');
-            break;
-        case 'error':
-            showError('Offline • mencoba menghubungkan');
-            updateConnectionStatus('error');
-            break;
-        case 'loading':
-            showLoadingState();
-            break;
-        case 'success':
-            updateSaldoDisplay({
-                raw: "Rp 15.000.000",
-                numeric: 15000000,
-                formatted: "15.000.000"
-            });
-            updateConnectionStatus('online');
-            break;
-    }
+    updateSaldoDisplay(data);
+    console.log(`Tema diuji dengan saldo: ${balance}`);
 };
