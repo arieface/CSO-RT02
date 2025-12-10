@@ -296,6 +296,29 @@ h1 {
     max-width: 100%;
     overflow-x: auto;
     overflow-y: hidden;
+    position: relative;
+    /* Efek kilau untuk angka saldo */
+    background: linear-gradient(
+        90deg,
+        #1e293b 0%,
+        #475569 25%,
+        #667eea 50%,
+        #475569 75%,
+        #1e293b 100%
+    );
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 3s infinite linear;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -100% 0;
+    }
+    100% {
+        background-position: 100% 0;
+    }
 }
 
 /* PERBAIKAN 3: Ganti warna error menjadi orange untuk "Coba" */
@@ -811,10 +834,10 @@ h1 {
     }
     
     /* =============== REVISI KHUSUS UNTUK STATS DI PHONE VIEW =============== */
-    /* Stats untuk mobile - Layout vertikal dengan setiap item center */
+    /* Stats untuk mobile - Layout 2 baris horizontal */
     .stats {
-        flex-direction: column; /* Ubah ke vertikal */
-        gap: 16px; /* Jarak antar item lebih besar */
+        flex-direction: column; /* Container utama vertikal */
+        gap: 15px; /* Jarak antar baris */
         padding: 15px;
         margin-bottom: 12px;
         border-radius: 12px;
@@ -824,24 +847,43 @@ h1 {
         box-sizing: border-box;
     }
     
-    /* Hapus divider untuk tampilan vertikal */
+    /* Hapus divider untuk tampilan 2 baris */
     .stat-divider {
         display: none;
     }
     
-    /* Item statistik - Layout column dengan icon di atas teks */
-    .stat-item {
-        flex-direction: column; /* Icon di atas, teks di bawah */
-        gap: 8px;
+    /* Container untuk baris pertama (icon) */
+    .stats-icons-row {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
         width: 100%;
-        justify-content: center; /* Center horizontal */
-        align-items: center; /* Center semua konten */
-        padding: 0;
-        text-align: center;
+        gap: 10px;
     }
     
+    /* Container untuk baris kedua (deskripsi) */
+    .stats-info-row {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        width: 100%;
+        gap: 10px;
+    }
+    
+    /* Item statistik - Icon di baris pertama */
+    .stat-item {
+        flex-direction: column; /* Icon di atas, teks di bawah */
+        width: calc(33.33% - 10px); /* 3 kolom dengan jarak */
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 0;
+        margin: 0;
+    }
+    
+    /* Icon untuk baris pertama */
     .stat-icon {
-        width: 45px; /* Sedikit lebih besar untuk emphasis */
+        width: 45px;
         height: 45px;
         font-size: 1.1rem;
         flex-shrink: 0;
@@ -851,7 +893,7 @@ h1 {
         margin-bottom: 5px;
     }
     
-    /* REVISI UTAMA: Layout teks dalam 2 baris (icon di atas, teks di bawah) */
+    /* Info untuk baris kedua */
     .stat-info {
         display: flex;
         flex-direction: column; /* Value dan label dalam kolom */
@@ -864,7 +906,7 @@ h1 {
     }
     
     .stat-value {
-        font-size: 1.1rem;
+        font-size: 1rem;
         line-height: 1.2;
         text-align: center;
         color: #1e293b;
@@ -873,13 +915,13 @@ h1 {
     }
     
     .stat-label {
-        font-size: 0.9rem;
+        font-size: 0.75rem;
         line-height: 1.2;
         margin-top: 0;
         text-align: center;
         color: #64748b;
         font-weight: 500;
-        white-space: nowrap;
+        white-space: normal;
     }
     /* =============== END REVISI STATS =============== */
     
