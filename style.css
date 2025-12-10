@@ -100,7 +100,6 @@ body {
     backdrop-filter: blur(5px);
     animation: float 15s infinite ease-in-out;
     pointer-events: none;
-    transition: all 0.8s ease;
 }
 
 .shape-1 {
@@ -211,7 +210,6 @@ body {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     filter: drop-shadow(0 2px 4px rgba(var(--primary-color-rgb), 0.3));
-    transition: all var(--transition-speed) var(--transition-timing);
 }
 
 h1 {
@@ -315,7 +313,6 @@ h1 {
 .card-label i {
     color: var(--primary-color);
     font-size: 1rem;
-    transition: color var(--transition-speed) var(--transition-timing);
 }
 
 /* Saldo display */
@@ -337,7 +334,6 @@ h1 {
     color: var(--primary-color);
     text-shadow: 0 2px 4px rgba(var(--primary-color-rgb), 0.2);
     line-height: 1;
-    transition: color var(--transition-speed) var(--transition-timing);
 }
 
 /* Efek kilau saldo */
@@ -534,7 +530,6 @@ h1 {
     font-size: 0.9rem;
     box-shadow: 0 4px 8px rgba(var(--primary-color-rgb), 0.3);
     flex-shrink: 0;
-    transition: background var(--transition-speed) var(--transition-timing);
 }
 
 .stat-info {
@@ -743,21 +738,19 @@ h1 {
     .shape-1 {
         width: 180px;
         height: 180px;
-        top: -100px !important; /* Posisi di luar kartu - lebih tinggi */
+        top: -50px !important; /* Posisi di luar kartu */
         left: -50px;
         opacity: 0.6;
         animation-delay: 0s;
-        animation-duration: 20s; /* Animasi lebih lambat untuk efek yang lebih halus */
     }
     
     .shape-2 {
         width: 120px;
         height: 120px;
-        bottom: -80px !important; /* Posisi di luar kartu - lebih rendah */
+        bottom: -30px !important; /* Posisi di luar kartu */
         right: -30px;
         opacity: 0.4;
         animation-delay: 5s;
-        animation-duration: 25s; /* Animasi lebih lambat */
     }
     
     .shape-3 {
@@ -768,7 +761,6 @@ h1 {
         left: 85% !important;
         opacity: 0.3;
         animation-delay: 10s;
-        animation-duration: 18s; /* Animasi lebih lambat */
     }
     
     /* REVISI: Bubble lebih kecil di mobile tapi tetap terlihat */
