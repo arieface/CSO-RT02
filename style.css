@@ -1,3 +1,719 @@
+/* ==================== VARIABEL CSS UNTUK THEME ==================== */
+:root {
+    /* Default theme (purple) */
+    --primary-color: #667eea;
+    --secondary-color: #764ba2;
+    --accent-color: #a5b4fc;
+    --danger-color: #ef4444;
+    --warning-color: #f59e0b;
+    --success-color: #10b981;
+    --background-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --card-gradient: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    --stat-icon-gradient: linear-gradient(135deg, #667eea, #764ba2);
+    --text-color: #1e293b;
+    --text-secondary: #64748b;
+    --card-border: rgba(226, 232, 240, 0.8);
+    --transition-speed: 0.5s;
+    --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Red Theme - STRAWBERRY DARK RED (Saldo < 500.000) */
+[data-theme="red"] {
+    --primary-color: #dc2626;
+    --secondary-color: #991b1b;
+    --accent-color: #fca5a5;
+    --background-gradient: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+    --stat-icon-gradient: linear-gradient(135deg, #dc2626, #991b1b);
+    --danger-color: #b91c1c;
+    --warning-color: #ea580c;
+}
+
+/* Yellow-Orange Theme (Saldo 500.000 - 1.000.000) */
+[data-theme="yellow-orange"] {
+    --primary-color: #f59e0b;
+    --secondary-color: #ea580c;
+    --accent-color: #fdba74;
+    --background-gradient: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+    --stat-icon-gradient: linear-gradient(135deg, #f59e0b, #ea580c);
+    --warning-color: #ea580c;
+}
+
+/* Teal Theme (Saldo > 1.000.000) */
+[data-theme="teal"] {
+    --primary-color: #0d9488;
+    --secondary-color: #0f766e;
+    --accent-color: #5eead4;
+    --background-gradient: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+    --stat-icon-gradient: linear-gradient(135deg, #0d9488, #0f766e);
+    --success-color: #0f766e;
+}
+
+/* ==================== TRANSISI GLOBAL ==================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    transition: background-color var(--transition-speed) var(--transition-timing),
+                color var(--transition-speed) var(--transition-timing),
+                border-color var(--transition-speed) var(--transition-timing),
+                box-shadow var(--transition-speed) var(--transition-timing),
+                background-image var(--transition-speed) var(--transition-timing);
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: var(--background-gradient);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow-x: hidden;
+    padding: 20px;
+    transition: background var(--transition-speed) var(--transition-timing);
+}
+
+.background-3d {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    perspective: 1000px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.floating-shapes {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.shape {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    animation: float 15s infinite ease-in-out;
+    pointer-events: none;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 
+        inset 0 0 20px rgba(255, 255, 255, 0.1),
+        0 0 40px rgba(255, 255, 255, 0.1);
+}
+
+.shape-1 {
+    width: 250px;
+    height: 250px;
+    top: 15%;
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.shape-2 {
+    width: 180px;
+    height: 180px;
+    bottom: 20%;
+    right: 12%;
+    animation-delay: 5s;
+}
+
+.shape-3 {
+    width: 120px;
+    height: 120px;
+    top: 65%;
+    left: 85%;
+    animation-delay: 10s;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-20px) rotate(180deg);
+    }
+}
+
+/* Container utama untuk centering */
+.app-container {
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin: 0 auto;
+    z-index: 1;
+}
+
+.card-3d {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 24px;
+    padding: 20px;
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.15),
+        0 15px 30px rgba(0, 0, 0, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transform-style: preserve-3d;
+    animation: cardEntrance 0.8s ease-out;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    max-width: 100%;
+    z-index: 2;
+}
+
+.card-3d::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    border-radius: 24px 24px 0 0;
+    transition: background var(--transition-speed) var(--transition-timing);
+}
+
+@keyframes cardEntrance {
+    from {
+        opacity: 0;
+        transform: translateY(50px) rotateX(10deg);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) rotateX(0);
+    }
+}
+
+/* Header */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: flex-start;
+    flex: 1;
+}
+
+.logo i {
+    font-size: 2rem;
+    color: var(--primary-color);
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 4px rgba(var(--primary-color-rgb), 0.3));
+}
+
+h1 {
+    color: #2d3748;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    text-align: left;
+}
+
+/* Connection signal */
+.connection-signal {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    color: #475569;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    margin-left: 10px;
+}
+
+.signal-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 14px;
+}
+
+.signal-bar {
+    width: 3px;
+    background: var(--success-color);
+    border-radius: 1px;
+    animation: signalPulse 2s infinite ease-in-out;
+}
+
+.signal-bar:nth-child(1) { height: 4px; animation-delay: 0s; }
+.signal-bar:nth-child(2) { height: 7px; animation-delay: 0.2s; }
+.signal-bar:nth-child(3) { height: 10px; animation-delay: 0.4s; }
+.signal-bar:nth-child(4) { height: 13px; animation-delay: 0.6s; }
+
+@keyframes signalPulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+.connection-signal.offline .signal-bar {
+    background: var(--danger-color);
+}
+
+/* Info card */
+.info-card-3d {
+    background: var(--card-gradient);
+    border-radius: 18px;
+    padding: 18px;
+    margin-bottom: 15px;
+    border: 1px solid var(--card-border);
+    box-shadow: 
+        0 10px 25px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    transform-style: preserve-3d;
+    position: relative;
+    overflow: hidden;
+}
+
+.info-card-3d::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transform: translateX(-100%);
+}
+
+.info-card-3d:hover::after {
+    animation: shine 1.5s;
+}
+
+@keyframes shine {
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.card-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.card-label i {
+    color: var(--primary-color);
+    font-size: 1rem;
+}
+
+/* Saldo display */
+.saldo-display {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    min-height: 50px;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    position: relative;
+}
+
+.currency {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-shadow: 0 2px 4px rgba(var(--primary-color-rgb), 0.2);
+    line-height: 1;
+}
+
+/* Efek kilau saldo */
+.amount {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-color);
+    letter-spacing: -0.5px;
+    word-break: keep-all;
+    overflow: hidden;
+    text-align: center;
+    line-height: 1;
+    white-space: nowrap;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    position: relative;
+    /* Efek kilau untuk seluruh view */
+    background: linear-gradient(
+        90deg,
+        var(--text-color) 0%,
+        var(--text-secondary) 45%,
+        var(--accent-color) 50%,
+        var(--text-secondary) 55%,
+        var(--text-color) 100%
+    );
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer-left-to-right 3s infinite linear;
+}
+
+/* CATATAN: background-position bergerak berlawanan dengan arah visual
+   Untuk membuat kilau BERGERAK dari kiri ke kanan, posisi background
+   justru dianimasi dari 100% ke -100% */
+@keyframes shimmer-left-to-right {
+    0% {
+        background-position: 100% 0;
+    }
+    100% {
+        background-position: -100% 0;
+    }
+}
+
+/* Error & empty state */
+.amount.error {
+    font-size: 1.1rem;
+    color: var(--warning-color);
+    background: none;
+    -webkit-text-fill-color: var(--warning-color);
+    font-weight: 600;
+    animation: shake 0.5s ease;
+    white-space: normal;
+}
+
+.amount.empty {
+    font-size: 1.1rem;
+    color: var(--warning-color);
+    background: none;
+    -webkit-text-fill-color: var(--warning-color);
+    font-weight: 600;
+    white-space: normal;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* Time card */
+.time-card-3d {
+    background: linear-gradient(145deg, #f0f0f0, #e0e0e0);
+    color: #1f2937;
+    border-radius: 16px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 
+        0 12px 30px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8),
+        inset 0 -1px 1px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(220, 220, 220, 0.8);
+    border: 1px solid rgba(200, 200, 200, 0.6);
+    position: relative;
+    overflow: hidden;
+}
+
+.time-card-3d::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, 
+        #c0c0c0, 
+        #f0f0f0, 
+        #ffffff,
+        #f0f0f0,
+        #c0c0c0);
+    border-radius: 16px 16px 0 0;
+    opacity: 0.9;
+    box-shadow: 
+        0 2px 15px rgba(192, 192, 192, 0.5),
+        0 0 25px rgba(255, 255, 255, 0.4);
+}
+
+.time-card-3d::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.4) 50%,
+        transparent 70%
+    );
+    pointer-events: none;
+    opacity: 0.3;
+    animation: shine 3s infinite linear;
+}
+
+.time-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    color: #4b5563;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+}
+
+.time-label i {
+    color: #6b7280;
+    font-size: 0.9rem;
+    text-shadow: 
+        0 1px 3px rgba(255, 255, 255, 0.8),
+        0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.time-display {
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+    color: #111827;
+    letter-spacing: 0.5px;
+    font-variant-numeric: tabular-nums;
+    min-height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.3;
+    text-shadow: 
+        0 1px 3px rgba(255, 255, 255, 0.8),
+        0 0 15px rgba(255, 255, 255, 0.4);
+}
+
+/* Stats */
+.stats {
+    display: flex;
+    justify-content: space-around;
+    background: rgba(241, 245, 249, 0.8);
+    border-radius: 14px;
+    padding: 15px;
+    margin-bottom: 15px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(226, 232, 240, 0.5);
+    flex-wrap: nowrap;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: auto;
+    justify-content: center;
+    flex-direction: row;
+}
+
+.stat-icon {
+    width: 35px;
+    height: 35px;
+    background: var(--stat-icon-gradient);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 8px rgba(var(--primary-color-rgb), 0.3);
+    flex-shrink: 0;
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.stat-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-color);
+    line-height: 1.2;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-top: 2px;
+    line-height: 1.1;
+}
+
+.stat-divider {
+    width: 1px;
+    height: 35px;
+    background: rgba(203, 213, 224, 0.5);
+    margin: 0 5px;
+    align-self: center;
+}
+
+/* Footer */
+.footer-3d {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    width: 100%;
+}
+
+.footer-3d p {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 0.8rem;
+}
+
+.footer-3d p i {
+    font-size: 0.9rem;
+    vertical-align: middle;
+    line-height: 1;
+}
+
+.watermark {
+    text-align: center;
+    margin-top: 20px;
+    color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    z-index: 2;
+}
+
+/* Loading dots (text) */
+.loading-dots {
+    display: inline-flex;
+    gap: 3px;
+}
+
+.loading-dots span {
+    animation: dotPulse 1.5s infinite ease-in-out;
+    opacity: 0;
+    font-size: 1rem;
+}
+
+.loading-dots span:nth-child(1) { animation-delay: 0s; }
+.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes dotPulse {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
+}
+
+/* Connection status */
+.connection-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 10px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    opacity: 0.8;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.connection-status i {
+    font-size: 0.65rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    position: relative;
+    top: 0;
+}
+
+.connection-status span {
+    line-height: 1.2;
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+}
+
+.connection-status.online i {
+    color: var(--success-color);
+}
+
+.connection-status.offline i {
+    color: var(--danger-color);
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* Loading dots (circle) */
+.loading-dots-container {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    height: 35px;
+}
+
+.loading-dots-container span {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    animation: dotBounce 1.4s infinite ease-in-out both;
+}
+
+.loading-dots-container span:nth-child(1) { 
+    animation-delay: -0.32s; 
+}
+.loading-dots-container span:nth-child(2) { 
+    animation-delay: -0.16s; 
+}
+.loading-dots-container span:nth-child(3) { 
+    animation-delay: 0s; 
+}
+
+@keyframes dotBounce {
+    0%, 80%, 100% { 
+        transform: scale(0);
+        opacity: 0.5;
+    }
+    40% { 
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
 /* ==================== RESPONSIVE DESIGN ==================== */
 
 /* ==================== MOBILE VIEW (Phone) ==================== */
@@ -34,97 +750,102 @@
         z-index: 0;
     }
     
-    /* Bubble lebih besar dan jelas terlihat */
+    /* Bubble lebih besar dan jelas terlihat dengan posisi Y yang keluar card */
     .shape {
-        opacity: 0.35; /* Sedikit lebih terang */
-        backdrop-filter: blur(2px); /* Kurangi blur agar lebih jelas */
+        opacity: 0.4;
+        backdrop-filter: blur(3px);
         filter: brightness(1.3) contrast(1.2);
-        border: 2px solid rgba(255, 255, 255, 0.4);
+        border: 2px solid rgba(255, 255, 255, 0.5);
         box-shadow: 
-            inset 0 0 40px rgba(255, 255, 255, 0.3),
-            0 0 80px rgba(255, 255, 255, 0.25),
-            0 0 120px rgba(255, 255, 255, 0.15);
-        animation: float-mobile 20s infinite ease-in-out;
+            inset 0 0 50px rgba(255, 255, 255, 0.4),
+            0 0 100px rgba(255, 255, 255, 0.3),
+            0 0 150px rgba(255, 255, 255, 0.2);
+        animation: float-mobile 25s infinite ease-in-out;
         z-index: 0;
     }
     
-    /* Bubble 1 - Kiri atas, sebagian masuk ke card */
+    /* BUBBLE 1 - Kiri atas, keluar dari card di bagian atas */
     .shape-1 {
-        width: 180px;
-        height: 180px;
-        top: 5% !important;
-        left: -40px !important; /* Masuk ke dalam dari kiri */
+        width: 200px;
+        height: 200px;
+        top: -50px !important;
+        left: -40px !important;
         animation-delay: 0s;
-        animation-duration: 25s;
-        background: radial-gradient(circle at 30% 30%, 
-            rgba(255, 255, 255, 0.25), 
-            rgba(255, 255, 255, 0.1) 70%);
-    }
-    
-    /* Bubble 2 - Kanan bawah, sebagian masuk ke card */
-    .shape-2 {
-        width: 140px;
-        height: 140px;
-        bottom: 10% !important;
-        right: -30px !important; /* Masuk ke dalam dari kanan */
-        animation-delay: 7s;
         animation-duration: 30s;
-        background: radial-gradient(circle at 70% 70%, 
-            rgba(255, 255, 255, 0.25), 
-            rgba(255, 255, 255, 0.1) 70%);
-    }
-    
-    /* Bubble 3 - Tengah kiri, jelas terlihat di luar card */
-    .shape-3 {
-        width: 100px;
-        height: 100px;
-        top: 60% !important;
-        left: 85% !important; /* Jelas di luar card di kanan */
-        animation-delay: 14s;
-        animation-duration: 35s;
-        background: radial-gradient(circle at 50% 50%, 
-            rgba(255, 255, 255, 0.3), 
+        background: radial-gradient(circle at 30% 30%, 
+            rgba(255, 255, 255, 0.35), 
             rgba(255, 255, 255, 0.15) 70%);
     }
     
-    /* Animasi khusus untuk mobile */
+    /* BUBBLE 2 - Kanan bawah, keluar dari card di bagian bawah */
+    .shape-2 {
+        width: 160px;
+        height: 160px;
+        bottom: -40px !important;
+        right: -30px !important;
+        animation-delay: 8s;
+        animation-duration: 35s;
+        background: radial-gradient(circle at 70% 70%, 
+            rgba(255, 255, 255, 0.35), 
+            rgba(255, 255, 255, 0.15) 70%);
+    }
+    
+    /* BUBBLE 3 - Tengah kanan, jelas terlihat di luar card */
+    .shape-3 {
+        width: 120px;
+        height: 120px;
+        top: 40% !important;
+        left: 90% !important;
+        animation-delay: 16s;
+        animation-duration: 40s;
+        background: radial-gradient(circle at 50% 50%, 
+            rgba(255, 255, 255, 0.4), 
+            rgba(255, 255, 255, 0.2) 70%);
+    }
+    
+    /* Animasi khusus untuk mobile dengan lebih banyak gerakan Y axis */
     @keyframes float-mobile {
         0%, 100% {
             transform: translateY(0) rotate(0deg) scale(1);
         }
-        25% {
-            transform: translateY(-20px) rotate(90deg) scale(1.05);
+        20% {
+            transform: translateY(-25px) rotate(72deg) scale(1.08);
         }
-        50% {
-            transform: translateY(10px) rotate(180deg) scale(0.95);
+        40% {
+            transform: translateY(15px) rotate(144deg) scale(0.95);
         }
-        75% {
-            transform: translateY(-10px) rotate(270deg) scale(1.02);
+        60% {
+            transform: translateY(-15px) rotate(216deg) scale(1.05);
+        }
+        80% {
+            transform: translateY(20px) rotate(288deg) scale(0.98);
         }
     }
     
-    /* Efek pulsasi tambahan untuk bubble */
+    /* Efek pulsasi dengan pergerakan Y yang lebih jelas */
     @keyframes pulse-mobile {
         0%, 100% {
-            opacity: 0.35;
-            box-shadow: 
-                inset 0 0 40px rgba(255, 255, 255, 0.3),
-                0 0 80px rgba(255, 255, 255, 0.25),
-                0 0 120px rgba(255, 255, 255, 0.15);
-        }
-        50% {
-            opacity: 0.45;
+            opacity: 0.4;
+            transform: translateY(0);
             box-shadow: 
                 inset 0 0 50px rgba(255, 255, 255, 0.4),
-                0 0 100px rgba(255, 255, 255, 0.35),
-                0 0 150px rgba(255, 255, 255, 0.25);
+                0 0 100px rgba(255, 255, 255, 0.3),
+                0 0 150px rgba(255, 255, 255, 0.2);
+        }
+        50% {
+            opacity: 0.5;
+            transform: translateY(-10px);
+            box-shadow: 
+                inset 0 0 60px rgba(255, 255, 255, 0.5),
+                0 0 120px rgba(255, 255, 255, 0.4),
+                0 0 180px rgba(255, 255, 255, 0.3);
         }
     }
     
     .shape {
         animation: 
-            float-mobile 20s infinite ease-in-out,
-            pulse-mobile 8s infinite ease-in-out;
+            float-mobile 25s infinite ease-in-out,
+            pulse-mobile 10s infinite ease-in-out;
     }
     
     /* Pastikan card memiliki background semi-transparan agar bubble terlihat */
@@ -150,86 +871,99 @@
         min-height: auto;
         box-sizing: border-box;
         border-radius: 20px;
-        background: rgba(255, 255, 255, 0.88); /* Lebih transparan */
-        backdrop-filter: blur(12px) saturate(180%);
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(15px) saturate(180%);
         z-index: 2;
         position: relative;
-        border: 1px solid rgba(255, 255, 255, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.5);
         box-shadow: 
-            0 15px 35px rgba(0, 0, 0, 0.1),
-            0 5px 15px rgba(0, 0, 0, 0.07),
-            inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            0 20px 40px rgba(0, 0, 0, 0.12),
+            0 8px 20px rgba(0, 0, 0, 0.08),
+            inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        margin-top: 30px;
+        margin-bottom: 30px;
     }
     
     /* Tambahkan efek border glowing pada card */
     .card-3d::after {
         content: '';
         position: absolute;
-        top: -1px;
-        left: -1px;
-        right: -1px;
-        bottom: -1px;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
         background: linear-gradient(
             45deg,
             transparent,
-            rgba(255, 255, 255, 0.3),
+            rgba(255, 255, 255, 0.4),
             transparent
         );
-        border-radius: 21px;
+        border-radius: 22px;
         z-index: -1;
-        opacity: 0.6;
+        opacity: 0.7;
+        animation: border-glow 4s infinite linear;
+    }
+    
+    @keyframes border-glow {
+        0%, 100% {
+            opacity: 0.5;
+        }
+        50% {
+            opacity: 0.8;
+        }
     }
     
     /* Overlay untuk meningkatkan visibilitas bubble di belakang card */
     .background-3d::before {
         content: '';
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
+        top: -50px;
+        left: -50px;
+        right: -50px;
+        bottom: -50px;
         background: 
             radial-gradient(
-                circle at 20% 15%,
+                circle at 15% -10%,
+                rgba(255, 255, 255, 0.2) 0%,
+                transparent 60%
+            ),
+            radial-gradient(
+                circle at 85% 110%,
+                rgba(255, 255, 255, 0.18) 0%,
+                transparent 60%
+            ),
+            radial-gradient(
+                circle at 95% 40%,
                 rgba(255, 255, 255, 0.15) 0%,
-                transparent 50%
-            ),
-            radial-gradient(
-                circle at 85% 65%,
-                rgba(255, 255, 255, 0.12) 0%,
-                transparent 50%
-            ),
-            radial-gradient(
-                circle at 75% 25%,
-                rgba(255, 255, 255, 0.1) 0%,
                 transparent 50%
             );
         pointer-events: none;
         z-index: -1;
     }
     
-    /* Efek highlight di belakang card untuk bubble yang masuk */
+    /* Efek highlight di sekitar card untuk bubble yang keluar */
     .card-3d::before {
         content: '';
         position: absolute;
-        top: -30px;
-        left: -30px;
-        right: -30px;
-        bottom: -30px;
+        top: -50px;
+        left: -50px;
+        right: -50px;
+        bottom: -50px;
         background: 
             radial-gradient(
-                circle at -20px -20px,
-                rgba(var(--primary-color-rgb, 102, 126, 234), 0.1) 0%,
-                transparent 100px
+                circle at -30px -50px,
+                rgba(var(--primary-color-rgb, 102, 126, 234), 0.15) 0%,
+                transparent 150px
             ),
             radial-gradient(
-                circle at calc(100% + 30px) calc(100% + 30px),
-                rgba(var(--secondary-color-rgb, 118, 75, 162), 0.1) 0%,
-                transparent 100px
+                circle at calc(100% + 40px) calc(100% + 50px),
+                rgba(var(--secondary-color-rgb, 118, 75, 162), 0.15) 0%,
+                transparent 150px
             );
         z-index: -2;
         pointer-events: none;
-        border-radius: 30px;
+        border-radius: 50px;
+        opacity: 0.6;
     }
     
     .card-header {
@@ -544,37 +1278,39 @@
     }
     
     .app-container {
-        margin-top: 5px;
-        max-height: 95vh;
+        margin-top: 10px;
+        max-height: 90vh;
         overflow-y: auto;
     }
     
     .card-3d {
-        padding: 10px;
-        max-height: 95vh;
+        padding: 12px;
+        max-height: 90vh;
         overflow-y: auto;
+        margin-top: 20px;
+        margin-bottom: 20px;
     }
     
-    /* Adjust bubble untuk landscape */
+    /* Adjust bubble untuk landscape dengan posisi Y yang keluar */
     .shape-1 {
-        width: 120px;
-        height: 120px;
-        top: 5% !important;
+        width: 150px;
+        height: 150px;
+        top: -30px !important;
         left: -25px !important;
     }
     
     .shape-2 {
-        width: 100px;
-        height: 100px;
-        bottom: 5% !important;
+        width: 120px;
+        height: 120px;
+        bottom: -25px !important;
         right: -20px !important;
     }
     
     .shape-3 {
-        width: 80px;
-        height: 80px;
+        width: 100px;
+        height: 100px;
         top: 50% !important;
-        left: 90% !important;
+        left: 95% !important;
     }
     
     .saldo-display {
@@ -624,32 +1360,34 @@
 @media (max-width: 360px) {
     .card-3d {
         padding: 12px;
+        margin-top: 25px;
+        margin-bottom: 25px;
     }
     
     h1 {
         font-size: 1.1rem;
     }
     
-    /* Adjust bubble untuk layar sangat kecil */
+    /* Adjust bubble untuk layar sangat kecil dengan posisi Y keluar */
     .shape-1 {
-        width: 150px;
-        height: 150px;
-        top: 3% !important;
+        width: 170px;
+        height: 170px;
+        top: -40px !important;
         left: -35px !important;
     }
     
     .shape-2 {
-        width: 110px;
-        height: 110px;
-        bottom: 5% !important;
+        width: 130px;
+        height: 130px;
+        bottom: -35px !important;
         right: -25px !important;
     }
     
     .shape-3 {
-        width: 90px;
-        height: 90px;
-        top: 65% !important;
-        left: 80% !important;
+        width: 110px;
+        height: 110px;
+        top: 45% !important;
+        left: 85% !important;
     }
     
     .saldo-display {
@@ -694,5 +1432,180 @@
     .stat-label {
         font-size: 0.7rem;
         text-align: center;
+    }
+}
+
+/* Tablet kecil */
+@media (min-width: 481px) and (max-width: 767px) {
+    body {
+        padding: 20px;
+    }
+    
+    .app-container {
+        max-width: 90%;
+        margin: 0 auto;
+    }
+    
+    .card-3d {
+        max-width: 100%;
+        padding: 20px;
+    }
+    
+    /* Adjust bubbles untuk tablet */
+    .shape-1 {
+        width: 200px;
+        height: 200px;
+        top: 10%;
+        left: 5%;
+    }
+    
+    .shape-2 {
+        width: 150px;
+        height: 150px;
+        bottom: 15%;
+        right: 5%;
+    }
+    
+    .shape-3 {
+        width: 120px;
+        height: 120px;
+        top: 70%;
+        left: 80%;
+    }
+    
+    .saldo-display {
+        align-items: center;
+        gap: 8px;
+        justify-content: center;
+    }
+    
+    .currency {
+        align-self: center;
+    }
+    
+    .amount {
+        align-self: center;
+        text-align: center;
+    }
+    
+    .stats {
+        padding: 12px;
+        align-items: center;
+        flex-direction: row;
+        gap: 10px;
+    }
+    
+    .stat-item {
+        justify-content: center;
+        flex-direction: row;
+        text-align: left;
+    }
+    
+    .stat-info {
+        align-items: flex-start;
+        text-align: left;
+        flex-direction: column;
+    }
+    
+    .stat-divider {
+        display: block;
+        height: 35px;
+    }
+}
+
+/* Tablet landscape */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .app-container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .card-3d {
+        max-width: 600px;
+        padding: 25px;
+    }
+    
+    .saldo-display {
+        align-items: center;
+        gap: 8px;
+        justify-content: center;
+    }
+    
+    .currency {
+        align-self: center;
+    }
+    
+    .amount {
+        align-self: center;
+        text-align: center;
+    }
+    
+    .stats {
+        padding: 15px;
+        align-items: center;
+        flex-direction: row;
+        gap: 15px;
+    }
+    
+    .stat-item {
+        justify-content: center;
+        flex-direction: row;
+        text-align: left;
+    }
+    
+    .stat-info {
+        align-items: flex-start;
+        text-align: left;
+        flex-direction: column;
+    }
+    
+    .stat-divider {
+        display: block;
+        height: 40px;
+    }
+}
+
+/* Desktop besar */
+@media (min-width: 1025px) {
+    .app-container {
+        max-width: 500px;
+    }
+    
+    .saldo-display {
+        align-items: center;
+        gap: 8px;
+        justify-content: center;
+    }
+    
+    .currency {
+        align-self: center;
+    }
+    
+    .amount {
+        align-self: center;
+        text-align: center;
+    }
+    
+    .stats {
+        align-items: center;
+        flex-direction: row;
+        gap: 15px;
+    }
+    
+    .stat-item {
+        justify-content: center;
+        flex-direction: row;
+        text-align: left;
+    }
+    
+    .stat-info {
+        align-items: flex-start;
+        text-align: left;
+        flex-direction: column;
+    }
+    
+    .stat-divider {
+        display: block;
+        height: 40px;
     }
 }
