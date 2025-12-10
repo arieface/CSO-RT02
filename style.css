@@ -17,14 +17,14 @@
     --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Red Theme (Saldo < 500.000) */
+/* Red Theme (Saldo < 500.000) - DIUBAH MENJADI DARK RED/STRAWBERRY */
 [data-theme="red"] {
-    --primary-color: #ef4444;
-    --secondary-color: #dc2626;
-    --accent-color: #fca5a5;
-    --background-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    --stat-icon-gradient: linear-gradient(135deg, #ef4444, #dc2626);
-    --danger-color: #dc2626;
+    --primary-color: #d32f2f;
+    --secondary-color: #b71c1c;
+    --accent-color: #ef9a9a;
+    --background-gradient: linear-gradient(135deg, #c62828 0%, #8e0000 100%);
+    --stat-icon-gradient: linear-gradient(135deg, #d32f2f, #b71c1c);
+    --danger-color: #b71c1c;
 }
 
 /* Yellow-Orange Theme (Saldo 500.000 - 1.000.000) */
@@ -724,8 +724,50 @@ h1 {
         padding: 10px;
     }
     
+    /* REVISI: Bubble/bentuk latar tidak disembunyikan di mobile */
     .floating-shapes {
-        display: none;
+        display: block !important; /* Pastikan tetap terlihat */
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        overflow: visible; /* Pastikan bubble tidak terpotong */
+    }
+    
+    /* REVISI: Atur posisi Y untuk bubble di mobile view */
+    .shape-1 {
+        width: 180px;
+        height: 180px;
+        top: -50px !important; /* Posisi di luar kartu */
+        left: -50px;
+        opacity: 0.6;
+        animation-delay: 0s;
+    }
+    
+    .shape-2 {
+        width: 120px;
+        height: 120px;
+        bottom: -30px !important; /* Posisi di luar kartu */
+        right: -30px;
+        opacity: 0.4;
+        animation-delay: 5s;
+    }
+    
+    .shape-3 {
+        width: 80px;
+        height: 80px;
+        top: auto !important;
+        bottom: 60% !important;
+        left: 85% !important;
+        opacity: 0.3;
+        animation-delay: 10s;
+    }
+    
+    /* REVISI: Bubble lebih kecil di mobile tapi tetap terlihat */
+    .shape {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(3px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
     
     .app-container {
