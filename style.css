@@ -298,7 +298,7 @@ h1 {
         90deg,
         #1e293b 0%,
         #475569 45%,
-        #a5b4fc 50%,
+        #a5b4fc 50%, /* Warna kilau lebih terang */
         #475569 55%,
         #1e293b 100%
     );
@@ -309,13 +309,13 @@ h1 {
     animation: shimmer-left-to-right 3s infinite linear;
 }
 
-/* PERBAIKAN 5: Keyframe animasi kilau dari kiri ke kanan (dari kiri → kanan) */
+/* PERBAIKAN 5: Keyframe animasi kilau dari kiri ke kanan */
 @keyframes shimmer-left-to-right {
     0% {
-        background-position: 0% 0;     /* mulai dari kiri */
+        background-position: -100% 0; /* Mulai dari kiri */
     }
     100% {
-        background-position: 200% 0;   /* bergerak ke kanan */
+        background-position: 100% 0; /* Berakhir di kanan */
     }
 }
 
@@ -398,6 +398,15 @@ h1 {
     pointer-events: none;
     opacity: 0.3;
     animation: shine 3s infinite linear;
+}
+
+@keyframes shine {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
 }
 
 .time-label {
@@ -651,6 +660,7 @@ h1 {
 @media (max-width: 480px) {
     body {
         padding: 15px 10px;
+        /* PERBAIKAN 2: Posisi Y axis untuk center di phone */
         justify-content: center;
         align-items: center;
         min-height: 100vh;
@@ -659,7 +669,7 @@ h1 {
     }
     
     .background-3d {
-        justify-content: flex-start;
+        justify-content: center;
         align-items: center;
         display: flex;
         flex-direction: column;
@@ -677,7 +687,6 @@ h1 {
         display: flex;
         flex-direction: column;
         align-items: center;
-        /* PERBAIKAN 2: centering vertikal di phone */
         justify-content: center;
         gap: 12px;
         padding: 0;
@@ -1119,7 +1128,7 @@ h1 {
 @media (max-width: 480px) and (orientation: landscape) {
     body {
         padding: 10px;
-        justify-content: flex-start;
+        justify-content: center;
     }
     
     .app-container {
