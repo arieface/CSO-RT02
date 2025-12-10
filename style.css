@@ -293,14 +293,14 @@ h1 {
     overflow-y: hidden;
     position: relative;
     /* LASER SUPER TIPIS (hanya 0.2%) */
-    background: linear-gradient(
-        90deg,
-        #1e293b 0%,
-        #1e293b 49.9%,
-        rgba(255, 255, 255, 1) 50%,     /* GARIS LASER SUPER TIPIS */
-        #1e293b 50.1%,
-        #1e293b 100%
-    );
+background: linear-gradient(
+    90deg,
+    #667eea 0%,           /* WARNA DASAR: abu-abu gelap */
+    #1e293b 49.9%,        /* BATAS AWAL: 49.9% - area sebelum laser */
+    rgba(255, 255, 255, 1) 50%,  /* LASER INTI: 50% - warna putih solid */
+    #1e293b 50.25%,        /* BATAS AKHIR: 50.1% - area setelah laser */
+    #667eea 100%          /* WARNA DASAR: abu-abu gelap */
+);
     background-size: 150% 100%;
     -webkit-background-clip: text;
     background-clip: text;
