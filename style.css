@@ -298,13 +298,13 @@ h1 {
         90deg,
         #1e293b 0%,
         #1e293b 25%,
-        #ffffff 35%,     /* Kilau putih terang */
-        #a5b4fc 45%,     /* Kilau ungu terang */
-        #ffffff 55%,     /* Kilau putih terang */
+        #ffffff 35%,     /* Kilau putih terang ← MULAI KILAU */
+        #a5b4fc 45%,     /* Kilau ungu terang ← PUNCAK KILAU */
+        #ffffff 55%,     /* Kilau putih terang ← AKHIR KILAU */
         #1e293b 65%,
         #1e293b 100%
     );
-    background-size: 200% 100%;
+    background-size: 50% 20%;  /* ← LEBAR TOTAL BACKGROUND: 200% */
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -315,10 +315,10 @@ h1 {
 /* PERBAIKAN 5: Keyframe animasi kilau DARI KIRI KE KANAN YANG BENAR */
 @keyframes shimmer-left-to-right {
     0% {
-        background-position: 100% 0;    /* Mulai dari KANAN (kilau di kanan) */
+        background-position: 100% 0;    /* ← POSISI AWAL: 100% ke KANAN */
     }
     100% {
-        background-position: -100% 0;   /* Berakhir di KIRI (kilau pindah ke kiri) */
+        background-position: -100% 0;   /* ← POSISI AKHIR: 100% ke KIRI */
     }
 }
 
