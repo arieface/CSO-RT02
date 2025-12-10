@@ -1,4 +1,4 @@
-/* ==================== VARIABEL CSS UNTUK THEME ==================== */
+/* ==================== VARIABEL CSS THEME ==================== */
 :root {
     /* Default theme (purple) */
     --primary-color: #667eea;
@@ -13,8 +13,8 @@
     --text-color: #1e293b;
     --text-secondary: #64748b;
     --card-border: rgba(226, 232, 240, 0.8);
-    --transition-speed: 0.5s;
-    --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-speed: 0.3s;
+    --transition-timing: ease-in-out;
 }
 
 /* Red Theme (Saldo < 500.000) */
@@ -47,16 +47,11 @@
     --success-color: #0f766e;
 }
 
-/* ==================== TRANSISI GLOBAL ==================== */
+/* ==================== RESET & BASE STYLES ==================== */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    transition: background-color var(--transition-speed) var(--transition-timing),
-                color var(--transition-speed) var(--transition-timing),
-                border-color var(--transition-speed) var(--transition-timing),
-                box-shadow var(--transition-speed) var(--transition-timing),
-                background-image var(--transition-speed) var(--transition-timing);
 }
 
 body {
@@ -64,10 +59,8 @@ body {
     background: var(--background-gradient);
     min-height: 100vh;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
-    overflow-x: hidden;
     padding: 20px;
     transition: background var(--transition-speed) var(--transition-timing);
 }
@@ -80,11 +73,7 @@ body {
     width: 100%;
     height: 100%;
     z-index: -1;
-    perspective: 1000px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    overflow: hidden;
 }
 
 .floating-shapes {
@@ -99,47 +88,47 @@ body {
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(5px);
-    animation: float 15s infinite ease-in-out;
+    animation: float 20s infinite ease-in-out;
     pointer-events: none;
 }
 
 .shape-1 {
-    width: 250px;
-    height: 250px;
-    top: 15%;
-    left: 10%;
+    width: 200px;
+    height: 200px;
+    top: 10%;
+    left: 5%;
     animation-delay: 0s;
 }
 
 .shape-2 {
-    width: 180px;
-    height: 180px;
-    bottom: 20%;
-    right: 12%;
+    width: 150px;
+    height: 150px;
+    bottom: 15%;
+    right: 10%;
     animation-delay: 5s;
 }
 
 .shape-3 {
-    width: 120px;
-    height: 120px;
-    top: 65%;
-    left: 85%;
+    width: 100px;
+    height: 100px;
+    top: 60%;
+    left: 80%;
     animation-delay: 10s;
 }
 
 @keyframes float {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-20px) rotate(180deg); }
+    0%, 100% { 
+        transform: translateY(0) rotate(0deg); 
+    }
+    50% { 
+        transform: translateY(-20px) rotate(180deg); 
+    }
 }
 
 /* ==================== MAIN CONTAINER ==================== */
 .app-container {
     width: 100%;
     max-width: 500px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
     margin: 0 auto;
 }
 
@@ -147,17 +136,15 @@ body {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
     border-radius: 24px;
-    padding: 20px;
+    padding: 25px;
     box-shadow: 
         0 20px 40px rgba(0, 0, 0, 0.15),
-        0 15px 30px rgba(0, 0, 0, 0.12),
+        0 10px 20px rgba(0, 0, 0, 0.1),
         inset 0 1px 0 rgba(255, 255, 255, 0.6);
     border: 1px solid rgba(255, 255, 255, 0.3);
-    transform-style: preserve-3d;
     animation: cardEntrance 0.8s ease-out;
     position: relative;
     overflow: hidden;
-    width: 100%;
 }
 
 .card-3d::before {
@@ -169,17 +156,16 @@ body {
     height: 4px;
     background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
     border-radius: 24px 24px 0 0;
-    transition: background var(--transition-speed) var(--transition-timing);
 }
 
 @keyframes cardEntrance {
     from {
         opacity: 0;
-        transform: translateY(50px) rotateX(10deg);
+        transform: translateY(30px) scale(0.95);
     }
     to {
         opacity: 1;
-        transform: translateY(0) rotateX(0);
+        transform: translateY(0) scale(1);
     }
 }
 
@@ -188,24 +174,21 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 
 .logo {
     display: flex;
     align-items: center;
     gap: 12px;
-    justify-content: flex-start;
-    flex: 1;
 }
 
 .logo i {
-    font-size: 2rem;
+    font-size: 2.2rem;
     color: var(--primary-color);
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 2px 4px rgba(var(--primary-color-rgb), 0.3));
 }
 
 h1 {
@@ -213,7 +196,6 @@ h1 {
     font-size: 1.5rem;
     font-weight: 700;
     letter-spacing: -0.3px;
-    text-align: left;
 }
 
 /* ==================== CONNECTION SIGNAL ==================== */
@@ -221,15 +203,14 @@ h1 {
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 6px 12px;
-    border-radius: 16px;
+    padding: 8px 12px;
+    border-radius: 20px;
     font-size: 0.8rem;
     font-weight: 600;
-    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    background: rgba(248, 250, 252, 0.9);
     color: #475569;
     border: 1px solid rgba(226, 232, 240, 0.8);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    margin-left: 10px;
 }
 
 .signal-bars {
@@ -260,17 +241,16 @@ h1 {
     background: var(--danger-color);
 }
 
-/* ==================== INFO CARD ==================== */
+/* ==================== BALANCE CARD ==================== */
 .info-card-3d {
     background: var(--card-gradient);
     border-radius: 18px;
-    padding: 18px;
-    margin-bottom: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
     border: 1px solid var(--card-border);
     box-shadow: 
         0 10px 25px rgba(0, 0, 0, 0.08),
         inset 0 1px 0 rgba(255, 255, 255, 0.8);
-    transform-style: preserve-3d;
     position: relative;
     overflow: hidden;
 }
@@ -300,7 +280,7 @@ h1 {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 12px;
+    margin-bottom: 15px;
     color: var(--text-secondary);
     font-size: 0.9rem;
     font-weight: 600;
@@ -308,7 +288,7 @@ h1 {
 
 .card-label i {
     color: var(--primary-color);
-    font-size: 1rem;
+    font-size: 1.1rem;
 }
 
 /* ==================== SALDO DISPLAY ==================== */
@@ -316,36 +296,24 @@ h1 {
     display: flex;
     align-items: baseline;
     justify-content: center;
-    gap: 8px;
-    margin-bottom: 12px;
-    min-height: 50px;
-    flex-wrap: nowrap;
-    white-space: nowrap;
-    position: relative;
+    gap: 10px;
+    margin-bottom: 15px;
+    min-height: 60px;
 }
 
 .currency {
-    font-size: 1.8rem;
+    font-size: 2rem;
     font-weight: 700;
     color: var(--primary-color);
-    text-shadow: 0 2px 4px rgba(var(--primary-color-rgb), 0.2);
-    line-height: 1;
 }
 
 .amount {
-    font-size: 2rem;
+    font-size: 2.5rem;
     font-weight: 800;
     color: var(--text-color);
     letter-spacing: -0.5px;
-    word-break: keep-all;
-    overflow: hidden;
     text-align: center;
     line-height: 1;
-    white-space: nowrap;
-    max-width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
-    position: relative;
     background: linear-gradient(
         90deg,
         var(--text-color) 0%,
@@ -358,10 +326,10 @@ h1 {
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: shimmer-left-to-right 3s infinite linear;
+    animation: shimmer 3s infinite linear;
 }
 
-@keyframes shimmer-left-to-right {
+@keyframes shimmer {
     0% {
         background-position: 100% 0;
     }
@@ -370,30 +338,42 @@ h1 {
     }
 }
 
-/* Error state */
 .amount.error {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     color: var(--warning-color);
     background: none;
     -webkit-text-fill-color: var(--warning-color);
     font-weight: 600;
-    animation: shake 0.5s ease;
-    white-space: normal;
 }
 
-.amount.empty {
-    font-size: 1.1rem;
-    color: var(--warning-color);
-    background: none;
-    -webkit-text-fill-color: var(--warning-color);
-    font-weight: 600;
-    white-space: normal;
+/* ==================== CONNECTION STATUS ==================== */
+.connection-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 10px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-align: center;
 }
 
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-    20%, 40%, 60%, 80% { transform: translateX(5px); }
+.connection-status i {
+    font-size: 0.7rem;
+}
+
+.connection-status.online i {
+    color: var(--success-color);
+}
+
+.connection-status.offline i {
+    color: var(--danger-color);
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
 }
 
 /* ==================== TIME CARD ==================== */
@@ -402,35 +382,11 @@ h1 {
     color: #1f2937;
     border-radius: 16px;
     padding: 15px;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     box-shadow: 
-        0 12px 30px rgba(0, 0, 0, 0.15),
-        inset 0 1px 0 rgba(255, 255, 255, 0.8),
-        inset 0 -1px 1px rgba(0, 0, 0, 0.1),
-        0 0 0 1px rgba(220, 220, 220, 0.8);
+        0 10px 20px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
     border: 1px solid rgba(200, 200, 200, 0.6);
-    position: relative;
-    overflow: hidden;
-}
-
-.time-card-3d::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, 
-        #c0c0c0, 
-        #f0f0f0, 
-        #ffffff,
-        #f0f0f0,
-        #c0c0c0);
-    border-radius: 16px 16px 0 0;
-    opacity: 0.9;
-    box-shadow: 
-        0 2px 15px rgba(192, 192, 192, 0.5),
-        0 0 25px rgba(255, 255, 255, 0.4);
 }
 
 .time-label {
@@ -441,32 +397,20 @@ h1 {
     color: #4b5563;
     font-size: 0.85rem;
     font-weight: 600;
-    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
 }
 
 .time-label i {
     color: #6b7280;
-    font-size: 0.9rem;
-    text-shadow: 
-        0 1px 3px rgba(255, 255, 255, 0.8),
-        0 0 10px rgba(255, 255, 255, 0.5);
 }
 
 .time-display {
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 600;
     text-align: center;
     color: #111827;
     letter-spacing: 0.5px;
-    font-variant-numeric: tabular-nums;
-    min-height: 25px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1.3;
-    text-shadow: 
-        0 1px 3px rgba(255, 255, 255, 0.8),
-        0 0 15px rgba(255, 255, 255, 0.4);
+    min-height: 22px;
+    line-height: 1.4;
 }
 
 /* ==================== STATS ==================== */
@@ -476,41 +420,33 @@ h1 {
     background: rgba(241, 245, 249, 0.8);
     border-radius: 14px;
     padding: 15px;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     backdrop-filter: blur(10px);
     border: 1px solid rgba(226, 232, 240, 0.5);
-    flex-wrap: nowrap;
 }
 
 .stat-item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    min-width: auto;
-    justify-content: center;
-    flex-direction: row;
+    gap: 10px;
 }
 
 .stat-icon {
-    width: 35px;
-    height: 35px;
+    width: 40px;
+    height: 40px;
     background: var(--stat-icon-gradient);
     border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 0.9rem;
-    box-shadow: 0 4px 8px rgba(var(--primary-color-rgb), 0.3);
-    flex-shrink: 0;
+    font-size: 1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .stat-info {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    text-align: left;
-    white-space: nowrap;
 }
 
 .stat-value {
@@ -525,27 +461,23 @@ h1 {
     color: var(--text-secondary);
     font-weight: 500;
     margin-top: 2px;
-    line-height: 1.1;
 }
 
 .stat-divider {
     width: 1px;
-    height: 35px;
+    height: 40px;
     background: rgba(203, 213, 224, 0.5);
-    margin: 0 5px;
-    align-self: center;
 }
 
-/* ==================== FOOTER & WATERMARK ==================== */
+/* ==================== FOOTER ==================== */
 .footer-3d {
     text-align: center;
     color: var(--text-secondary);
     font-size: 0.85rem;
-    width: 100%;
 }
 
 .footer-3d p {
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -553,12 +485,21 @@ h1 {
     font-size: 0.8rem;
 }
 
-.footer-3d p i {
-    font-size: 0.9rem;
-    vertical-align: middle;
-    line-height: 1;
+.footer-3d a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: opacity 0.2s;
 }
 
+.footer-3d a:hover {
+    opacity: 0.8;
+}
+
+.footer-3d p i {
+    font-size: 0.9rem;
+}
+
+/* ==================== WATERMARK ==================== */
 .watermark {
     text-align: center;
     margin-top: 20px;
@@ -571,35 +512,29 @@ h1 {
     font-weight: 500;
 }
 
-/* ==================== LOADING DOTS ==================== */
-.loading-dots-container {
+/* ==================== LOADING ANIMATION ==================== */
+.loading-dots {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 4px;
-    height: 35px;
+    height: 40px;
 }
 
-.loading-dots-container span {
+.loading-dots span {
     display: inline-block;
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     background: var(--primary-color);
-    animation: dotBounce 1.4s infinite ease-in-out both;
+    animation: bounce 1.4s infinite ease-in-out both;
 }
 
-.loading-dots-container span:nth-child(1) { 
-    animation-delay: -0.32s; 
-}
-.loading-dots-container span:nth-child(2) { 
-    animation-delay: -0.16s; 
-}
-.loading-dots-container span:nth-child(3) { 
-    animation-delay: 0s; 
-}
+.loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+.loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+.loading-dots span:nth-child(3) { animation-delay: 0s; }
 
-@keyframes dotBounce {
+@keyframes bounce {
     0%, 80%, 100% { 
         transform: scale(0);
         opacity: 0.5;
@@ -610,94 +545,41 @@ h1 {
     }
 }
 
-/* ==================== CONNECTION STATUS ==================== */
-.connection-status {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    margin-top: 10px;
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-    opacity: 0.8;
-    text-align: center;
-    line-height: 1.2;
-}
-
-.connection-status i {
-    font-size: 0.65rem;
-    line-height: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    vertical-align: middle;
-    position: relative;
-    top: 0;
-}
-
-.connection-status span {
-    line-height: 1.2;
-    display: inline-flex;
-    align-items: center;
-    vertical-align: middle;
-}
-
-.connection-status.online i {
-    color: var(--success-color);
-}
-
-.connection-status.offline i {
-    color: var(--danger-color);
-    animation: blink 1s infinite;
-}
-
-@keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-}
-
 /* ==================== RESPONSIVE DESIGN ==================== */
 @media (max-width: 480px) {
     body {
-        padding: 15px 10px;
-    }
-    
-    .app-container {
-        max-width: 100%;
+        padding: 15px;
     }
     
     .card-3d {
-        padding: 15px;
+        padding: 20px;
         border-radius: 20px;
     }
     
     .card-header {
         flex-direction: column;
-        gap: 12px;
+        gap: 15px;
         text-align: center;
     }
     
     h1 {
-        font-size: 1.2rem;
+        font-size: 1.3rem;
     }
     
     .logo i {
-        font-size: 1.5rem;
+        font-size: 1.8rem;
     }
     
-    .info-card-3d {
-        padding: 15px;
-    }
-    
-    .saldo-display {
-        gap: 6px;
-    }
-    
-    .currency {
-        font-size: 1.5rem;
+    .connection-signal {
+        width: 100%;
+        justify-content: center;
     }
     
     .amount {
+        font-size: 2rem;
+    }
+    
+    .currency {
         font-size: 1.6rem;
     }
     
@@ -706,27 +588,12 @@ h1 {
     }
     
     .stats {
-        grid-template-columns: repeat(3, 1fr);
-        grid-template-rows: auto auto;
-        gap: 8px 15px;
-        padding: 15px;
+        flex-direction: column;
+        gap: 15px;
     }
     
     .stat-item {
-        display: contents;
-    }
-    
-    .stat-icon {
-        grid-row: 1;
-        justify-self: center;
-        width: 40px;
-        height: 40px;
-    }
-    
-    .stat-info {
-        grid-row: 2;
-        text-align: center;
-        align-items: center;
+        justify-content: center;
     }
     
     .stat-divider {
@@ -740,7 +607,6 @@ h1 {
     }
     
     .card-3d {
-        max-width: 600px;
-        padding: 25px;
+        padding: 30px;
     }
 }
