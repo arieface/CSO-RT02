@@ -644,16 +644,52 @@ h1 {
     line-height: 1;
 }
 
+/* ==================== WATERMARK (SELALU DI ATAS) ==================== */
 .watermark {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
     text-align: center;
-    margin-top: 20px;
-    color: rgba(0, 0, 0, 0.6); /* Ubah watermark agar kontras dengan bg terang */
+    color: rgba(255, 255, 255, 0.8);
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
     font-size: 0.85rem;
     font-weight: 500;
+    
+    /* Z-index tinggi untuk selalu di atas */
+    z-index: 9999;
+    
+    /* Efek backdrop untuk keterbacaan */
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(5px);
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    
+    /* Transisi untuk tema */
+    transition: all var(--transition-speed-elements) var(--transition-timing);
+    
+    /* Pointer events none agar tidak mengganggu interaksi */
+    pointer-events: none;
+}
+
+/* Warna watermark untuk tema terang */
+[data-theme="default"] .watermark {
+    color: rgba(0, 0, 0, 0.7);
+    background: rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Warna watermark untuk tema gelap */
+[data-theme="red"] .watermark,
+[data-theme="yellow-orange"] .watermark,
+[data-theme="teal"] .watermark {
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* Loading dots (text) */
@@ -1067,7 +1103,7 @@ h1 {
     .watermark {
         margin-top: 15px;
         font-size: 0.7rem;
-        padding: 0 10px;
+        padding: 6px 12px;
         flex-wrap: wrap;
         justify-content: center;
         text-align: center;
@@ -1347,5 +1383,10 @@ h1 {
     .stat-label {
         font-size: 0.8rem;
         text-align: center;
+    }
+    
+    .watermark {
+        font-size: 0.65rem;
+        padding: 5px 10px;
     }
 }
