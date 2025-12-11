@@ -239,17 +239,17 @@ function updateSaldoDisplay(data) {
 
 function updateThemeBasedOnSaldo(saldo) {
     let newTheme = 'default';
-    let statusText = 'Status: Memuat Data'; // Default status
+    let statusText = 'Memuat Data'; // Default status
     
     if (saldo < 500000) {
         newTheme = 'red';
-        statusText = 'Status: Darurat';
+        statusText = 'Darurat!';
     } else if (saldo >= 500000 && saldo < 1000000) {
         newTheme = 'yellow-orange';
-        statusText = 'Status: Cukup';
+        statusText = 'Cukup';
     } else if (saldo >= 1000000) {
         newTheme = 'teal';
-        statusText = 'Status: Optimal';
+        statusText = 'Optimal';
     }
     
     // Update status text
