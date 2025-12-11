@@ -15,7 +15,7 @@
     --card-border: rgba(226, 232, 240, 0.8);
     
     /* --- PERUBAHAN TRANSISI --- */
-    --transition-speed-bg: 1.2s; /* Transisi paling lambut untuk background utama */
+    --transition-speed-bg: 2.5s; /* Transisi sangat lambat untuk background utama */
     --transition-speed-elements: 0.8s; /* Transisi untuk elemen lainnya */
     --transition-timing: ease-in-out; /* Timing function untuk akselerasi dan deselerasi yang halus */
 }
@@ -50,17 +50,7 @@
     --success-color: #0f766e;
 }
 
-/* ==================== TRANSISI GLOBAL (DIREVISI) ==================== */
-
-/* Hapus transisi global (*) untuk performa dan kontrol yang lebih baik */
-/* * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    transition: ...;
-} */
-
-/* Gunakan reset yang bersih */
+/* ==================== TRANSISI GLOBAL ==================== */
 * {
     margin: 0;
     padding: 0;
@@ -77,11 +67,30 @@ body {
     align-items: center;
     overflow-x: hidden;
     padding: 20px;
+    position: relative;
     
     /* TRANSISI PRIORITAS UTAMA UNTUK BACKGROUND */
-    /* Fokus pada background-image untuk gradien dan background-color untuk fallback */
     transition: background-image var(--transition-speed-bg) var(--transition-timing),
                 background-color var(--transition-speed-bg) var(--transition-timing);
+}
+
+/* Overlay untuk transisi background yang lebih halus */
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--background-gradient);
+    opacity: 0;
+    z-index: -1;
+    transition: opacity var(--transition-speed-bg) var(--transition-timing);
+}
+
+/* Aktifkan overlay saat tema berubah */
+body.changing-theme::before {
+    opacity: 1;
 }
 
 /* --- TAMBAHAN ANIMASI FADE-IN SAAT HALAMAN PERTAMA KALI DIMUAT --- */
