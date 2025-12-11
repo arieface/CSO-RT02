@@ -32,7 +32,7 @@ window.addEventListener('balanceReady', () => {
 window.addEventListener('balanceUpdated', (event) => {
     console.log("📬 [Script] Data baru dari balance.js:", event.detail);
     
-    // --- PERBAIKAN 1: Hanya proses jika data VALID ---
+    // PERBAIKAN: Hanya proses jika data VALID
     if (event.detail && event.detail.saldo !== null && !isNaN(event.detail.saldo)) {
         
         const processedData = {
@@ -45,13 +45,8 @@ window.addEventListener('balanceUpdated', (event) => {
                 }).format(event.detail.saldo)
         };
         
-        // Tampilkan indikator force refresh jika diperlukan
-        if (event.detail.isForceRefresh) {
-            showForceRefreshIndicator();
-        }
-        
         updateSaldoDisplay(processedData);
-        updateThemeBasedOnSaldo(processedData.numeric); // Panggil hanya jika data valid
+        updateThemeBasedOnSaldo(processedData.numeric);
         lastSaldo = processedData.numeric;
         
         updateConnectionStatus('online');
@@ -61,13 +56,6 @@ window.addEventListener('balanceUpdated', (event) => {
         updateTime();
         
         console.log("✅ [Script] Tampilan diperbarui dari balance.js");
-
-        // --- PERBAIKAN 2a: Hentikan animasi tombol setelah berhasil ---
-        const refreshBtn = document.getElementById('force-refresh-btn');
-        if (refreshBtn) {
-            refreshBtn.classList.remove('refreshing');
-        }
-
     } else {
         console.warn("⚠️ [Script] Menerima data tidak valid, tidak memperbarui tampilan.");
     }
@@ -84,7 +72,7 @@ async function fetchSaldo() {
         console.log("📡 [Script] Memulai fetch saldo...");
         showLoadingState();
         
-        // --- PERBAIKAN: Hanya gunakan data dari balance.js ---
+        // PERBAIKAN: Hanya gunakan data dari balance.js
         if (balanceSystemReady && window.BalanceSystem) {
             const cachedSaldo = window.BalanceSystem.getCurrentSaldo();
             
@@ -111,8 +99,37 @@ async function fetchSaldo() {
             }
         }
         
-        // --- PERBAIKAN: Jangan lakukan fallback ke Google Sheets langsung ---
-        // Biarkan balance.js menangani semua pengambilan data
+        // PERBAIKAN: Minta balance.js refresh tanpa fallback
+        if (window.BalanceSystem && window.BalanceSystem.refresh) {
+            console.log("🔄 [Script] Minta balance.js refresh...");
+            window.BalanceSystem.refresh();
+            
+            // Tunggu 1 detik untuk balance.js merespons
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Cek lagi
+            if (window.BalanceSystem.getCurrentSaldo()) {
+                const newSaldo = window.BalanceSystem.getCurrentSaldo();
+                const processedData = {
+                    raw: newSaldo.toString(),
+                    numeric: newSaldo,
+                    formatted: new Intl.NumberFormat('id-ID', {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    }).format(newSaldo)
+                };
+                
+                updateSaldoDisplay(processedData);
+                updateThemeBasedOnSaldo(processedData.numeric);
+                lastSaldo = processedData.numeric;
+                
+                updateConnectionStatus('online');
+                lastSuccessfulFetch = new Date();
+                
+                return; // SELESAI
+            }
+        }
+        
         console.log("⚠️ [Script] Menunggu data dari balance.js...");
         
     } catch (error) {
@@ -121,7 +138,7 @@ async function fetchSaldo() {
     } finally {
         setTimeout(() => {
             isRefreshing = false;
-        }, 500); // Dipercepat untuk update 5 detik
+        }, 500);
     }
 }
 
@@ -177,7 +194,7 @@ function updateThemeBasedOnSaldo(saldo) {
             // Setelah transisi selesai, hapus kelas changing-theme
             setTimeout(() => {
                 document.body.classList.remove('changing-theme');
-            }, 2500); // Sesuaikan dengan --transition-speed-bg
+            }, 2500);
         }, 100);
     }
 }
@@ -200,26 +217,7 @@ function updateStatusText(status) {
     }
 }
 
-// Fungsi untuk menampilkan indikator force refresh
-function showForceRefreshIndicator() {
-    const statusElement = document.getElementById('connection-status');
-    if (statusElement) {
-        statusElement.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> <span>Force refresh • Memuat data terbaru...</span>';
-        
-        // Kembalikan ke status normal setelah 2 detik
-        setTimeout(() => {
-            updateConnectionStatus('online');
-        }, 2000);
-    }
-}
-
 function handleFetchError(error) {
-    // --- PERBAIKAN 2a: Hentikan animasi tombol saat error ---
-    const refreshBtn = document.getElementById('force-refresh-btn');
-    if (refreshBtn) {
-        refreshBtn.classList.remove('refreshing');
-    }
-
     if (error.name === 'AbortError') {
         updateConnectionStatus('timeout');
         showError('Timeout - coba lagi');
@@ -234,7 +232,7 @@ function handleFetchError(error) {
     if (retryCount < MAX_RETRIES) {
         retryCount++;
         console.log(`🔄 Retry ${retryCount}/${MAX_RETRIES}...`);
-        setTimeout(fetchSaldo, 2000); // Dipercepat retry
+        setTimeout(fetchSaldo, 2000);
     }
 }
 
@@ -381,7 +379,7 @@ document.addEventListener('DOMContentLoaded', function() {
         balanceSystemReady = true;
     }
     
-    // Tunggu 1 detik baru fetch pertama (dipercepat)
+    // Tunggu 1 detik baru fetch pertama
     setTimeout(() => {
         fetchSaldo();
     }, 1000);
@@ -390,11 +388,11 @@ document.addEventListener('DOMContentLoaded', function() {
     updateTime();
     setInterval(updateTime, 1000);
     
-    // --- PERBAIKAN: HAPUS INTERVAL UPDATE DI SCRIPT.JS ---
+    // PERBAIKAN: Hapus interval update di script.js
     // Biarkan balance.js menangani semua update berkala
 });
 
-// ==================== FUNGSI DEBUG & FORCE REFRESH ====================
+// ==================== FUNGSI DEBUG ====================
 window.debugFetch = function() {
     console.log("🔧 Debug: Manual fetch");
     fetchSaldo();
@@ -426,33 +424,5 @@ window.testTheme = function(saldo) {
         saldoElement.textContent = formatted;
         saldoElement.className = 'amount';
         lastSaldo = saldo;
-    }
-};
-
-// --- PERBAIKAN 2: Fungsi Force Refresh yang Ditingkatkan ---
-window.forceBalanceUpdate = function() {
-    console.log("🔧 [Script] Tombol Force Refresh diklik! Memulai HARD REFRESH...");
-    
-    const refreshBtn = document.getElementById('force-refresh-btn');
-    if (refreshBtn) {
-        // 2a. Tambahkan animasi
-        refreshBtn.classList.add('refreshing');
-    }
-
-    // 2b. Lakukan hard refresh
-    // Reset state agar dianggap sebagai fetch pertama kali
-    lastSuccessfulFetch = null;
-    retryCount = 0;
-    
-    // Tampilkan loading state secara instan
-    showLoadingState();
-    
-    // Panggil fungsi hard refresh dari balance.js
-    if (window.BalanceSystem && window.BalanceSystem.forceRefresh) {
-        window.BalanceSystem.forceRefresh();
-    } else {
-        console.warn("⚠️ BalanceSystem tidak tersedia untuk hard refresh.");
-        // Jika balance.js tidak siap, hentikan animasi
-        if(refreshBtn) refreshBtn.classList.remove('refreshing');
     }
 };
