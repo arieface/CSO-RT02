@@ -239,7 +239,7 @@ function updateSaldoDisplay(data) {
 
 function updateThemeBasedOnSaldo(saldo) {
     let newTheme = 'default';
-    let statusText = 'Memuat Data'; // Default status
+    let statusText = '...'; // Default status
     
     if (saldo < 500000) {
         newTheme = 'red';
