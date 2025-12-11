@@ -101,16 +101,8 @@
                     </div>
                 </div>
                 
-                <!-- Tombol Force Refresh -->
-                <div class="refresh-button-container">
-                    <button id="force-refresh-btn" class="force-refresh-btn">
-                        <i class="fas fa-sync-alt"></i>
-                        <span>Force Refresh</span>
-                    </button>
-                </div>
-                
                 <div class="footer-3d">
-                    <p><i class="fas fa-info-circle"></i> Data diperbarui otomatis setiap 5 waktu</p>
+                    <p><i class="fas fa-info-circle"></i> Data diperbarui otomatis setiap (5) detik</p>
                 </div>
             </div>
         </div>
@@ -131,26 +123,8 @@
         console.log("🔧 Untuk debugging, gunakan perintah berikut di console:");
         console.log("- debugFetch() - Manual fetch data");
         console.log("- debugCheckData() - Cek status data");
-        console.log("- forceBalanceUpdate() - Paksa update dari balance.js");
         console.log("- testTheme(saldo) - Test tema dengan saldo tertentu");
         console.log("- BalanceSystem.debug() - Debug balance.js");
-        
-        // --- PERBAIKAN: Event listener untuk tombol force refresh ---
-        document.addEventListener('DOMContentLoaded', function() {
-            const refreshBtn = document.getElementById('force-refresh-btn');
-            if (refreshBtn) {
-                refreshBtn.addEventListener('click', function() {
-                    console.log("🔧 Tombol Force Refresh diklik melalui event listener");
-                    if (typeof forceBalanceUpdate === 'function') {
-                        forceBalanceUpdate();
-                    } else {
-                        console.error("⚠️ Fungsi forceBalanceUpdate tidak ditemukan");
-                    }
-                });
-            } else {
-                console.error("⚠️ Tombol Force Refresh tidak ditemukan");
-            }
-        });
     </script>
 </body>
 </html>
