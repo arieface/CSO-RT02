@@ -46,7 +46,6 @@
                         <div class="currency">Rp</div>
                         <div class="amount" id="saldo">Memuat saldo</div>
                     </div>
-                    <!-- Tambahkan elemen status di sini -->
                     <div class="status-display" id="status-display">
                         <i class="fas fa-info-circle"></i>
                         <span id="status-text"> </span>
@@ -80,7 +79,7 @@
                     
                     <div class="stat-item">
                         <div class="stat-icon">
-                            <i class="fas fa-sync-alt"></i>
+                            <i class="fas fa-bolt"></i>
                         </div>
                         <div class="stat-info">
                             <span class="stat-value">Real-time</span>
@@ -102,27 +101,25 @@
                 </div>
                 
                 <div class="footer-3d">
-                    <p><i class="fas fa-info-circle"></i> Data diperbarui otomatis setiap (5) detik</p>
+                    <p><i class="fas fa-info-circle"></i> Data diperbarui real-time setiap 5 detik</p>
                 </div>
             </div>
         </div>
         
-        <!-- Watermark dikembalikan ke posisi semula -->
         <div class="watermark">
             <i class="fas fa-home"></i>
             <span> RT02 RW18 Digitaltech ~ by Arief (Aace)</span>
         </div>
     </div>
 
-    <!-- Load balance.js terlebih dahulu, baru script.js -->
     <script src="balance.js"></script>
     <script src="script.js"></script>
     
     <script>
-        // Debug helpers
         console.log("🔧 Untuk debugging, gunakan perintah berikut di console:");
         console.log("- debugFetch() - Manual fetch data");
         console.log("- debugCheckData() - Cek status data");
+        console.log("- forceBalanceUpdate() - Paksa update dari balance.js");
         console.log("- testTheme(saldo) - Test tema dengan saldo tertentu");
         console.log("- BalanceSystem.debug() - Debug balance.js");
     </script>
