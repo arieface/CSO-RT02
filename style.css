@@ -1,15 +1,15 @@
 /* ==================== VARIABEL CSS UNTUK THEME ==================== */
 :root {
-    /* Default theme (purple) */
-    --primary-color: #667eea;
-    --secondary-color: #764ba2;
-    --accent-color: #a5b4fc;
+    /* Default theme (silver/black-white) */
+    --primary-color: #4a4a4a;
+    --secondary-color: #2c2c2c;
+    --accent-color: #e0e0e0;
     --danger-color: #ef4444;
     --warning-color: #f59e0b;
     --success-color: #10b981;
-    --background-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --background-gradient: linear-gradient(135deg, #4a4a4a 0%, #2c2c2c 100%);
     --card-gradient: linear-gradient(135deg, #f8fafc, #f1f5f9);
-    --stat-icon-gradient: linear-gradient(135deg, #667eea, #764ba2);
+    --stat-icon-gradient: linear-gradient(135deg, #4a4a4a, #2c2c2c);
     --text-color: #1e293b;
     --text-secondary: #64748b;
     --card-border: rgba(226, 232, 240, 0.8);
