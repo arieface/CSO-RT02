@@ -1,15 +1,15 @@
 /* ==================== VARIABEL CSS UNTUK THEME ==================== */
 :root {
-    /* Default theme (silver/black-white) */
-    --primary-color: #a6a6a6;
-    --secondary-color: #b4b4b4;
-    --accent-color: #d9d9d9;
+    /* Default theme (Light Silver) */
+    --primary-color: #9ca3af; /* Wana abu-abu medium untuk ikon dan aksen utama */
+    --secondary-color: #6b7280; /* Abu-abu lebih gelap untuk kontras */
+    --accent-color: #d1d5db; /* Abu-abu sangat muda untuk highlight */
     --danger-color: #ef4444;
     --warning-color: #f59e0b;
     --success-color: #10b981;
-    --background-gradient: linear-gradient(135deg, #4a4a4a 0%, #2c2c2c 100%);
+    --background-gradient: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%); /* Gradien dari putih ke abu-abu sangat muda */
     --card-gradient: linear-gradient(135deg, #f8fafc, #f1f5f9);
-    --stat-icon-gradient: linear-gradient(135deg, #4a4a4a, #2c2c2c);
+    --stat-icon-gradient: linear-gradient(135deg, #9ca3af, #6b7280); /* Gradien ikon yang lebih terang */
     --text-color: #1e293b;
     --text-secondary: #64748b;
     --card-border: rgba(226, 232, 240, 0.8);
@@ -96,7 +96,7 @@ body {
 .shape {
     position: absolute;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.05); /* Ubah bubble menjadi lebih gelap untuk kontras dengan bg terang */
     backdrop-filter: blur(5px);
     animation: float 15s infinite ease-in-out;
     pointer-events: none;
@@ -589,7 +589,7 @@ h1 {
 .watermark {
     text-align: center;
     margin-top: 20px;
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(0, 0, 0, 0.6); /* Ubah watermark agar kontras dengan bg terang */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -765,9 +765,9 @@ h1 {
     
     /* REVISI: Bubble lebih kecil di mobile tapi tetap terlihat */
     .shape {
-        background: rgba(255, 255, 255, 0.15);
+        background: rgba(0, 0, 0, 0.08); /* Sesuaikan dengan bg terang */
         backdrop-filter: blur(3px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(0, 0, 0, 0.05);
     }
     
     .app-container {
