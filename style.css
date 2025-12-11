@@ -20,17 +20,6 @@
     --transition-timing: ease-in-out; /* Timing function untuk akselerasi dan deselerasi yang halus */
 }
 
-/* Silver Theme (Loading State) */
-[data-theme="silver"] {
-    --primary-color: #9ca3af;
-    --secondary-color: #6b7280;
-    --accent-color: #d1d5db;
-    --background-gradient: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-    --stat-icon-gradient: linear-gradient(135deg, #9ca3af, #6b7280);
-    --text-color: #1e293b;
-    --text-secondary: #64748b;
-}
-
 /* Red Theme (Saldo < 500.000) - DIUBAH MENJADI DARK RED/STRAWBERRY */
 [data-theme="red"] {
     --primary-color: #d32f2f;
@@ -39,20 +28,16 @@
     --background-gradient: linear-gradient(135deg, #c62828 0%, #8e0000 100%);
     --stat-icon-gradient: linear-gradient(135deg, #d32f2f, #b71c1c);
     --danger-color: #b71c1c;
-    --text-color: #ffffff;
-    --text-secondary: #f8d7da;
 }
 
-/* Yellow Theme (Saldo 500.000 - 1.000.000) */
-[data-theme="yellow"] {
-    --primary-color: #fbbf24;
-    --secondary-color: #f59e0b;
-    --accent-color: #fde68a;
-    --background-gradient: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-    --stat-icon-gradient: linear-gradient(135deg, #fbbf24, #f59e0b);
-    --warning-color: #f59e0b;
-    --text-color: #ffffff;
-    --text-secondary: #fef3c7;
+/* Yellow-Orange Theme (Saldo 500.000 - 1.000.000) */
+[data-theme="yellow-orange"] {
+    --primary-color: #f59e0b;
+    --secondary-color: #ea580c;
+    --accent-color: #fdba74;
+    --background-gradient: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+    --stat-icon-gradient: linear-gradient(135deg, #f59e0b, #ea580c);
+    --warning-color: #ea580c;
 }
 
 /* Teal Theme (Saldo > 1.000.000) */
@@ -63,8 +48,6 @@
     --background-gradient: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
     --stat-icon-gradient: linear-gradient(135deg, #0d9488, #0f766e);
     --success-color: #0f766e;
-    --text-color: #ffffff;
-    --text-secondary: #ccfbf1;
 }
 
 /* ==================== TRANSISI GLOBAL ==================== */
@@ -219,18 +202,6 @@ body.changing-theme::before {
                 border-color var(--transition-speed-elements) var(--transition-timing);
 }
 
-/* Theme-specific card styles */
-[data-theme="red"] .card-3d,
-[data-theme="yellow"] .card-3d,
-[data-theme="teal"] .card-3d {
-    background: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 
-        0 20px 40px rgba(0, 0, 0, 0.3),
-        0 15px 30px rgba(0, 0, 0, 0.25),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-}
-
 .card-3d::before {
     content: '';
     position: absolute;
@@ -281,13 +252,6 @@ h1 {
     text-align: left;
 }
 
-/* Theme-specific header styles */
-[data-theme="red"] h1,
-[data-theme="yellow"] h1,
-[data-theme="teal"] h1 {
-    color: var(--text-color);
-}
-
 /* Connection signal */
 .connection-signal {
     display: flex;
@@ -302,15 +266,6 @@ h1 {
     border: 1px solid rgba(226, 232, 240, 0.8);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     margin-left: 10px;
-}
-
-/* Theme-specific connection signal */
-[data-theme="red"] .connection-signal,
-[data-theme="yellow"] .connection-signal,
-[data-theme="teal"] .connection-signal {
-    background: rgba(255, 255, 255, 0.2);
-    color: var(--text-color);
-    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .signal-bars {
@@ -358,17 +313,6 @@ h1 {
     /* Transisi untuk info card */
     transition: background var(--transition-speed-elements) var(--transition-timing),
                 border-color var(--transition-speed-elements) var(--transition-timing);
-}
-
-/* Theme-specific info card */
-[data-theme="red"] .info-card-3d,
-[data-theme="yellow"] .info-card-3d,
-[data-theme="teal"] .info-card-3d {
-    background: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 
-        0 10px 25px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .info-card-3d::after {
@@ -433,12 +377,52 @@ h1 {
                 text-shadow var(--transition-speed-elements) var(--transition-timing);
 }
 
-/* Theme-specific currency */
-[data-theme="red"] .currency,
-[data-theme="yellow"] .currency,
-[data-theme="teal"] .currency {
-    color: var(--text-color);
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+/* Status display - Tambahkan styling untuk elemen status */
+.status-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--primary-color);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    transition: all var(--transition-speed-elements) var(--transition-timing);
+}
+
+.status-display i {
+    font-size: 0.9rem;
+    color: var(--primary-color);
+    transition: color var(--transition-speed-elements) var(--transition-timing);
+}
+
+/* Warna status berdasarkan tema */
+[data-theme="default"] .status-display {
+    background: rgba(255, 255, 255, 0.7);
+    color: var(--primary-color);
+}
+
+[data-theme="red"] .status-display {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+[data-theme="yellow-orange"] .status-display {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+[data-theme="teal"] .status-display {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.3);
 }
 
 /* Efek kilau saldo */
@@ -470,25 +454,6 @@ h1 {
     background-clip: text;
     -webkit-text-fill-color: transparent;
     animation: shimmer-left-to-right 3s infinite linear;
-}
-
-/* Theme-specific amount */
-[data-theme="red"] .amount,
-[data-theme="yellow"] .amount,
-[data-theme="teal"] .amount {
-    color: var(--text-color);
-    background: linear-gradient(
-        90deg,
-        var(--text-color) 0%,
-        rgba(255, 255, 255, 0.7) 45%,
-        rgba(255, 255, 255, 0.9) 50%,
-        rgba(255, 255, 255, 0.7) 55%,
-        var(--text-color) 100%
-    );
-    background-size: 200% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
 }
 
 /* CATATAN: background-position bergerak berlawanan dengan arah visual
@@ -546,20 +511,6 @@ h1 {
     overflow: hidden;
 }
 
-/* Theme-specific time card */
-[data-theme="red"] .time-card-3d,
-[data-theme="yellow"] .time-card-3d,
-[data-theme="teal"] .time-card-3d {
-    background: rgba(255, 255, 255, 0.15);
-    color: var(--text-color);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 
-        0 12px 30px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2),
-        inset 0 -1px 1px rgba(0, 0, 0, 0.1),
-        0 0 0 1px rgba(255, 255, 255, 0.2);
-}
-
 .time-card-3d::before {
     content: '';
     position: absolute;
@@ -578,43 +529,6 @@ h1 {
     box-shadow: 
         0 2px 15px rgba(192, 192, 192, 0.5),
         0 0 25px rgba(255, 255, 255, 0.4);
-}
-
-/* Theme-specific time card header */
-[data-theme="red"] .time-card-3d::before {
-    background: linear-gradient(90deg, 
-        var(--secondary-color), 
-        var(--primary-color), 
-        var(--accent-color),
-        var(--primary-color),
-        var(--secondary-color));
-    box-shadow: 
-        0 2px 15px rgba(0, 0, 0, 0.3),
-        0 0 25px rgba(255, 255, 255, 0.2);
-}
-
-[data-theme="yellow"] .time-card-3d::before {
-    background: linear-gradient(90deg, 
-        var(--secondary-color), 
-        var(--primary-color), 
-        var(--accent-color),
-        var(--primary-color),
-        var(--secondary-color));
-    box-shadow: 
-        0 2px 15px rgba(0, 0, 0, 0.3),
-        0 0 25px rgba(255, 255, 255, 0.2);
-}
-
-[data-theme="teal"] .time-card-3d::before {
-    background: linear-gradient(90deg, 
-        var(--secondary-color), 
-        var(--primary-color), 
-        var(--accent-color),
-        var(--primary-color),
-        var(--secondary-color));
-    box-shadow: 
-        0 2px 15px rgba(0, 0, 0, 0.3),
-        0 0 25px rgba(255, 255, 255, 0.2);
 }
 
 .time-card-3d::after {
@@ -646,30 +560,12 @@ h1 {
     text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
 }
 
-/* Theme-specific time label */
-[data-theme="red"] .time-label,
-[data-theme="yellow"] .time-label,
-[data-theme="teal"] .time-label {
-    color: var(--text-color);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-}
-
 .time-label i {
     color: #6b7280;
     font-size: 0.9rem;
     text-shadow: 
         0 1px 3px rgba(255, 255, 255, 0.8),
         0 0 10px rgba(255, 255, 255, 0.5);
-}
-
-/* Theme-specific time label icon */
-[data-theme="red"] .time-label i,
-[data-theme="yellow"] .time-label i,
-[data-theme="teal"] .time-label i {
-    color: var(--text-color);
-    text-shadow: 
-        0 1px 3px rgba(0, 0, 0, 0.3),
-        0 0 10px rgba(255, 255, 255, 0.2);
 }
 
 .time-display {
@@ -689,16 +585,6 @@ h1 {
         0 0 15px rgba(255, 255, 255, 0.4);
 }
 
-/* Theme-specific time display */
-[data-theme="red"] .time-display,
-[data-theme="yellow"] .time-display,
-[data-theme="teal"] .time-display {
-    color: var(--text-color);
-    text-shadow: 
-        0 1px 3px rgba(0, 0, 0, 0.3),
-        0 0 15px rgba(255, 255, 255, 0.2);
-}
-
 /* Stats */
 .stats {
     display: flex;
@@ -714,14 +600,6 @@ h1 {
     /* Transisi untuk stats container */
     transition: background var(--transition-speed-elements) var(--transition-timing),
                 border-color var(--transition-speed-elements) var(--transition-timing);
-}
-
-/* Theme-specific stats */
-[data-theme="red"] .stats,
-[data-theme="yellow"] .stats,
-[data-theme="teal"] .stats {
-    background: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .stat-item {
@@ -788,13 +666,6 @@ h1 {
     align-self: center;
 }
 
-/* Theme-specific stat divider */
-[data-theme="red"] .stat-divider,
-[data-theme="yellow"] .stat-divider,
-[data-theme="teal"] .stat-divider {
-    background: rgba(255, 255, 255, 0.3);
-}
-
 /* Footer */
 .footer-3d {
     text-align: center;
@@ -840,9 +711,9 @@ h1 {
 
 /* Warna watermark untuk tema lain (light gray/silver) */
 [data-theme="red"] .watermark,
-[data-theme="yellow"] .watermark,
+[data-theme="yellow-orange"] .watermark,
 [data-theme="teal"] .watermark {
-    color: rgba(255, 255, 255, 0.8); /* Putih dengan opacity tinggi */
+    color: rgba(211, 211, 211, 0.9); /* Light gray/silver dengan opacity tinggi */
 }
 
 /* Loading dots (text) */
@@ -1127,6 +998,13 @@ h1 {
         font-size: 0.9rem;
         white-space: normal;
         text-align: center;
+    }
+    
+    /* Status display untuk mobile */
+    .status-display {
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        margin-bottom: 10px;
     }
     
     .connection-status {
@@ -1456,6 +1334,11 @@ h1 {
         gap: 6px;
     }
     
+    .status-display {
+        padding: 5px 10px;
+        font-size: 0.85rem;
+    }
+    
     .stats {
         flex-direction: row;
         gap: 10px;
@@ -1506,6 +1389,11 @@ h1 {
     .amount {
         font-size: 1.4rem;
         text-align: center;
+    }
+    
+    .status-display {
+        padding: 5px 10px;
+        font-size: 0.85rem;
     }
     
     .time-display {
