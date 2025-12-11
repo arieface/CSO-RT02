@@ -57,6 +57,12 @@ async function fetchAndProcessSaldo() {
         
         console.log("🧹 [Balance] Setelah cleaning:", cleaned);
         
+        // Periksa apakah data adalah error seperti #NAME?
+        if (cleaned.includes('#NAME?') || cleaned.includes('#REF!') || cleaned.includes('#VALUE!')) {
+            console.error("❌ [Balance] Error dari Google Sheets:", text);
+            return null;
+        }
+        
         if (!cleaned || cleaned === '') {
             console.warn("⚠️ [Balance] Data kosong setelah cleaning");
             return null;
@@ -187,6 +193,12 @@ async function aggressiveForceRefresh() {
             cleaned = cleaned.replace(/\./g, '');
             cleaned = cleaned.replace(',', '.');
             cleaned = cleaned.replace(/[^\d.-]/g, '');
+            
+            // Periksa error Google Sheets
+            if (cleaned.includes('#NAME?') || cleaned.includes('#REF!') || cleaned.includes('#VALUE!')) {
+                console.warn(`⚠️ [Balance] Error dari Google Sheets dengan metode ${i + 1}:`, text);
+                continue;
+            }
             
             if (!cleaned || cleaned === '') {
                 console.warn(`⚠️ [Balance] Data kosong dengan metode ${i + 1}`);
