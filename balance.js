@@ -1,6 +1,6 @@
 // ==================== KONFIGURASI =====================
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbLFk69seIMkTsx5xGSLyOHM4Iou1uTQMNNpTnwSoWX5Yu2JBgs71Lbd9OH2Xdgq6GKR0_OiTo9shV/pub?gid=236846195&range=A100:A100&single=true&output=csv";
-const UPDATE_INTERVAL = 300000; // 5 menit
+const UPDATE_INTERVAL = 5000; // 5 detik
 
 // ==================== VARIABEL GLOBAL ====================
 let currentSaldo = null;
@@ -15,10 +15,17 @@ async function fetchAndProcessSaldo() {
     try {
         console.log("📡 [Balance] Mengambil dari Google Sheets...");
         
+        // Tambahkan timestamp untuk menghindari cache
         const timestamp = new Date().getTime();
-        const response = await fetch(`${SHEET_URL}&_=${timestamp}`, {
+        const urlWithCacheBuster = `${SHEET_URL}&_=${timestamp}`;
+        
+        const response = await fetch(urlWithCacheBuster, {
             cache: 'no-store',
-            headers: { 'Cache-Control': 'no-cache' }
+            headers: { 
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            }
         });
         
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -134,9 +141,12 @@ async function initBalance() {
     // 1. Load pertama kali
     await updateSaldo();
     
-    // 2. Setup auto-update setiap 5 menit
-    updateTimer = setInterval(updateSaldo, UPDATE_INTERVAL);
-    console.log(`⏰ [Balance] Auto-update diatur (${UPDATE_INTERVAL/60000} menit)`);
+    // 2. Setup auto-update setiap 5 detik
+    updateTimer = setInterval(() => {
+        console.log("⏰ [Balance] Interval update terpicu (5 detik)");
+        updateSaldo();
+    }, UPDATE_INTERVAL);
+    console.log(`⏰ [Balance] Auto-update diatur (${UPDATE_INTERVAL/1000} detik)`);
     
     // 3. Update saat tab aktif
     document.addEventListener('visibilitychange', () => {
