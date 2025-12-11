@@ -1,4 +1,4 @@
-// ==================== KONFIGURASI ====================
+// ==================== KONFIGURASI =====================
 let DATABASE_URL = null;
 let balanceSystemReady = false;
 
