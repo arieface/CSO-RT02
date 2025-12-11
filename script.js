@@ -1,3 +1,4 @@
+//============ script.js
 // ==================== KONFIGURASI ====================
 let DATABASE_URL = null;
 let balanceSystemReady = false;
@@ -238,27 +239,21 @@ function updateSaldoDisplay(data) {
 
 function updateThemeBasedOnSaldo(saldo) {
     let newTheme = 'default';
-    let statusText = '';
+    let statusText = 'Memuat'; // Default status
     
-    if (saldo === null || saldo === undefined) {
-        newTheme = 'silver';
-        statusText = 'Memuat';
-    } else if (saldo < 500000) {
+    if (saldo < 500000) {
         newTheme = 'red';
         statusText = 'Darurat';
     } else if (saldo >= 500000 && saldo < 1000000) {
-        newTheme = 'yellow';
+        newTheme = 'yellow-orange';
         statusText = 'Cukup';
     } else if (saldo >= 1000000) {
         newTheme = 'teal';
         statusText = 'Optimal';
     }
     
-    // Update status display
-    const statusElement = document.getElementById('connection-status');
-    if (statusElement && statusText) {
-        statusElement.innerHTML = `<i class="fas fa-circle"></i> <span>Status: ${statusText}</span>`;
-    }
+    // Update status text
+    updateStatusText(statusText);
     
     if (newTheme !== currentTheme) {
         // Tambahkan kelas changing-theme untuk efek transisi
@@ -275,6 +270,24 @@ function updateThemeBasedOnSaldo(saldo) {
                 document.body.classList.remove('changing-theme');
             }, 2500); // Sesuaikan dengan --transition-speed-bg
         }, 100);
+    }
+}
+
+// Fungsi untuk memperbarui teks status
+function updateStatusText(status) {
+    const statusElement = document.getElementById('status-text');
+    if (statusElement) {
+        statusElement.textContent = status;
+        
+        // Tambahkan animasi saat status berubah
+        statusElement.style.transition = 'all 0.5s ease';
+        statusElement.style.transform = 'scale(1.05)';
+        statusElement.style.opacity = '0.8';
+        
+        setTimeout(() => {
+            statusElement.style.transform = 'scale(1)';
+            statusElement.style.opacity = '1';
+        }, 300);
     }
 }
 
@@ -299,7 +312,8 @@ function handleFetchError(error) {
 
 function showLoadingState() {
     const saldoElement = document.getElementById('saldo');
-    const statusElement = document.getElementById('connection-status');
+    const statusElement = document.getElementById('status-text');
+    const connectionStatusElement = document.getElementById('connection-status');
     
     if (saldoElement) {
         saldoElement.innerHTML = `
@@ -310,13 +324,14 @@ function showLoadingState() {
         saldoElement.className = 'amount';
     }
     
+    // Update status ke "Memuat" saat loading
     if (statusElement) {
-        statusElement.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> <span>Memuat data...</span>';
+        statusElement.textContent = 'Memuat';
     }
     
-    // Set tema silver saat loading
-    document.body.setAttribute('data-theme', 'silver');
-    currentTheme = 'silver';
+    if (connectionStatusElement) {
+        connectionStatusElement.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> <span>Memuat data...</span>';
+    }
 }
 
 function updateConnectionStatus(status) {
@@ -424,7 +439,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log("🚀 [Script] Aplikasi dimulai...");
     
     // Setup awal
-    document.body.setAttribute('data-theme', 'silver');
+    document.body.setAttribute('data-theme', 'default');
     updateStatsDisplay();
     checkConnection();
     
