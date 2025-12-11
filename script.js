@@ -1,6 +1,5 @@
-//============ script.js
 // ==================== KONFIGURASI ====================
-let DATABASE_URL = null;
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbLFk69seIMkTsx5xGSLyOHM4Iou1uTQMNNpTnwSoWX5Yu2JBgs71Lbd9OH2Xdgq6GKR0_OiTo9shV/pub?gid=236846195&range=A100:A100&single=true&output=csv";
 let balanceSystemReady = false;
 
 // ==================== VARIABEL GLOBAL ====================
@@ -14,63 +13,73 @@ let lastSaldo = 0;
 
 // ==================== EVENT LISTENERS ====================
 
-window.addEventListener('balanceReady', () => {
-    console.log("🎯 [Script] Balance.js siap!");
+// Event 1: Balance.js siap
+window.addEventListener('balanceReady', (event) => {
+    console.log("🎯 [Script] Balance.js siap!", event.detail);
     balanceSystemReady = true;
-    
-    if (window.BalanceSystem && window.BalanceSystem.getCurrentSaldo()) {
-        DATABASE_URL = "data_from_balance";
-    }
-    
-    setTimeout(fetchSaldo, 500);
 });
 
+// Event 2: Data diupdate oleh balance.js - HANDLER UTAMA
 window.addEventListener('balanceUpdated', (event) => {
-    console.log("📬 [Script] Data baru dari balance.js:", event.detail);
+    console.log("📬 [Script] Data baru diterima:", event.detail);
     
-    if (event.detail && event.detail.saldo !== null && !isNaN(event.detail.saldo)) {
+    if (event.detail && event.detail.saldo !== null && event.detail.saldo !== undefined) {
+        const saldo = event.detail.saldo;
         
         const processedData = {
-            raw: event.detail.saldo.toString(),
-            numeric: event.detail.saldo,
+            raw: saldo.toString(),
+            numeric: saldo,
             formatted: event.detail.formatted || 
                 new Intl.NumberFormat('id-ID', {
                     minimumFractionDigits: 0,
                     maximumFractionDigits: 0
-                }).format(event.detail.saldo)
+                }).format(saldo)
         };
         
+        console.log("✅ [Script] Memproses saldo:", processedData);
+        
+        // Update UI
         updateSaldoDisplay(processedData);
         updateThemeBasedOnSaldo(processedData.numeric);
         lastSaldo = processedData.numeric;
         
+        // Update status koneksi
         updateConnectionStatus('online');
         lastSuccessfulFetch = new Date();
+        retryCount = 0;
         
+        // Update waktu
         updateTime();
         
-        console.log("✅ [Script] Tampilan diperbarui dari balance.js");
+        console.log("🎨 [Script] UI berhasil diperbarui");
     } else {
-        console.warn("⚠️ [Script] Menerima data tidak valid, tidak memperbarui tampilan.");
+        console.warn("⚠️ [Script] Data saldo tidak valid:", event.detail);
     }
 });
 
 // ==================== FUNGSI UTAMA ====================
 async function fetchSaldo() {
-    if (isRefreshing) return;
+    if (isRefreshing) {
+        console.log("⏳ [Script] Fetch sudah berjalan...");
+        return;
+    }
     
     isRefreshing = true;
     updateConnectionStatus('connecting');
+    console.log("📡 [Script] Memulai fetch saldo...");
     
     try {
-        console.log("📡 [Script] Memulai fetch saldo...");
         showLoadingState();
         
+        // STRATEGI 1: Gunakan BalanceSystem (prioritas utama)
         if (balanceSystemReady && window.BalanceSystem) {
+            console.log("🔄 [Script] Menggunakan BalanceSystem...");
+            
+            // Cek cache dulu
             const cachedSaldo = window.BalanceSystem.getCurrentSaldo();
             
             if (cachedSaldo !== null && cachedSaldo !== undefined) {
-                console.log(`📊 [Script] Pakai cache: ${cachedSaldo}`);
+                console.log(`📊 [Script] Cache tersedia: ${cachedSaldo}`);
                 
                 const processedData = {
                     raw: cachedSaldo.toString(),
@@ -84,43 +93,23 @@ async function fetchSaldo() {
                 updateSaldoDisplay(processedData);
                 updateThemeBasedOnSaldo(processedData.numeric);
                 lastSaldo = processedData.numeric;
-                
                 updateConnectionStatus('online');
                 lastSuccessfulFetch = new Date();
-                
-                return;
             }
+            
+            // Trigger refresh untuk data terbaru
+            console.log("🔄 [Script] Meminta refresh dari BalanceSystem...");
+            await window.BalanceSystem.refresh();
+            
+            // BalanceSystem akan mengirim event 'balanceUpdated' jika berhasil
+            // UI akan otomatis update via event listener
+            
+            return; // SELESAI
         }
         
-        if (window.BalanceSystem && window.BalanceSystem.refresh) {
-            console.log("🔄 [Script] Minta balance.js refresh...");
-            window.BalanceSystem.refresh();
-            
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            if (window.BalanceSystem.getCurrentSaldo()) {
-                const newSaldo = window.BalanceSystem.getCurrentSaldo();
-                const processedData = {
-                    raw: newSaldo.toString(),
-                    numeric: newSaldo,
-                    formatted: new Intl.NumberFormat('id-ID', {
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0
-                    }).format(newSaldo)
-                };
-                
-                updateSaldoDisplay(processedData);
-                updateThemeBasedOnSaldo(processedData.numeric);
-                lastSaldo = processedData.numeric;
-                
-                updateConnectionStatus('online');
-                lastSuccessfulFetch = new Date();
-                
-                return;
-            }
-        }
-        
-        console.log("⚠️ [Script] Menunggu data dari balance.js...");
+        // STRATEGI 2: Fallback langsung ke Google Sheets
+        console.log("⚠️ [Script] BalanceSystem tidak siap, fallback ke direct fetch...");
+        await fetchDirectFromGoogleSheets();
         
     } catch (error) {
         console.error("❌ [Script] Error fetch:", error);
@@ -128,26 +117,120 @@ async function fetchSaldo() {
     } finally {
         setTimeout(() => {
             isRefreshing = false;
-        }, 500);
+            console.log("✅ [Script] Fetch selesai");
+        }, 1000);
+    }
+}
+
+// ==================== FUNGSI FALLBACK ====================
+async function fetchDirectFromGoogleSheets() {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+    
+    try {
+        console.log("📡 [Script] Direct fetch dari Google Sheets...");
+        
+        const timestamp = new Date().getTime();
+        const randomParam = Math.random().toString(36).substring(7);
+        
+        const response = await fetch(`${SHEET_URL}&_=${timestamp}&rand=${randomParam}`, {
+            signal: controller.signal,
+            cache: 'no-store',
+            headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            }
+        });
+        
+        clearTimeout(timeout);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const text = await response.text();
+        console.log("📄 [Script] Data langsung:", text);
+        
+        const processedData = processSaldoData(text);
+        
+        if (processedData) {
+            updateSaldoDisplay(processedData);
+            updateThemeBasedOnSaldo(processedData.numeric);
+            lastSaldo = processedData.numeric;
+            
+            updateConnectionStatus('online');
+            retryCount = 0;
+            lastSuccessfulFetch = new Date();
+            
+            console.log("✅ [Script] Direct fetch berhasil");
+        } else {
+            throw new Error('Data tidak valid');
+        }
+        
+    } catch (error) {
+        clearTimeout(timeout);
+        throw error;
+    }
+}
+
+function processSaldoData(rawData) {
+    try {
+        if (!rawData || rawData.trim() === '') {
+            return null;
+        }
+        
+        let cleaned = rawData.trim();
+        
+        // Bersihkan data
+        cleaned = cleaned.replace(/Rp\s*/gi, '');
+        cleaned = cleaned.replace(/\./g, '');
+        cleaned = cleaned.replace(/,/g, '.');
+        cleaned = cleaned.replace(/[^\d.-]/g, '');
+        
+        if (!cleaned) return null;
+        
+        const numericValue = parseFloat(cleaned);
+        if (isNaN(numericValue)) return null;
+        
+        const formatted = new Intl.NumberFormat('id-ID', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(numericValue);
+        
+        return {
+            raw: rawData,
+            numeric: numericValue,
+            formatted: formatted
+        };
+    } catch (error) {
+        console.error("❌ Error process data:", error);
+        return null;
     }
 }
 
 // ==================== FUNGSI UI ====================
 function updateSaldoDisplay(data) {
     const saldoElement = document.getElementById('saldo');
-    if (!saldoElement) return;
+    if (!saldoElement) {
+        console.warn("⚠️ Element 'saldo' tidak ditemukan");
+        return;
+    }
+    
+    console.log("🎨 Updating display dengan:", data.formatted);
     
     saldoElement.className = 'amount';
     saldoElement.textContent = data.formatted;
     
-    saldoElement.style.transition = 'all 0.3s ease';
-    saldoElement.style.transform = 'scale(1.02)';
-    saldoElement.style.opacity = '0.9';
+    // Animasi update
+    saldoElement.style.transition = 'all 0.5s ease';
+    saldoElement.style.transform = 'scale(1.05)';
+    saldoElement.style.opacity = '0.8';
     
     setTimeout(() => {
         saldoElement.style.transform = 'scale(1)';
         saldoElement.style.opacity = '1';
-    }, 150);
+    }, 300);
     
     updateTime();
 }
@@ -170,12 +253,14 @@ function updateThemeBasedOnSaldo(saldo) {
     updateStatusText(statusText);
     
     if (newTheme !== currentTheme) {
+        console.log(`🎨 Changing theme: ${currentTheme} → ${newTheme}`);
+        
         document.body.classList.add('changing-theme');
         
         setTimeout(() => {
             currentTheme = newTheme;
             document.body.setAttribute('data-theme', currentTheme);
-            console.log(`🎨 Theme: ${currentTheme} (Saldo: ${saldo})`);
+            console.log(`✅ Theme changed: ${currentTheme} (Saldo: ${saldo.toLocaleString('id-ID')})`);
             
             setTimeout(() => {
                 document.body.classList.remove('changing-theme');
@@ -189,14 +274,14 @@ function updateStatusText(status) {
     if (statusElement) {
         statusElement.textContent = status;
         
-        statusElement.style.transition = 'all 0.3s ease';
-        statusElement.style.transform = 'scale(1.02)';
-        statusElement.style.opacity = '0.9';
+        statusElement.style.transition = 'all 0.5s ease';
+        statusElement.style.transform = 'scale(1.05)';
+        statusElement.style.opacity = '0.8';
         
         setTimeout(() => {
             statusElement.style.transform = 'scale(1)';
             statusElement.style.opacity = '1';
-        }, 150);
+        }, 300);
     }
 }
 
@@ -215,14 +300,13 @@ function handleFetchError(error) {
     if (retryCount < MAX_RETRIES) {
         retryCount++;
         console.log(`🔄 Retry ${retryCount}/${MAX_RETRIES}...`);
-        setTimeout(fetchSaldo, 2000);
+        setTimeout(fetchSaldo, 3000);
     }
 }
 
 function showLoadingState() {
     const saldoElement = document.getElementById('saldo');
     const statusElement = document.getElementById('status-text');
-    const connectionStatusElement = document.getElementById('connection-status');
     
     if (saldoElement) {
         saldoElement.innerHTML = `
@@ -235,10 +319,6 @@ function showLoadingState() {
     
     if (statusElement) {
         statusElement.textContent = ' ';
-    }
-    
-    if (connectionStatusElement) {
-        connectionStatusElement.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> <span>Memuat data...</span>';
     }
 }
 
@@ -256,7 +336,7 @@ function updateConnectionStatus(status) {
         case 'online':
             signalElement.classList.add('online');
             signalText.textContent = 'Online';
-            statusElement.innerHTML = '<i class="fas fa-circle" style="color:#10b981"></i> <span>Terhubung • Real-time</span>';
+            statusElement.innerHTML = '<i class="fas fa-circle" style="color:#10b981"></i> <span>Terhubung • Data real-time</span>';
             statusElement.classList.add('online');
             break;
         case 'connecting':
@@ -272,13 +352,13 @@ function updateConnectionStatus(status) {
         case 'offline':
             signalElement.classList.add('offline');
             signalText.textContent = 'Offline';
-            statusElement.innerHTML = '<i class="fas fa-circle" style="color:#ef4444"></i> <span>Server offline</span>';
+            statusElement.innerHTML = '<i class="fas fa-circle" style="color:#ef4444"></i> <span>Tidak terhubung</span>';
             statusElement.classList.add('offline');
             break;
         case 'error':
             signalElement.classList.add('offline');
-            signalText.textContent = 'Offline';
-            statusElement.innerHTML = '<i class="fas fa-circle" style="color:#ef4444"></i> <span>Offline • Menyambungkan...</span>';
+            signalText.textContent = 'Error';
+            statusElement.innerHTML = '<i class="fas fa-circle" style="color:#ef4444"></i> <span>Error • Mencoba lagi...</span>';
             statusElement.classList.add('offline');
             break;
     }
@@ -319,7 +399,7 @@ function checkConnection() {
     
     if (isOnline) {
         updateConnectionStatus('online');
-        if (!lastSuccessfulFetch || (Date.now() - lastSuccessfulFetch) > 5000) {
+        if (!lastSuccessfulFetch || (Date.now() - lastSuccessfulFetch) > 300000) {
             fetchSaldo();
         }
     } else {
@@ -328,42 +408,49 @@ function checkConnection() {
     }
 }
 
-function updateStatsDisplay() {
-    const statItems = document.querySelectorAll('.stat-item');
-    if (statItems.length >= 2) {
-        const timeStat = statItems[1];
-        const statValue = timeStat.querySelector('.stat-value');
-        const statLabel = timeStat.querySelector('.stat-label');
-        
-        if (statValue && statLabel) {
-            statValue.textContent = 'Real-time';
-            statLabel.textContent = 'Update';
-        }
-    }
-}
-
 // ==================== INISIALISASI ====================
 document.addEventListener('DOMContentLoaded', function() {
     console.log("🚀 [Script] Aplikasi dimulai...");
     
+    // Setup awal
     document.body.setAttribute('data-theme', 'default');
-    updateStatsDisplay();
     checkConnection();
     
-    window.addEventListener('online', checkConnection);
-    window.addEventListener('offline', checkConnection);
+    // Event listeners
+    window.addEventListener('online', () => {
+        console.log("🌐 Online detected");
+        checkConnection();
+    });
     
+    window.addEventListener('offline', () => {
+        console.log("📴 Offline detected");
+        checkConnection();
+    });
+    
+    // Cek apakah balance.js sudah loaded
     if (window.BalanceSystem) {
-        console.log("⚡ [Script] Balance.js sudah loaded");
+        console.log("⚡ [Script] BalanceSystem sudah tersedia");
         balanceSystemReady = true;
     }
     
+    // Tunggu balance.js siap, lalu fetch
     setTimeout(() => {
+        console.log("⏰ [Script] Inisialisasi fetch pertama");
         fetchSaldo();
     }, 1000);
     
+    // Update waktu
     updateTime();
     setInterval(updateTime, 1000);
+    
+    // Auto-refresh TIDAK diperlukan karena balance.js sudah handle
+    // Tapi tetap ada sebagai backup
+    setInterval(() => {
+        if (isOnline && window.BalanceSystem) {
+            console.log("🔄 [Script] Periodic check (backup)");
+            window.BalanceSystem.refresh();
+        }
+    }, 300000); // 5 menit
 });
 
 // ==================== FUNGSI DEBUG ====================
@@ -373,18 +460,19 @@ window.debugFetch = function() {
 };
 
 window.debugCheckData = function() {
-    console.log("🔧 Debug: Check data state");
+    console.log("🔧 Debug: Data state");
+    console.log("Balance System Ready:", balanceSystemReady);
     console.log("Is Refreshing:", isRefreshing);
     console.log("Retry Count:", retryCount);
     console.log("Last Fetch:", lastSuccessfulFetch);
     console.log("Is Online:", isOnline);
-    console.log("Database URL:", DATABASE_URL);
     console.log("Current Theme:", currentTheme);
     console.log("Last Saldo:", lastSaldo);
-    console.log("Balance System Ready:", balanceSystemReady);
     
-    if (window.BalanceSystem && window.BalanceSystem.debug) {
-        console.log("Balance System Debug:", window.BalanceSystem.debug());
+    if (window.BalanceSystem) {
+        console.log("BalanceSystem Debug:", window.BalanceSystem.debug());
+    } else {
+        console.warn("BalanceSystem tidak tersedia");
     }
 };
 
@@ -392,11 +480,20 @@ window.testTheme = function(saldo) {
     console.log("🎨 Testing theme dengan saldo:", saldo);
     updateThemeBasedOnSaldo(saldo);
     
+    const formatted = new Intl.NumberFormat('id-ID').format(saldo);
     const saldoElement = document.getElementById('saldo');
     if (saldoElement) {
-        const formatted = new Intl.NumberFormat('id-ID').format(saldo);
         saldoElement.textContent = formatted;
         saldoElement.className = 'amount';
         lastSaldo = saldo;
+    }
+};
+
+window.forceBalanceUpdate = function() {
+    if (window.BalanceSystem) {
+        console.log("🔧 Force update BalanceSystem");
+        window.BalanceSystem.forceRefresh();
+    } else {
+        console.warn("⚠️ BalanceSystem tidak tersedia");
     }
 };
