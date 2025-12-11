@@ -13,8 +13,10 @@
     --text-color: #1e293b;
     --text-secondary: #64748b;
     --card-border: rgba(226, 232, 240, 0.8);
-    --transition-speed: 0.5s;
-    --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* --- PERUBAHAN TRANSISI --- */
+    --transition-speed: 0.8s; /* Durasi transisi diperlambat untuk efek yang lebih lembut */
+    --transition-timing: ease-in-out; /* Timing function untuk akselerasi dan deselerasi yang halus */
 }
 
 /* Red Theme (Saldo < 500.000) - DIUBAH MENJADI DARK RED/STRAWBERRY */
@@ -69,7 +71,20 @@ body {
     align-items: center;
     overflow-x: hidden;
     padding: 20px;
+    /* Transisi khusus untuk background body agar lebih diutamakan */
     transition: background var(--transition-speed) var(--transition-timing);
+}
+
+/* --- TAMBAHAN ANIMASI FADE-IN SAAT HALAMAN PERTAMA KALI DIMUAT --- */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px); /* Efek sedikit bergerak ke atas */
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .background-3d {
@@ -144,6 +159,8 @@ body {
     align-items: center;
     gap: 15px;
     margin: 0 auto;
+    /* Terapkan animasi fadeIn di sini */
+    animation: fadeIn 1s ease-out;
 }
 
 .card-3d {
@@ -157,7 +174,8 @@ body {
         inset 0 1px 0 rgba(255, 255, 255, 0.6);
     border: 1px solid rgba(255, 255, 255, 0.3);
     transform-style: preserve-3d;
-    animation: cardEntrance 0.8s ease-out;
+    /* Animasi masuk kartu dinonaktifkan karena sudah ada fadeIn di container */
+    /* animation: cardEntrance 0.8s ease-out; */
     position: relative;
     overflow: hidden;
     width: 100%;
@@ -176,6 +194,8 @@ body {
     transition: background var(--transition-speed) var(--transition-timing);
 }
 
+/* Animasi cardEntrance tidak lagi digunakan */
+/*
 @keyframes cardEntrance {
     from {
         opacity: 0;
@@ -186,6 +206,7 @@ body {
         transform: translateY(0) rotateX(0);
     }
 }
+*/
 
 /* Header */
 .card-header {
@@ -1028,19 +1049,9 @@ h1 {
     .signal-bar:nth-child(3) { height: 7px; }
     .signal-bar:nth-child(4) { height: 9px; }
     
-    @keyframes cardEntranceMobile {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
+    /* Gunakan animasi fadeIn untuk mobile juga */
     .card-3d {
-        animation: cardEntranceMobile 0.8s ease-out;
+        animation: fadeIn 1s ease-out;
     }
 }
 
