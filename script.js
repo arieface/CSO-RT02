@@ -326,7 +326,7 @@ function showLoadingState() {
     
     // Update status ke "Memuat" saat loading
     if (statusElement) {
-        statusElement.textContent = 'Memuat';
+        statusElement.textContent = '...';
     }
     
     if (connectionStatusElement) {
