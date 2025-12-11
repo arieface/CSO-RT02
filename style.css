@@ -798,11 +798,13 @@ h1 {
     }
 }
 
-/* Tombol Force Refresh */
+/* Tombol Force Refresh - PERBAIKAN Z-INDEX */
 .refresh-button-container {
     display: flex;
     justify-content: center;
     margin: 15px 0;
+    position: relative; /* Tambahkan position relative */
+    z-index: 100; /* Tambahkan z-index tinggi */
 }
 
 .force-refresh-btn {
@@ -821,6 +823,8 @@ h1 {
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+    position: relative; /* Tambahkan position relative */
+    z-index: 101; /* Tambahkan z-index lebih tinggi */
 }
 
 .force-refresh-btn:hover {
