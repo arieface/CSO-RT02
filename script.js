@@ -84,7 +84,7 @@ async function fetchSaldo() {
         console.log("📡 [Script] Memulai fetch saldo...");
         showLoadingState();
         
-        // STRATEGI 1: Gunakan data dari balance.js jika siap
+        // --- PERBAIKAN: Hanya gunakan data dari balance.js ---
         if (balanceSystemReady && window.BalanceSystem) {
             const cachedSaldo = window.BalanceSystem.getCurrentSaldo();
             
@@ -111,40 +111,9 @@ async function fetchSaldo() {
             }
         }
         
-        // STRATEGI 2: Minta balance.js refresh
-        if (window.BalanceSystem && window.BalanceSystem.refresh) {
-            console.log("🔄 [Script] Minta balance.js refresh...");
-            window.BalanceSystem.refresh();
-            
-            // Tunggu 1 detik untuk balance.js merespons (dipercepat karena update 5 detik)
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            // Cek lagi
-            if (window.BalanceSystem.getCurrentSaldo()) {
-                const newSaldo = window.BalanceSystem.getCurrentSaldo();
-                const processedData = {
-                    raw: newSaldo.toString(),
-                    numeric: newSaldo,
-                    formatted: new Intl.NumberFormat('id-ID', {
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0
-                    }).format(newSaldo)
-                };
-                
-                updateSaldoDisplay(processedData);
-                updateThemeBasedOnSaldo(processedData.numeric);
-                lastSaldo = processedData.numeric;
-                
-                updateConnectionStatus('online');
-                lastSuccessfulFetch = new Date();
-                
-                return; // SELESAI
-            }
-        }
-        
-        // STRATEGY 3: Fallback langsung ke Google Sheets
-        console.log("⚠️ [Script] Fallback ke Google Sheets langsung...");
-        await fetchDirectFromGoogleSheets();
+        // --- PERBAIKAN: Jangan lakukan fallback ke Google Sheets langsung ---
+        // Biarkan balance.js menangani semua pengambilan data
+        console.log("⚠️ [Script] Menunggu data dari balance.js...");
         
     } catch (error) {
         console.error("❌ [Script] Error fetch:", error);
@@ -153,92 +122,6 @@ async function fetchSaldo() {
         setTimeout(() => {
             isRefreshing = false;
         }, 500); // Dipercepat untuk update 5 detik
-    }
-}
-
-// ==================== FUNGSI FALLBACK ====================
-async function fetchDirectFromGoogleSheets() {
-    const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbLFk69seIMkTsx5xGSLyOHM4Iou1uTQMNNpTnwSoWX5Yu2JBgs71Lbd9OH2Xdgq6GKR0_OiTo9shV/pub?gid=236846195&range=A100:A100&single=true&output=csv";
-    
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10000); // Dipercepat timeout
-    
-    try {
-        // Tambahkan cache buster
-        const timestamp = new Date().getTime();
-        const random = Math.floor(Math.random() * 10000);
-        const urlWithCacheBuster = `${SHEET_URL}&_=${timestamp}&rand=${random}`;
-        
-        const response = await fetch(urlWithCacheBuster, {
-            signal: controller.signal,
-            cache: 'no-store',
-            mode: 'cors',
-            headers: { 
-                'Cache-Control': 'no-cache'
-            }
-        });
-        
-        clearTimeout(timeout);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        
-        const text = await response.text();
-        console.log("📄 [Script] Data langsung:", text);
-        
-        const processedData = processSaldoData(text);
-        
-        if (processedData) {
-            updateSaldoDisplay(processedData);
-            updateThemeBasedOnSaldo(processedData.numeric);
-            lastSaldo = processedData.numeric;
-            
-            updateConnectionStatus('online');
-            retryCount = 0;
-            lastSuccessfulFetch = new Date();
-        } else {
-            throw new Error('Data tidak valid');
-        }
-        
-    } catch (error) {
-        clearTimeout(timeout);
-        throw error;
-    }
-}
-
-function processSaldoData(rawData) {
-    try {
-        if (!rawData || rawData.trim() === '') {
-            return null;
-        }
-        
-        let cleaned = rawData.trim();
-        
-        // Bersihkan data
-        cleaned = cleaned.replace(/Rp\s*/i, '');
-        cleaned = cleaned.replace(/\./g, '');
-        cleaned = cleaned.replace(',', '.');
-        cleaned = cleaned.replace(/[^\d.-]/g, '');
-        
-        if (!cleaned) return null;
-        
-        const numericValue = parseFloat(cleaned);
-        if (isNaN(numericValue)) return null;
-        
-        const formatted = new Intl.NumberFormat('id-ID', {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0
-        }).format(numericValue);
-        
-        return {
-            raw: rawData,
-            numeric: numericValue,
-            formatted: formatted
-        };
-    } catch (error) {
-        console.error("❌ Error process data:", error);
-        return null;
     }
 }
 
@@ -507,13 +390,8 @@ document.addEventListener('DOMContentLoaded', function() {
     updateTime();
     setInterval(updateTime, 1000);
     
-    // Auto-refresh setiap 5 detik
-    setInterval(() => {
-        if (isOnline) {
-            console.log("⏰ [Script] Interval update terpicu (5 detik)");
-            fetchSaldo();
-        }
-    }, 5000);
+    // --- PERBAIKAN: HAPUS INTERVAL UPDATE DI SCRIPT.JS ---
+    // Biarkan balance.js menangani semua update berkala
 });
 
 // ==================== FUNGSI DEBUG & FORCE REFRESH ====================
