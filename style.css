@@ -15,7 +15,8 @@
     --card-border: rgba(226, 232, 240, 0.8);
     
     /* --- PERUBAHAN TRANSISI --- */
-    --transition-speed: 0.8s; /* Durasi transisi diperlambat untuk efek yang lebih lembut */
+    --transition-speed-bg: 1.2s; /* Transisi paling lambut untuk background utama */
+    --transition-speed-elements: 0.8s; /* Transisi untuk elemen lainnya */
     --transition-timing: ease-in-out; /* Timing function untuk akselerasi dan deselerasi yang halus */
 }
 
@@ -49,16 +50,21 @@
     --success-color: #0f766e;
 }
 
-/* ==================== TRANSISI GLOBAL ==================== */
+/* ==================== TRANSISI GLOBAL (DIREVISI) ==================== */
+
+/* Hapus transisi global (*) untuk performa dan kontrol yang lebih baik */
+/* * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    transition: ...;
+} */
+
+/* Gunakan reset yang bersih */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    transition: background-color var(--transition-speed) var(--transition-timing),
-                color var(--transition-speed) var(--transition-timing),
-                border-color var(--transition-speed) var(--transition-timing),
-                box-shadow var(--transition-speed) var(--transition-timing),
-                background-image var(--transition-speed) var(--transition-timing);
 }
 
 body {
@@ -71,8 +77,11 @@ body {
     align-items: center;
     overflow-x: hidden;
     padding: 20px;
-    /* Transisi khusus untuk background body agar lebih diutamakan */
-    transition: background var(--transition-speed) var(--transition-timing);
+    
+    /* TRANSISI PRIORITAS UTAMA UNTUK BACKGROUND */
+    /* Fokus pada background-image untuk gradien dan background-color untuk fallback */
+    transition: background-image var(--transition-speed-bg) var(--transition-timing),
+                background-color var(--transition-speed-bg) var(--transition-timing);
 }
 
 /* --- TAMBAHAN ANIMASI FADE-IN SAAT HALAMAN PERTAMA KALI DIMUAT --- */
@@ -174,12 +183,14 @@ body {
         inset 0 1px 0 rgba(255, 255, 255, 0.6);
     border: 1px solid rgba(255, 255, 255, 0.3);
     transform-style: preserve-3d;
-    /* Animasi masuk kartu dinonaktifkan karena sudah ada fadeIn di container */
-    /* animation: cardEntrance 0.8s ease-out; */
     position: relative;
     overflow: hidden;
     width: 100%;
     max-width: 100%;
+    
+    /* Transisi untuk elemen kartu */
+    transition: box-shadow var(--transition-speed-elements) var(--transition-timing),
+                border-color var(--transition-speed-elements) var(--transition-timing);
 }
 
 .card-3d::before {
@@ -191,22 +202,9 @@ body {
     height: 4px;
     background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
     border-radius: 24px 24px 0 0;
-    transition: background var(--transition-speed) var(--transition-timing);
+    /* Transisi untuk aksen kartu */
+    transition: background var(--transition-speed-elements) var(--transition-timing);
 }
-
-/* Animasi cardEntrance tidak lagi digunakan */
-/*
-@keyframes cardEntrance {
-    from {
-        opacity: 0;
-        transform: translateY(50px) rotateX(10deg);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) rotateX(0);
-    }
-}
-*/
 
 /* Header */
 .card-header {
@@ -231,6 +229,10 @@ body {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     filter: drop-shadow(0 2px 4px rgba(var(--primary-color-rgb), 0.3));
+    /* Transisi untuk logo */
+    transition: background var(--transition-speed-elements) var(--transition-timing),
+                color var(--transition-speed-elements) var(--transition-timing),
+                filter var(--transition-speed-elements) var(--transition-timing);
 }
 
 h1 {
@@ -298,6 +300,10 @@ h1 {
     transform-style: preserve-3d;
     position: relative;
     overflow: hidden;
+    
+    /* Transisi untuk info card */
+    transition: background var(--transition-speed-elements) var(--transition-timing),
+                border-color var(--transition-speed-elements) var(--transition-timing);
 }
 
 .info-card-3d::after {
@@ -334,6 +340,8 @@ h1 {
 .card-label i {
     color: var(--primary-color);
     font-size: 1rem;
+    /* Transisi untuk ikon label */
+    transition: color var(--transition-speed-elements) var(--transition-timing);
 }
 
 /* Saldo display */
@@ -355,6 +363,9 @@ h1 {
     color: var(--primary-color);
     text-shadow: 0 2px 4px rgba(var(--primary-color-rgb), 0.2);
     line-height: 1;
+    /* Transisi untuk mata uang */
+    transition: color var(--transition-speed-elements) var(--transition-timing),
+                text-shadow var(--transition-speed-elements) var(--transition-timing);
 }
 
 /* Efek kilau saldo */
@@ -528,6 +539,10 @@ h1 {
     backdrop-filter: blur(10px);
     border: 1px solid rgba(226, 232, 240, 0.5);
     flex-wrap: nowrap;
+    
+    /* Transisi untuk stats container */
+    transition: background var(--transition-speed-elements) var(--transition-timing),
+                border-color var(--transition-speed-elements) var(--transition-timing);
 }
 
 .stat-item {
@@ -551,6 +566,10 @@ h1 {
     font-size: 0.9rem;
     box-shadow: 0 4px 8px rgba(var(--primary-color-rgb), 0.3);
     flex-shrink: 0;
+    
+    /* Transisi untuk ikon statistik */
+    transition: background var(--transition-speed-elements) var(--transition-timing),
+                box-shadow var(--transition-speed-elements) var(--transition-timing);
 }
 
 .stat-info {
@@ -566,6 +585,9 @@ h1 {
     font-weight: 700;
     color: var(--text-color);
     line-height: 1.2;
+    
+    /* Transisi untuk nilai statistik */
+    transition: color var(--transition-speed-elements) var(--transition-timing);
 }
 
 .stat-label {
@@ -574,6 +596,9 @@ h1 {
     font-weight: 500;
     margin-top: 2px;
     line-height: 1.1;
+    
+    /* Transisi untuk label statistik */
+    transition: color var(--transition-speed-elements) var(--transition-timing);
 }
 
 .stat-divider {
@@ -590,6 +615,9 @@ h1 {
     color: var(--text-secondary);
     font-size: 0.85rem;
     width: 100%;
+    
+    /* Transisi untuk footer */
+    transition: color var(--transition-speed-elements) var(--transition-timing);
 }
 
 .footer-3d p {
