@@ -1,9 +1,9 @@
 /* ==================== VARIABEL CSS UNTUK THEME ==================== */
 :root {
     /* Default theme (silver/black-white) */
-    --primary-color: #4a4a4a;
-    --secondary-color: #2c2c2c;
-    --accent-color: #e0e0e0;
+    --primary-color: #a6a6a6;
+    --secondary-color: #b4b4b4;
+    --accent-color: #d9d9d9;
     --danger-color: #ef4444;
     --warning-color: #f59e0b;
     --success-color: #10b981;
