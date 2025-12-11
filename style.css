@@ -798,6 +798,60 @@ h1 {
     }
 }
 
+/* Tombol Force Refresh */
+.refresh-button-container {
+    display: flex;
+    justify-content: center;
+    margin: 15px 0;
+}
+
+.force-refresh-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 20px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+.force-refresh-btn:hover {
+    background: linear-gradient(135deg, #4338ca, #6d28d9);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(79, 70, 229, 0.4);
+}
+
+.force-refresh-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+}
+
+.force-refresh-btn i {
+    transition: transform 0.5s ease;
+}
+
+.force-refresh-btn:hover i {
+    transform: rotate(180deg);
+}
+
+/* Animasi untuk force refresh */
+.force-refresh-btn.refreshing i {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 /* ==================== RESPONSIVE DESIGN ==================== */
 
 @media (max-width: 480px) {
