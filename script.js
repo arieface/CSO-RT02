@@ -244,9 +244,20 @@ function updateThemeBasedOnSaldo(saldo) {
     else if (saldo >= 1000000) newTheme = 'teal';
     
     if (newTheme !== currentTheme) {
-        currentTheme = newTheme;
-        document.body.setAttribute('data-theme', currentTheme);
-        console.log(`🎨 Theme: ${currentTheme} (Saldo: ${saldo})`);
+        // Tambahkan kelas changing-theme untuk efek transisi
+        document.body.classList.add('changing-theme');
+        
+        // Setelah sedikit delay, ubah tema
+        setTimeout(() => {
+            currentTheme = newTheme;
+            document.body.setAttribute('data-theme', currentTheme);
+            console.log(`🎨 Theme: ${currentTheme} (Saldo: ${saldo})`);
+            
+            // Setelah transisi selesai, hapus kelas changing-theme
+            setTimeout(() => {
+                document.body.classList.remove('changing-theme');
+            }, 2500); // Sesuaikan dengan --transition-speed-bg
+        }, 100);
     }
 }
 
