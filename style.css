@@ -229,27 +229,34 @@ body.changing-theme::before {
     gap: 12px;
     justify-content: flex-start;
     flex: 1;
+    min-width: 0; /* Memungkinkan logo untuk menyusut */
 }
 
 .logo i {
-    font-size: 2rem;
+    font-size: clamp(1.5rem, 5vw, 2rem); /* Ukuran ikon responsif */
     color: var(--primary-color);
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     filter: drop-shadow(0 2px 4px rgba(var(--primary-color-rgb), 0.3));
     /* Transisi untuk logo */
     transition: background var(--transition-speed-elements) var(--transition-timing),
                 color var(--transition-speed-elements) var(--transition-timing),
                 filter var(--transition-speed-elements) var(--transition-timing);
+    flex-shrink: 0; /* Mencegah ikon menyusut */
 }
 
 h1 {
     color: #2d3748;
-    font-size: 1.5rem;
+    font-size: clamp(1.2rem, 4vw, 1.5rem); /* Ukuran font responsif */
     font-weight: 700;
     letter-spacing: -0.3px;
     text-align: left;
+    line-height: 1.2;
+    white-space: nowrap; /* Mencegah teks ke baris baru */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Opsional: untuk menunjukkan teks yang terpotong */
 }
 
 /* Connection signal */
@@ -259,13 +266,14 @@ h1 {
     gap: 6px;
     padding: 6px 12px;
     border-radius: 16px;
-    font-size: 0.8rem;
+    font-size: clamp(0.7rem, 2vw, 0.8rem); /* Ukuran font responsif */
     font-weight: 600;
     background: linear-gradient(135deg, #f8fafc, #f1f5f9);
     color: #475569;
     border: 1px solid rgba(226, 232, 240, 0.8);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     margin-left: 10px;
+    flex-shrink: 0; /* Mencegah elemen ini menyusut */
 }
 
 .signal-bars {
@@ -342,15 +350,16 @@ h1 {
     gap: 8px;
     margin-bottom: 12px;
     color: var(--text-secondary);
-    font-size: 0.9rem;
+    font-size: clamp(0.85rem, 2.5vw, 0.9rem); /* Ukuran font responsif */
     font-weight: 600;
 }
 
 .card-label i {
     color: var(--primary-color);
-    font-size: 1rem;
+    font-size: clamp(0.9rem, 2.5vw, 1rem); /* Ukuran ikon responsif */
     /* Transisi untuk ikon label */
     transition: color var(--transition-speed-elements) var(--transition-timing);
+    flex-shrink: 0; /* Mencegah ikon menyusut */
 }
 
 /* Saldo display */
@@ -362,12 +371,12 @@ h1 {
     margin-bottom: 12px;
     min-height: 50px;
     flex-wrap: nowrap;
-    white-space: nowrap;
     position: relative;
+    width: 100%;
 }
 
 .currency {
-    font-size: 1.8rem;
+    font-size: clamp(1.5rem, 5vw, 1.8rem); /* Ukuran font responsif */
     font-weight: 700;
     color: var(--primary-color);
     text-shadow: 0 2px 4px rgba(var(--primary-color-rgb), 0.2);
@@ -375,6 +384,7 @@ h1 {
     /* Transisi untuk mata uang */
     transition: color var(--transition-speed-elements) var(--transition-timing),
                 text-shadow var(--transition-speed-elements) var(--transition-timing);
+    flex-shrink: 0; /* Mencegah mata uang menyusut */
 }
 
 /* Status display - Diperbarui untuk mengikuti warna card-label */
@@ -389,21 +399,23 @@ h1 {
     background: rgba(255, 255, 255, 0.7);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: clamp(0.85rem, 2.5vw, 0.9rem); /* Ukuran font responsif */
     color: var(--text-secondary); /* Mengikuti warna card-label */
     border: 1px solid rgba(255, 255, 255, 0.5);
     transition: all var(--transition-speed-elements) var(--transition-timing);
+    white-space: nowrap; /* Mencegah teks ke baris baru */
 }
 
 .status-display i {
-    font-size: 0.9rem;
+    font-size: clamp(0.9rem, 2.5vw, 0.9rem); /* Ukuran ikon responsif */
     color: var(--primary-color); /* Mengikuti warna ikon card-label */
     transition: color var(--transition-speed-elements) var(--transition-timing);
+    flex-shrink: 0; /* Mencegah ikon menyusut */
 }
 
 /* Efek kilau saldo */
 .amount {
-    font-size: 2rem;
+    font-size: clamp(1.6rem, 6vw, 2rem); /* Ukuran font responsif yang lebih fleksibel */
     font-weight: 800;
     color: var(--text-color);
     letter-spacing: -0.5px;
@@ -411,10 +423,7 @@ h1 {
     overflow: hidden;
     text-align: center;
     line-height: 1;
-    white-space: nowrap;
-    max-width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
+    white-space: nowrap; /* PENTING: Mencegah teks ke baris baru */
     position: relative;
     /* Efek kilau untuk seluruh view */
     background: linear-gradient(
@@ -430,6 +439,8 @@ h1 {
     background-clip: text;
     -webkit-text-fill-color: transparent;
     animation: shimmer-left-to-right 3s infinite linear;
+    min-width: 0; /* Memungkinkan elemen untuk menyusut di bawah ukuran konten */
+    flex-shrink: 1; /* Memungkinkan elemen untuk menyusut */
 }
 
 /* CATATAN: background-position bergerak berlawanan dengan arah visual
@@ -446,22 +457,22 @@ h1 {
 
 /* Error & empty state */
 .amount.error {
-    font-size: 1.1rem;
+    font-size: clamp(1rem, 3vw, 1.1rem); /* Ukuran font responsif */
     color: var(--warning-color);
     background: none;
     -webkit-text-fill-color: var(--warning-color);
     font-weight: 600;
     animation: shake 0.5s ease;
-    white-space: normal;
+    white-space: normal; /* Izinkan wrapping untuk pesan error yang panjang */
 }
 
 .amount.empty {
-    font-size: 1.1rem;
+    font-size: clamp(1rem, 3vw, 1.1rem); /* Ukuran font responsif */
     color: var(--warning-color);
     background: none;
     -webkit-text-fill-color: var(--warning-color);
     font-weight: 600;
-    white-space: normal;
+    white-space: normal; /* Izinkan wrapping untuk pesan kosong */
 }
 
 @keyframes shake {
@@ -531,21 +542,22 @@ h1 {
     gap: 8px;
     margin-bottom: 8px;
     color: #4b5563;
-    font-size: 0.85rem;
+    font-size: clamp(0.8rem, 2.5vw, 0.85rem); /* Ukuran font responsif */
     font-weight: 600;
     text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
 }
 
 .time-label i {
     color: #6b7280;
-    font-size: 0.9rem;
+    font-size: clamp(0.9rem, 2.5vw, 0.9rem); /* Ukuran ikon responsif */
     text-shadow: 
         0 1px 3px rgba(255, 255, 255, 0.8),
         0 0 10px rgba(255, 255, 255, 0.5);
+    flex-shrink: 0; /* Mencegah ikon menyusut */
 }
 
 .time-display {
-    font-size: 1rem;
+    font-size: clamp(0.85rem, 2.5vw, 1rem); /* Ukuran font responsif */
     font-weight: 600;
     text-align: center;
     color: #111827;
@@ -559,6 +571,9 @@ h1 {
     text-shadow: 
         0 1px 3px rgba(255, 255, 255, 0.8),
         0 0 15px rgba(255, 255, 255, 0.4);
+    white-space: nowrap; /* PENTING: Mencegah teks ke baris baru */
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Stats */
@@ -582,23 +597,23 @@ h1 {
     display: flex;
     align-items: center;
     gap: 8px;
-    min-width: auto;
+    min-width: 0; /* Memungkinkan item untuk menyusut */
     justify-content: center;
     flex-direction: row;
 }
 
 .stat-icon {
-    width: 35px;
-    height: 35px;
+    width: clamp(30px, 8vw, 35px); /* Ukuran ikon responsif */
+    height: clamp(30px, 8vw, 35px); /* Ukuran ikon responsif */
     background: var(--stat-icon-gradient);
     border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 0.9rem;
+    font-size: clamp(0.8rem, 2.5vw, 0.9rem); /* Ukuran font ikon responsif */
     box-shadow: 0 4px 8px rgba(var(--primary-color-rgb), 0.3);
-    flex-shrink: 0;
+    flex-shrink: 0; /* Mencegah ikon menyusut */
     
     /* Transisi untuk ikon statistik */
     transition: background var(--transition-speed-elements) var(--transition-timing),
@@ -610,25 +625,32 @@ h1 {
     flex-direction: column;
     align-items: flex-start;
     text-align: left;
-    white-space: nowrap;
+    min-width: 0; /* Memungkinkan info untuk menyusut */
+    flex-shrink: 1; /* Memungkinkan info untuk menyusut */
 }
 
 .stat-value {
-    font-size: 1.1rem;
+    font-size: clamp(1rem, 3vw, 1.1rem); /* Ukuran font responsif */
     font-weight: 700;
     color: var(--text-color);
     line-height: 1.2;
+    white-space: nowrap; /* PENTING: Mencegah teks ke baris baru */
+    overflow: hidden;
+    text-overflow: ellipsis;
     
     /* Transisi untuk nilai statistik */
     transition: color var(--transition-speed-elements) var(--transition-timing);
 }
 
 .stat-label {
-    font-size: 0.8rem;
+    font-size: clamp(0.7rem, 2vw, 0.8rem); /* Ukuran font responsif */
     color: var(--text-secondary);
     font-weight: 500;
     margin-top: 2px;
     line-height: 1.1;
+    white-space: nowrap; /* PENTING: Mencegah teks ke baris baru */
+    overflow: hidden;
+    text-overflow: ellipsis;
     
     /* Transisi untuk label statistik */
     transition: color var(--transition-speed-elements) var(--transition-timing);
@@ -646,7 +668,7 @@ h1 {
 .footer-3d {
     text-align: center;
     color: var(--text-secondary);
-    font-size: 0.85rem;
+    font-size: clamp(0.75rem, 2vw, 0.85rem); /* Ukuran font responsif */
     width: 100%;
     
     /* Transisi untuk footer */
@@ -659,13 +681,17 @@ h1 {
     align-items: center;
     justify-content: center;
     gap: 6px;
-    font-size: 0.8rem;
+    font-size: clamp(0.7rem, 2vw, 0.8rem); /* Ukuran font responsif */
+    white-space: nowrap; /* PENTING: Mencegah teks ke baris baru */
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .footer-3d p i {
-    font-size: 0.9rem;
+    font-size: clamp(0.8rem, 2.5vw, 0.9rem); /* Ukuran ikon responsif */
     vertical-align: middle;
     line-height: 1;
+    flex-shrink: 0; /* Mencegah ikon menyusut */
 }
 
 /* ==================== WATERMARK (SELALU DI ATAS) ==================== */
@@ -677,7 +703,7 @@ h1 {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    font-size: 0.85rem;
+    font-size: clamp(0.75rem, 2vw, 0.85rem); /* Ukuran font responsif */
     font-weight: 500;
     
     /* Z-index tinggi untuk selalu di atas */
@@ -689,7 +715,7 @@ h1 {
 [data-theme="red"] .watermark,
 [data-theme="yellow-orange"] .watermark,
 [data-theme="teal"] .watermark {
-    color: rgba(211, 211, 211, 0.9); /* Light gray/silver dengan opacity tinggi */
+    color: rgba(255, 255, 255, 0.8); /* Light gray/silver dengan opacity tinggi */
 }
 
 /* Loading dots (text) */
@@ -701,7 +727,7 @@ h1 {
 .loading-dots span {
     animation: dotPulse 1.5s infinite ease-in-out;
     opacity: 0;
-    font-size: 1rem;
+    font-size: clamp(0.9rem, 2.5vw, 1rem); /* Ukuran font responsif */
 }
 
 .loading-dots span:nth-child(1) { animation-delay: 0s; }
@@ -720,15 +746,16 @@ h1 {
     justify-content: center;
     gap: 6px;
     margin-top: 10px;
-    font-size: 0.75rem;
+    font-size: clamp(0.7rem, 2vw, 0.75rem); /* Ukuran font responsif */
     color: var(--text-secondary);
     opacity: 0.8;
     text-align: center;
     line-height: 1.2;
+    white-space: nowrap; /* Mencegah teks ke baris baru */
 }
 
 .connection-status i {
-    font-size: 0.65rem;
+    font-size: clamp(0.6rem, 2vw, 0.65rem); /* Ukuran ikon responsif */
     line-height: 1;
     display: inline-flex;
     align-items: center;
@@ -736,6 +763,7 @@ h1 {
     vertical-align: middle;
     position: relative;
     top: 0;
+    flex-shrink: 0; /* Mencegah ikon menyusut */
 }
 
 .connection-status span {
@@ -901,16 +929,6 @@ h1 {
         gap: 10px;
     }
     
-    h1 {
-        font-size: 1.2rem;
-        text-align: center;
-        line-height: 1.3;
-    }
-    
-    .logo i {
-        font-size: 1.5rem;
-    }
-    
     .connection-signal {
         font-size: 0.7rem;
         padding: 5px 10px;
@@ -955,24 +973,20 @@ h1 {
         font-size: 1.6rem;
         line-height: 1;
         padding: 0;
-        white-space: nowrap;
-        overflow-x: auto;
-        overflow-y: hidden;
-        text-overflow: ellipsis;
-        max-width: calc(100% - 40px);
+        white-space: nowrap; /* Pertahankan satu baris */
         align-self: center;
         text-align: center;
     }
     
     .amount.error {
         font-size: 0.9rem;
-        white-space: normal;
+        white-space: normal; /* Izinkan wrapping untuk pesan error */
         text-align: center;
     }
     
     .amount.empty {
         font-size: 0.9rem;
-        white-space: normal;
+        white-space: normal; /* Izinkan wrapping untuk pesan kosong */
         text-align: center;
     }
     
@@ -993,6 +1007,7 @@ h1 {
         flex-wrap: wrap;
         text-align: center;
         width: 100%;
+        white-space: normal; /* Izinkan wrapping untuk pesan panjang */
     }
     
     .time-card-3d {
@@ -1017,9 +1032,7 @@ h1 {
         min-height: 20px;
         padding: 0 5px;
         text-align: center;
-        word-break: break-word;
-        overflow-wrap: break-word;
-        hyphens: auto;
+        white-space: nowrap; /* Pertahankan satu baris */
     }
     
     /* Stats mobile: grid 2 baris (icon atas, teks bawah) */
@@ -1053,11 +1066,7 @@ h1 {
         text-align: center;
         align-items: center;
         justify-content: center;
-        white-space: normal;
-    }
-    
-    .stat-divider {
-        display: none;
+        min-width: auto; /* Reset for grid layout */
     }
 
     .stat-value {
@@ -1065,6 +1074,7 @@ h1 {
         font-weight: 700;
         color: var(--text-color);
         line-height: 1.2;
+        white-space: nowrap; /* Pertahankan satu baris */
     }
     
     .stat-label {
@@ -1073,6 +1083,11 @@ h1 {
         font-weight: 500;
         margin-top: 2px;
         line-height: 1.1;
+        white-space: nowrap; /* Pertahankan satu baris */
+    }
+    
+    .stat-divider {
+        display: none;
     }
     
     .footer-3d {
@@ -1090,6 +1105,7 @@ h1 {
         margin-bottom: 8px;
         align-items: center;
         justify-content: center;
+        white-space: nowrap; /* Pertahankan satu baris */
     }
     
     .footer-3d p i {
@@ -1164,6 +1180,7 @@ h1 {
     .amount {
         align-self: center;
         text-align: center;
+        white-space: nowrap; /* Pertahankan satu baris */
     }
     
     .stats {
@@ -1177,12 +1194,14 @@ h1 {
         justify-content: center;
         flex-direction: row;
         text-align: left;
+        min-width: 0;
     }
     
     .stat-info {
         align-items: flex-start;
         text-align: left;
         flex-direction: column;
+        min-width: 0;
     }
     
     .stat-divider {
@@ -1216,6 +1235,7 @@ h1 {
     .amount {
         align-self: center;
         text-align: center;
+        white-space: nowrap; /* Pertahankan satu baris */
     }
     
     .stats {
@@ -1229,12 +1249,14 @@ h1 {
         justify-content: center;
         flex-direction: row;
         text-align: left;
+        min-width: 0;
     }
     
     .stat-info {
         align-items: flex-start;
         text-align: left;
         flex-direction: column;
+        min-width: 0;
     }
     
     .stat-divider {
@@ -1262,6 +1284,7 @@ h1 {
     .amount {
         align-self: center;
         text-align: center;
+        white-space: nowrap; /* Pertahankan satu baris */
     }
     
     .stats {
@@ -1274,12 +1297,14 @@ h1 {
         justify-content: center;
         flex-direction: row;
         text-align: left;
+        min-width: 0;
     }
     
     .stat-info {
         align-items: flex-start;
         text-align: left;
         flex-direction: column;
+        min-width: 0;
     }
     
     .stat-divider {
@@ -1326,12 +1351,14 @@ h1 {
         justify-content: center;
         flex-direction: column;
         align-items: center;
+        min-width: 0;
     }
     
     .stat-info {
         align-items: center;
         text-align: center;
         flex-direction: column;
+        min-width: 0;
     }
     
     .stat-divider {
@@ -1340,6 +1367,7 @@ h1 {
     
     .time-display {
         font-size: 0.8rem;
+        white-space: nowrap; /* Pertahankan satu baris */
     }
 }
 
@@ -1347,10 +1375,6 @@ h1 {
 @media (max-width: 360px) {
     .card-3d {
         padding: 12px;
-    }
-    
-    h1 {
-        font-size: 1.1rem;
     }
     
     .saldo-display {
@@ -1365,6 +1389,7 @@ h1 {
     .amount {
         font-size: 1.4rem;
         text-align: center;
+        white-space: nowrap; /* Pertahankan satu baris */
     }
     
     .status-display {
@@ -1375,6 +1400,7 @@ h1 {
     .time-display {
         font-size: 0.75rem;
         text-align: center;
+        white-space: nowrap; /* Pertahankan satu baris */
     }
     
     .stats {
@@ -1384,6 +1410,7 @@ h1 {
     
     .stat-item {
         gap: 6px;
+        min-width: 0;
     }
     
     .stat-icon {
@@ -1395,10 +1422,12 @@ h1 {
     .stat-value {
         font-size: 1rem;
         text-align: center;
+        white-space: nowrap; /* Pertahankan satu baris */
     }
     
     .stat-label {
         font-size: 0.8rem;
         text-align: center;
+        white-space: nowrap; /* Pertahankan satu baris */
     }
 }
