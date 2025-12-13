@@ -2,132 +2,171 @@
 const CONFIG = {
     SHEET_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbLFk69seIMkTsx5xGSLyOHM4Iou1uTQMNNpTnwSoWX5Yu2JBgs71Lbd9OH2Xdgq6GKR0_OiTo9shV/pub?gid=236846195&single=true&output=csv",
     
-    // ⭐ INTERVAL OPTIMAL BERDASARKAN LOG ANDA:
-    // Log menunjukkan fetch bekerja baik dalam 600-800ms
-    // Google cache update dalam 1 menit (dari 10:27:59 ke 10:28:59)
-    UPDATE_INTERVAL: 20000, // ⭐ 20 DETIK (optimal untuk kasus Anda)
+    // ⭐ INTERVAL OPTIMAL: JANGAN terlalu cepat (20-30 detik)
+    UPDATE_INTERVAL: 30000, // 30 detik
     
-    // ⭐ VALIDASI YANG LEBIH FLEKSIBEL:
-    MAX_PERCENT_CHANGE: 150,    // 150% perubahan langsung diterima
-    REQUIRED_CONSECUTIVE: 1,    // Hanya butuh 1x konfirmasi (bukan 2)
-    CONFIRMATION_TIMEOUT: 30000, // Timeout 30 detik (bukan 60)
+    // ⭐ CACHE DAN VALIDASI
+    LOCAL_CACHE_TTL: 15000, // 15 detik cache lokal
+    MAX_RETRIES: 2,
     
-    // ⭐ CACHE YANG LEBIH SINGKAT:
-    CACHE_TTL: 10000,           // 10 detik cache lokal
-    RETRY_DELAY: 1000,          // 1 detik retry
-    MAX_RETRIES: 2,             // Maks 2 retry (cepat gagal)
+    // ⭐ MAJORITY VOTING SYSTEM
+    VOTING_WINDOW: 5, // Simpan 5 pembacaan terakhir
+    REQUIRED_CONSENSUS: 3, // Butuh 3x nilai sama untuk konfirmasi
+    STICKY_THRESHOLD: 2, // Minimal 2x nilai sama untuk "sticky"
 };
 
-// ==================== PERBAIKAN VALIDASI ====================
+// ==================== VARIABEL GLOBAL ====================
+let currentBalance = null;
+let lastUpdateTime = null;
+let isFetching = false;
+let updateTimer = null;
+let consecutiveStableReads = 0;
+let votingHistory = [];
+let lastStableValue = null;
+let isValueSticky = false;
 
-function validateBalanceChange(oldValue, newValue) {
-    if (oldValue === null || newValue === null) {
-        return { isValid: true, reason: 'First load' };
-    }
-    
-    // Hitung perubahan absolut (bukan persentase saja)
-    const absoluteChange = Math.abs(newValue - oldValue);
-    const percentChange = (absoluteChange / oldValue) * 100;
-    
-    // Rule 1: Perubahan kecil (< 50%) langsung terima
-    if (percentChange <= 50) {
-        return { 
-            isValid: true, 
-            reason: `Small change: ${percentChange.toFixed(1)}%`,
-            type: 'small'
-        };
-    }
-    
-    // Rule 2: Perubahan sedang (50-150%) butuh konfirmasi cepat
-    if (percentChange <= CONFIG.MAX_PERCENT_CHANGE) {
-        return { 
-            isValid: 'pending', // ⭐ Status baru: pending (bukan false)
-            reason: `Medium change: ${percentChange.toFixed(1)}%`,
-            type: 'medium',
-            needsConfirmation: true
-        };
-    }
-    
-    // Rule 3: Perubahan sangat besar (>150%) butuh konfirmasi
-    return { 
-        isValid: false, 
-        reason: `Large change: ${percentChange.toFixed(1)}%`,
-        type: 'large',
-        needsConfirmation: true
-    };
-}
+// ==================== MAJORITY VOTING SYSTEM ====================
 
-// ==================== SMART CACHE SYSTEM ====================
-
-class SmartCache {
+class MajorityVotingSystem {
     constructor() {
-        this.cache = new Map();
-        this.ttl = CONFIG.CACHE_TTL;
+        this.readings = [];
+        this.maxReadings = CONFIG.VOTING_WINDOW;
+        this.consensusThreshold = CONFIG.REQUIRED_CONSENSUS;
     }
     
-    set(key, value) {
-        this.cache.set(key, {
-            value: value,
-            timestamp: Date.now(),
-            ttl: this.calculateTTL(value) // ⭐ Dynamic TTL
-        });
-    }
-    
-    get(key) {
-        const item = this.cache.get(key);
-        if (!item) return null;
+    addReading(value) {
+        const timestamp = Date.now();
+        const reading = { value, timestamp };
         
-        const age = Date.now() - item.timestamp;
+        // Tambahkan ke history
+        this.readings.push(reading);
         
-        // ⭐ Cache lebih pendek jika data sering berubah
-        if (age < item.ttl) {
-            return item.value;
+        // Hapus yang terlama jika melebihi batas
+        if (this.readings.length > this.maxReadings) {
+            this.readings.shift();
         }
         
-        this.cache.delete(key);
-        return null;
+        console.log(`📊 [Voting] Readings: ${this.readings.map(r => r.value).join(', ')}`);
+        
+        return this.getConsensus();
     }
     
-    calculateTTL(value) {
-        // ⭐ Dynamic TTL berdasarkan nilai
-        if (value < 100000) return 15000;      // Kecil: 15 detik
-        if (value < 1000000) return 10000;     // Sedang: 10 detik  
-        return 5000;                           // Besar: 5 detik
+    getConsensus() {
+        if (this.readings.length === 0) return null;
+        
+        // Hitung frekuensi setiap nilai
+        const frequency = {};
+        this.readings.forEach(reading => {
+            const key = reading.value.toString();
+            frequency[key] = (frequency[key] || 0) + 1;
+        });
+        
+        // Cari nilai dengan frekuensi tertinggi
+        let maxCount = 0;
+        let consensusValue = null;
+        
+        Object.entries(frequency).forEach(([valueStr, count]) => {
+            if (count > maxCount) {
+                maxCount = count;
+                consensusValue = parseFloat(valueStr);
+            }
+        });
+        
+        // Cek apakah mencapai consensus
+        const hasConsensus = maxCount >= this.consensusThreshold;
+        
+        return {
+            value: consensusValue,
+            confidence: maxCount / this.readings.length,
+            hasConsensus: hasConsensus,
+            totalReadings: this.readings.length
+        };
     }
     
     clear() {
-        this.cache.clear();
+        this.readings = [];
     }
 }
 
-const smartCache = new SmartCache();
+const votingSystem = new MajorityVotingSystem();
 
-// ==================== OPTIMIZED FETCH LOGIC ====================
+// ==================== STICKY VALUE SYSTEM ====================
 
-async function optimizedFetchBalance() {
+class StickyValueSystem {
+    constructor() {
+        this.stickyValue = null;
+        this.stickySince = null;
+        this.confirmationCount = 0;
+        this.requiredConfirmations = CONFIG.STICKY_THRESHOLD;
+    }
+    
+    checkSticky(newValue) {
+        if (this.stickyValue === null) {
+            // First time, set as sticky candidate
+            this.stickyValue = newValue;
+            this.stickySince = Date.now();
+            this.confirmationCount = 1;
+            return { isSticky: false, shouldChange: true };
+        }
+        
+        // Check if value is the same as sticky
+        if (Math.abs(newValue - this.stickyValue) < (this.stickyValue * 0.01)) {
+            // Same value, increase confirmation
+            this.confirmationCount++;
+            
+            console.log(`🎯 [Sticky] Confirmation ${this.confirmationCount}/${this.requiredConfirmations}`);
+            
+            if (this.confirmationCount >= this.requiredConfirmations) {
+                // Value is now officially sticky
+                return { isSticky: true, shouldChange: false };
+            }
+            
+            return { isSticky: false, shouldChange: false };
+        } else {
+            // Different value, check if we should break stickiness
+            const timeSticky = Date.now() - this.stickySince;
+            const timeThreshold = 60000; // 1 menit
+            
+            if (timeSticky > timeThreshold) {
+                // Sudah cukup lama, bisa ganti nilai
+                console.log(`🔄 [Sticky] Breaking stickiness after ${Math.round(timeSticky/1000)}s`);
+                this.stickyValue = newValue;
+                this.stickySince = Date.now();
+                this.confirmationCount = 1;
+                return { isSticky: false, shouldChange: true };
+            } else {
+                // Masih dalam periode sticky, pertahankan nilai lama
+                console.log(`🔒 [Sticky] Maintaining sticky value: ${this.stickyValue}`);
+                return { isSticky: true, shouldChange: false };
+            }
+        }
+    }
+    
+    getValue() {
+        return this.stickyValue;
+    }
+    
+    reset() {
+        this.stickyValue = null;
+        this.stickySince = null;
+        this.confirmationCount = 0;
+    }
+}
+
+const stickySystem = new StickyValueSystem();
+
+// ==================== SMART FETCH SYSTEM ====================
+
+async function smartFetch() {
     const startTime = Date.now();
     
     try {
-        // ⭐ Cek cache dengan smart system
-        const cached = smartCache.get('balance');
-        if (cached !== null) {
-            const cacheAge = Date.now() - startTime;
-            console.log(`💾 [Balance] Cache hit (${cacheAge}ms old)`);
-            return { value: cached, fromCache: true };
-        }
+        console.log(`📡 [Balance] Fetching...`);
         
-        console.log(`🚀 [Balance] Fetching from Google Sheets...`);
-        
-        // ⭐ Fetch dengan timeout cepat
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000);
-        
+        // Cache busting yang minimal
         const url = `${CONFIG.SHEET_URL}&_=${Date.now()}`;
-        const response = await fetch(url, {
-            signal: controller.signal
-        });
         
-        clearTimeout(timeoutId);
+        const response = await fetch(url);
         
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
@@ -135,15 +174,27 @@ async function optimizedFetchBalance() {
         
         const csvText = await response.text();
         
-        // ⭐ Fast parsing (simplified)
+        // Simple parsing untuk A100
         const lines = csvText.split('\n');
-        const targetLine = lines.length >= 100 ? lines[99] : lines[lines.length - 1];
+        let targetLine;
+        
+        if (lines.length >= 100) {
+            targetLine = lines[99];
+        } else {
+            targetLine = lines[lines.length - 1];
+        }
+        
         const cellValue = targetLine.split(',')[0] || '';
         
-        // Fast cleaning
-        const numericValue = parseFloat(
-            cellValue.replace(/[^\d.-]/g, '')
-        );
+        // Clean and parse
+        let cleaned = cellValue.replace(/[^\d.-]/g, '');
+        if (cleaned.includes(',') && cleaned.includes('.')) {
+            cleaned = cleaned.replace(/\./g, '').replace(',', '.');
+        } else if (cleaned.includes(',')) {
+            cleaned = cleaned.replace(',', '.');
+        }
+        
+        const numericValue = parseFloat(cleaned);
         
         if (isNaN(numericValue)) {
             throw new Error('Invalid number');
@@ -152,240 +203,226 @@ async function optimizedFetchBalance() {
         const fetchTime = Date.now() - startTime;
         console.log(`✅ [Balance] Fetched: ${numericValue} (${fetchTime}ms)`);
         
-        // ⭐ Simpan ke cache
-        smartCache.set('balance', numericValue);
-        
-        return { value: numericValue, fromCache: false, fetchTime };
+        return numericValue;
         
     } catch (error) {
         console.error(`❌ [Balance] Fetch error: ${error.message}`);
-        
-        // ⭐ Return cached value jika ada error
-        const cached = smartCache.get('balance');
-        if (cached !== null) {
-            console.log(`🔄 [Balance] Using cached due to error: ${cached}`);
-            return { value: cached, fromCache: true, error: true };
-        }
-        
         throw error;
     }
 }
 
-// ==================== ADAPTIVE INTERVAL SYSTEM ====================
+// ==================== MAIN UPDATE LOGIC ====================
 
-class AdaptiveInterval {
-    constructor() {
-        this.baseInterval = CONFIG.UPDATE_INTERVAL;
-        this.currentInterval = CONFIG.UPDATE_INTERVAL;
-        this.lastFetchTimes = [];
-        this.varianceHistory = [];
-        this.lastChangeTime = 0;
-        this.isDataStable = true;
-    }
+async function updateBalance() {
+    if (isFetching) return;
     
-    calculateOptimalInterval() {
-        const now = Date.now();
-        
-        // ⭐ Rule 1: Jika data baru saja berubah, fetch lebih cepat
-        if (now - this.lastChangeTime < 60000) { // Dalam 1 menit terakhir
-            return Math.max(10000, this.baseInterval * 0.5); // Min 10 detik
-        }
-        
-        // ⭐ Rule 2: Hitung rata-rata waktu fetch
-        if (this.lastFetchTimes.length > 0) {
-            const avgFetchTime = this.lastFetchTimes.reduce((a, b) => a + b, 0) / this.lastFetchTimes.length;
-            
-            // Jika fetch cepat (<1s), bisa lebih agresif
-            if (avgFetchTime < 1000) {
-                return Math.max(15000, this.baseInterval * 0.75); // Min 15 detik
-            }
-            
-            // Jika fetch lambat (>2s), lebih konservatif
-            if (avgFetchTime > 2000) {
-                return Math.min(60000, this.baseInterval * 1.5); // Max 60 detik
-            }
-        }
-        
-        // ⭐ Rule 3: Default ke base interval
-        return this.baseInterval;
-    }
-    
-    recordFetch(fetchTime, valueChanged) {
-        // Simpan waktu fetch (max 5 entries)
-        this.lastFetchTimes.push(fetchTime);
-        if (this.lastFetchTimes.length > 5) {
-            this.lastFetchTimes.shift();
-        }
-        
-        // Catat jika ada perubahan
-        if (valueChanged) {
-            this.lastChangeTime = Date.now();
-            this.isDataStable = false;
-            
-            // Setelah perubahan, lebih cepat dulu
-            setTimeout(() => {
-                this.isDataStable = true;
-            }, 120000); // 2 menit setelah perubahan
-        }
-    }
-    
-    getInterval() {
-        const optimal = this.calculateOptimalInterval();
-        
-        // Smooth transition
-        if (Math.abs(optimal - this.currentInterval) > 5000) {
-            this.currentInterval = optimal;
-            console.log(`⏰ [Interval] Adjusted to ${this.currentInterval/1000}s`);
-        }
-        
-        return this.currentInterval;
-    }
-}
-
-// ==================== MAIN EXECUTION ====================
-
-const adaptiveInterval = new AdaptiveInterval();
-let balanceValue = null;
-let updateInProgress = false;
-
-async function executeBalanceUpdate() {
-    if (updateInProgress) return;
-    
-    updateInProgress = true;
+    isFetching = true;
     const updateStart = Date.now();
     
     try {
-        const result = await optimizedFetchBalance();
-        const newValue = result.value;
-        const previousValue = balanceValue;
+        // 1. Fetch data baru
+        const newValue = await smartFetch();
         
-        // Validasi perubahan
-        if (previousValue !== null) {
-            const change = Math.abs(newValue - previousValue);
-            const percentChange = (change / previousValue) * 100;
-            
-            if (percentChange > 50) { // Perubahan signifikan
-                console.log(`🔄 [Balance] Significant change: ${previousValue} → ${newValue} (${percentChange.toFixed(1)}%)`);
+        // 2. Tambahkan ke voting system
+        const voteResult = votingSystem.addReading(newValue);
+        
+        // 3. Cek sticky system
+        const stickyCheck = stickySystem.checkSticky(newValue);
+        
+        let finalValue = null;
+        let shouldUpdateUI = false;
+        let isSignificant = false;
+        
+        // 4. DECISION MAKING LOGIC
+        if (stickyCheck.isSticky) {
+            // Nilai masih sticky, pertahankan
+            finalValue = stickySystem.getValue();
+            console.log(`🔒 [Balance] Using sticky value: ${finalValue}`);
+            shouldUpdateUI = false; // Jangan update UI karena sama
+        } 
+        else if (voteResult.hasConsensus && voteResult.confidence >= 0.6) {
+            // Ada consensus yang kuat (>60%)
+            finalValue = voteResult.value;
+            shouldUpdateUI = true;
+            isSignificant = true;
+            console.log(`🎯 [Balance] Consensus reached: ${finalValue} (${(voteResult.confidence*100).toFixed(0)}% confidence)`);
+        }
+        else if (stickyCheck.shouldChange) {
+            // Boleh ganti nilai (sticky period sudah lewat)
+            finalValue = newValue;
+            shouldUpdateUI = true;
+            console.log(`🔄 [Balance] Changing value to: ${finalValue}`);
+        }
+        else {
+            // Belum ada consensus dan belum boleh ganti
+            finalValue = stickySystem.getValue() || currentBalance;
+            shouldUpdateUI = false;
+            console.log(`⏳ [Balance] Waiting for consensus/stickiness`);
+        }
+        
+        // 5. Update jika perlu
+        if (finalValue !== null && shouldUpdateUI) {
+            // Cek jika benar-benar berbeda dari nilai saat ini
+            if (currentBalance === null || 
+                Math.abs(finalValue - currentBalance) > (currentBalance * 0.01)) {
                 
-                // ⭐ Untuk perubahan besar, langsung terima (tanpa konfirmasi)
-                // Karena dari log, Google cache sudah konsisten
-                balanceValue = newValue;
-                adaptiveInterval.recordFetch(result.fetchTime || 0, true);
+                currentBalance = finalValue;
+                lastUpdateTime = new Date();
                 
-                // Dispatch event
-                dispatchBalanceUpdate(newValue, true);
-                
-            } else if (percentChange > 10) { // Perubahan sedang
-                // Butuh 1 konfirmasi
-                console.log(`⏳ [Balance] Medium change, accepting after one confirmation`);
-                balanceValue = newValue;
-                adaptiveInterval.recordFetch(result.fetchTime || 0, true);
-                dispatchBalanceUpdate(newValue, false);
-                
-            } else { // Perubahan kecil
-                balanceValue = newValue;
-                adaptiveInterval.recordFetch(result.fetchTime || 0, false);
-                dispatchBalanceUpdate(newValue, false);
+                // Dispatch event dengan informasi lengkap
+                dispatchBalanceUpdate(finalValue, isSignificant, {
+                    voting: voteResult,
+                    sticky: stickyCheck,
+                    newValue: newValue
+                });
             }
-        } else {
-            // First load
-            balanceValue = newValue;
-            adaptiveInterval.recordFetch(result.fetchTime || 0, false);
-            dispatchBalanceUpdate(newValue, false);
         }
         
     } catch (error) {
         console.error(`❌ [Balance] Update failed: ${error.message}`);
-    } finally {
-        updateInProgress = false;
         
-        // Schedule next update dengan interval adaptive
-        const nextInterval = adaptiveInterval.getInterval();
-        setTimeout(executeBalanceUpdate, nextInterval);
+        // Jika error, coba gunakan nilai terakhir yang valid
+        if (currentBalance !== null) {
+            console.log(`🔄 [Balance] Using last known value due to error: ${currentBalance}`);
+        }
+    } finally {
+        isFetching = false;
+        
+        // Schedule next update
+        scheduleNextUpdate();
         
         const totalTime = Date.now() - updateStart;
-        console.log(`⏱️ [Balance] Update cycle: ${totalTime}ms, next in: ${nextInterval/1000}s`);
+        console.log(`⏱️ [Balance] Cycle: ${totalTime}ms`);
     }
 }
 
-function dispatchBalanceUpdate(value, isSignificant) {
+// ==================== SCHEDULING ====================
+
+function scheduleNextUpdate() {
+    if (updateTimer) {
+        clearTimeout(updateTimer);
+    }
+    
+    // Adaptive interval berdasarkan stability
+    let nextInterval = CONFIG.UPDATE_INTERVAL;
+    
+    if (consecutiveStableReads > 3) {
+        // Data stabil, bisa lebih lama
+        nextInterval = Math.min(nextInterval * 1.5, 60000); // Max 60 detik
+    } else if (consecutiveStableReads === 0) {
+        // Data tidak stabil, lebih sering
+        nextInterval = Math.max(nextInterval * 0.5, 10000); // Min 10 detik
+    }
+    
+    updateTimer = setTimeout(() => {
+        updateBalance();
+    }, nextInterval);
+    
+    console.log(`⏰ [Balance] Next update in ${nextInterval/1000}s`);
+}
+
+// ==================== EVENT DISPATCH ====================
+
+function dispatchBalanceUpdate(value, isSignificant, metadata = {}) {
+    const formatted = new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(value);
+    
     const eventDetail = {
         balance: value,
-        formatted: new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR'
-        }).format(value),
+        formatted: formatted,
         timestamp: new Date().toISOString(),
         isSignificant: isSignificant,
-        source: 'google-sheets'
+        source: 'google-sheets',
+        metadata: metadata
     };
     
     const event = new CustomEvent('balanceUpdated', { detail: eventDetail });
     window.dispatchEvent(event);
     
-    console.log(`📢 [Balance] Updated: ${eventDetail.formatted} ${isSignificant ? '🔄' : ''}`);
-}
-
-// ==================== START SYSTEM ====================
-
-function startBalanceSystem() {
-    console.log('🚀 [Balance] Starting optimized system...');
-    
-    // Initial fetch
-    executeBalanceUpdate();
-    
-    // Event listeners
-    document.addEventListener('visibilitychange', () => {
-        if (!document.hidden) {
-            console.log('👁️ [Balance] Tab active, immediate refresh');
-            executeBalanceUpdate();
-        }
-    });
-    
-    // Manual refresh hotkey
-    document.addEventListener('keydown', (e) => {
-        if (e.ctrlKey && e.key === 'r') {
-            e.preventDefault();
-            console.log('🔄 [Balance] Manual refresh triggered');
-            smartCache.clear();
-            executeBalanceUpdate();
-        }
-    });
+    console.log(`📢 [Balance] Updated: ${formatted} ${isSignificant ? '🔄' : ''}`);
 }
 
 // ==================== PUBLIC API ====================
 
 window.BalanceSystem = {
-    getCurrentSaldo: () => balanceValue,
+    // Data
+    getCurrentSaldo: () => currentBalance,
     getFormattedBalance: () => {
-        if (balanceValue === null) return 'Rp 0';
+        if (currentBalance === null) return 'Rp 0';
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
             currency: 'IDR'
-        }).format(balanceValue);
+        }).format(currentBalance);
     },
+    getLastUpdateTime: () => lastUpdateTime,
+    
+    // Actions
     refresh: () => {
-        smartCache.clear();
-        executeBalanceUpdate();
+        console.log('🔧 [Balance] Manual refresh');
+        updateBalance();
     },
-    forceUpdate: () => {
-        console.log('⚡ [Balance] Force update');
-        smartCache.clear();
-        balanceValue = null;
-        executeBalanceUpdate();
+    forceRefresh: () => {
+        console.log('⚡ [Balance] Force refresh - resetting systems');
+        votingSystem.clear();
+        stickySystem.reset();
+        currentBalance = null;
+        updateBalance();
     },
-    getConfig: () => ({ ...CONFIG }),
-    getStats: () => ({
-        currentValue: balanceValue,
+    
+    // Configuration
+    setUpdateInterval: (ms) => {
+        if (ms >= 10000 && ms <= 120000) {
+            CONFIG.UPDATE_INTERVAL = ms;
+            console.log(`⏰ [Balance] Interval set to ${ms/1000}s`);
+        }
+    },
+    
+    // Debug
+    debug: () => ({
+        currentBalance,
         lastUpdate: lastUpdateTime,
-        cacheSize: smartCache.cache.size,
-        currentInterval: adaptiveInterval.currentInterval
-    })
+        voting: votingSystem.getConsensus(),
+        sticky: stickySystem.getValue(),
+        config: { ...CONFIG }
+    }),
+    
+    // Reset systems
+    resetSystems: () => {
+        votingSystem.clear();
+        stickySystem.reset();
+        console.log('🔄 [Balance] Systems reset');
+    }
 };
+
+// ==================== INITIALIZATION ====================
+
+function initialize() {
+    console.log('🚀 [Balance] Initializing with voting system...');
+    
+    // Initial fetch
+    updateBalance();
+    
+    // Event listeners
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+            console.log('👁️ [Balance] Tab active, refreshing...');
+            updateBalance();
+        }
+    });
+    
+    console.log('✅ [Balance] System ready');
+    
+    // Dispatch ready event
+    window.dispatchEvent(new CustomEvent('balanceReady'));
+}
 
 // Auto start
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', startBalanceSystem);
+    document.addEventListener('DOMContentLoaded', initialize);
 } else {
-    startBalanceSystem();
+    setTimeout(initialize, 1000);
 }
