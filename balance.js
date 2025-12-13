@@ -1,59 +1,51 @@
 /* ==================== BALANCE.JS - SISTEM PEMANTAUAN SALDO DENGAN VOTING ==================== */
 
 /* ==================== KONFIGURASI ==================== */
-const BALANCE_ENDPOINT = 'https://api.indolinknetwork.co.id/balance'; // Ganti dengan endpoint yang sesuai
-const UPDATE_INTERVAL = 15000; // 15 detik
-const MAX_READINGS = 5; // Window readings
-const REQUIRED_CONSECUTIVE = 2; // Konfirmasi berturut-turut yang dibutuhkan
-const SIGNIFICANT_CHANGE_THRESHOLD = 0.5; // 50% perubahan dianggap signifikan
+const BALANCE_ENDPOINT = 'https://api.indolinknetwork.co.id/balance';
+const UPDATE_INTERVAL = 15000;
+const BALANCE_MAX_READINGS = 5;
+const BALANCE_REQUIRED_CONSECUTIVE = 2;
+const BALANCE_SIGNIFICANT_CHANGE = 0.5;
 
 /* ==================== VARIABEL STATE ==================== */
-let stickyValue = null; // Nilai yang saat ini ditampilkan
-let stickyCounter = 0; // Counter untuk konfirmasi berturut-turut
-let readings = []; // Array untuk menyimpan pembacaan terakhir
-let currentCandidate = null; // Kandidat nilai yang sedang diproses
-let lastDisplayedBalance = null; // Nilai terakhir yang ditampilkan
-let updateTimer = null; // Timer untuk update interval
-let isFetching = false; // Flag untuk mencegah fetch bersamaan
-let retryCount = 0; // Counter untuk retry
-const MAX_RETRIES = 3; // Maksimal retry
-
-/* ==================== ELEMEN DOM ==================== */
-const balanceElement = document.getElementById('balance');
-const currencyElement = document.getElementById('currency');
-const statusElement = document.getElementById('balance-status');
-const connectionSignal = document.querySelector('.connection-signal');
-const signalBars = document.querySelectorAll('.signal-bar');
-const body = document.body;
+// Gunakan namespace unik untuk menghindari konflik
+const BalanceSystem = {
+    stickyValue: null,
+    stickyCounter: 0,
+    readings: [],
+    currentCandidate: null,
+    lastDisplayedBalance: null,
+    updateTimer: null,
+    isFetching: false,
+    retryCount: 0,
+    MAX_RETRIES: 3
+};
 
 /* ==================== FUNGSI UTILITAS ==================== */
 
 /**
  * Format angka menjadi format Rupiah
- * @param {number} amount - Jumlah yang akan diformat
- * @returns {string} String yang sudah diformat
  */
-function formatRupiah(amount) {
+function formatBalance(amount) {
     if (typeof amount !== 'number' || isNaN(amount)) {
         return 'Error';
     }
     
-    // Untuk saldo besar, tampilkan dalam jutaan
     if (amount >= 1000000) {
         const juta = (amount / 1000000).toFixed(3);
         return `${juta.replace('.', ',')} Jt`;
     }
     
-    // Format biasa dengan pemisah ribuan
     return amount.toLocaleString('id-ID');
 }
 
 /**
  * Deteksi tema berdasarkan saldo
- * @param {number} balance - Saldo untuk menentukan tema
  */
-function detectTheme(balance) {
-    let theme = 'default'; // Default: silver theme
+function detectThemeFromBalance(balance) {
+    if (!document.body) return;
+    
+    let theme = 'default';
     
     if (balance < 500000) {
         theme = 'red';
@@ -63,11 +55,10 @@ function detectTheme(balance) {
         theme = 'teal';
     }
     
-    // Terapkan tema dengan transisi halus
+    const body = document.body;
     body.classList.add('changing-theme');
     body.setAttribute('data-theme', theme);
     
-    // Hapus class setelah transisi selesai
     setTimeout(() => {
         body.classList.remove('changing-theme');
     }, 2500);
@@ -75,10 +66,16 @@ function detectTheme(balance) {
 
 /**
  * Update tampilan saldo
- * @param {number} balance - Saldo yang akan ditampilkan
  */
-function updateDisplay(balance) {
-    // Validasi input
+function updateBalanceDisplay(balance) {
+    const balanceElement = document.getElementById('balance');
+    const statusElement = document.getElementById('balance-status');
+    
+    if (!balanceElement || !statusElement) {
+        console.error('❌ [Display] Balance elements not found');
+        return;
+    }
+    
     if (typeof balance !== 'number' || isNaN(balance) || balance < 0) {
         console.error('❌ [Display] Invalid balance value:', balance);
         balanceElement.textContent = 'Error';
@@ -87,8 +84,7 @@ function updateDisplay(balance) {
         return;
     }
     
-    // Format dan update saldo
-    const formattedBalance = formatRupiah(balance);
+    const formattedBalance = formatBalance(balance);
     balanceElement.textContent = formattedBalance;
     balanceElement.className = 'amount';
     
@@ -104,8 +100,8 @@ function updateDisplay(balance) {
         statusElement.style.color = 'var(--success-color)';
     }
     
-    // Update tema berdasarkan saldo
-    detectTheme(balance);
+    // Update tema
+    detectThemeFromBalance(balance);
     
     console.log(`🖥️ [Display] Updated to: ${balance} (${formattedBalance})`);
 }
@@ -113,61 +109,56 @@ function updateDisplay(balance) {
 /**
  * Reset state voting
  */
-function resetVotingState() {
-    console.log('🔄 [Voting] Resetting voting state');
-    readings = [];
-    currentCandidate = null;
-    stickyCounter = 0;
+function resetBalanceVoting() {
+    console.log('🔄 [Balance] Resetting voting state');
+    BalanceSystem.readings = [];
+    BalanceSystem.currentCandidate = null;
+    BalanceSystem.stickyCounter = 0;
 }
 
 /**
  * Cek apakah perubahan signifikan
- * @param {number} newValue - Nilai baru
- * @param {number} oldValue - Nilai lama
- * @returns {boolean} True jika perubahan signifikan
  */
-function isSignificantChange(newValue, oldValue) {
+function isBalanceChangeSignificant(newValue, oldValue) {
     if (oldValue === null || oldValue === 0) return false;
     
     const changePercentage = Math.abs(newValue - oldValue) / oldValue;
-    return changePercentage > SIGNIFICANT_CHANGE_THRESHOLD;
+    return changePercentage > BALANCE_SIGNIFICANT_CHANGE;
 }
 
 /**
- * Algoritma voting yang lebih responsif
- * @param {number} newValue - Nilai baru dari fetch
- * @returns {number|null} Nilai yang sudah divoting atau null
+ * Algoritma voting untuk balance
  */
-function processVoting(newValue) {
-    // Validasi input
+function processBalanceVoting(newValue) {
     if (typeof newValue !== 'number' || isNaN(newValue)) {
-        console.error('❌ [Voting] Invalid value for voting:', newValue);
-        return stickyValue;
+        console.error('❌ [Balance] Invalid value for voting:', newValue);
+        return BalanceSystem.stickyValue;
     }
     
     // Cek perubahan signifikan
-    if (stickyValue !== null && isSignificantChange(newValue, stickyValue)) {
-        console.log(`⚠️ [Voting] Significant change detected (${stickyValue} -> ${newValue}), resetting voting`);
-        resetVotingState();
+    if (BalanceSystem.stickyValue !== null && 
+        isBalanceChangeSignificant(newValue, BalanceSystem.stickyValue)) {
+        console.log(`⚠️ [Balance] Significant change detected (${BalanceSystem.stickyValue} -> ${newValue})`);
+        resetBalanceVoting();
     }
     
-    // Tambahkan nilai baru ke readings
-    readings.push(newValue);
+    // Tambahkan ke readings
+    BalanceSystem.readings.push(newValue);
     
     // Batasi ukuran readings
-    if (readings.length > MAX_READINGS) {
-        readings.shift();
+    if (BalanceSystem.readings.length > BALANCE_MAX_READINGS) {
+        BalanceSystem.readings.shift();
     }
     
-    console.log('📊 [Voting] Readings:', readings);
+    console.log('📊 [Balance] Readings:', BalanceSystem.readings);
     
-    // Analisis frekuensi nilai dalam readings
+    // Analisis frekuensi
     const valueCounts = {};
-    readings.forEach(value => {
+    BalanceSystem.readings.forEach(value => {
         valueCounts[value] = (valueCounts[value] || 0) + 1;
     });
     
-    // Temukan nilai dengan frekuensi tertinggi
+    // Temukan nilai paling sering muncul
     let mostCommonValue = null;
     let highestCount = 0;
     
@@ -177,9 +168,8 @@ function processVoting(newValue) {
             highestCount = count;
             mostCommonValue = numValue;
         } else if (count === highestCount && numValue !== mostCommonValue) {
-            // Jika ada nilai dengan frekuensi sama, pilih yang terbaru
-            const lastIndexNew = readings.lastIndexOf(numValue);
-            const lastIndexCurrent = readings.lastIndexOf(mostCommonValue);
+            const lastIndexNew = BalanceSystem.readings.lastIndexOf(numValue);
+            const lastIndexCurrent = BalanceSystem.readings.lastIndexOf(mostCommonValue);
             
             if (lastIndexNew > lastIndexCurrent) {
                 mostCommonValue = numValue;
@@ -187,90 +177,77 @@ function processVoting(newValue) {
         }
     }
     
-    // Jika tidak ada nilai yang memadai, return stickyValue yang ada
+    // Jika tidak ada konsensus
     if (!mostCommonValue || highestCount < 2) {
-        console.log('📊 [Voting] No clear consensus yet');
-        return stickyValue;
+        console.log('📊 [Balance] No clear consensus yet');
+        return BalanceSystem.stickyValue;
     }
     
-    // Proses konfirmasi nilai
-    if (mostCommonValue === currentCandidate) {
-        // Nilai sama dengan kandidat saat ini
-        stickyCounter++;
-        console.log(`🔼 [Voting] Same candidate: ${mostCommonValue}, counter: ${stickyCounter}/${REQUIRED_CONSECUTIVE}`);
+    // Proses konfirmasi
+    if (mostCommonValue === BalanceSystem.currentCandidate) {
+        BalanceSystem.stickyCounter++;
+        console.log(`🔼 [Balance] Same candidate: ${mostCommonValue}, counter: ${BalanceSystem.stickyCounter}/${BALANCE_REQUIRED_CONSECUTIVE}`);
         
-        if (stickyCounter >= REQUIRED_CONSECUTIVE) {
-            // Konfirmasi tercapai
-            console.log(`🎯 [Voting] Confirmation ${stickyCounter}/${REQUIRED_CONSECUTIVE} for ${mostCommonValue}`);
+        if (BalanceSystem.stickyCounter >= BALANCE_REQUIRED_CONSECUTIVE) {
+            console.log(`🎯 [Balance] Confirmation ${BalanceSystem.stickyCounter}/${BALANCE_REQUIRED_CONSECUTIVE} for ${mostCommonValue}`);
             
-            if (stickyValue !== mostCommonValue) {
-                console.log(`🔄 [Voting] Updating sticky value from ${stickyValue} to ${mostCommonValue}`);
-                stickyValue = mostCommonValue;
-                resetVotingState(); // Reset untuk nilai berikutnya
-                return stickyValue;
+            if (BalanceSystem.stickyValue !== mostCommonValue) {
+                console.log(`🔄 [Balance] Updating sticky value from ${BalanceSystem.stickyValue} to ${mostCommonValue}`);
+                BalanceSystem.stickyValue = mostCommonValue;
+                resetBalanceVoting();
+                return BalanceSystem.stickyValue;
             }
         }
     } else {
-        // Nilai baru yang berbeda
-        console.log(`🔄 [Voting] New candidate: ${mostCommonValue} (was: ${currentCandidate})`);
-        currentCandidate = mostCommonValue;
-        stickyCounter = 1;
+        console.log(`🔄 [Balance] New candidate: ${mostCommonValue} (was: ${BalanceSystem.currentCandidate})`);
+        BalanceSystem.currentCandidate = mostCommonValue;
+        BalanceSystem.stickyCounter = 1;
         
-        // Jika nilai baru langsung muncul beberapa kali, konfirmasi cepat
-        if (highestCount >= REQUIRED_CONSECUTIVE) {
-            console.log(`🎯 [Voting] Quick confirmation for ${mostCommonValue}`);
-            stickyValue = mostCommonValue;
-            resetVotingState();
-            return stickyValue;
+        if (highestCount >= BALANCE_REQUIRED_CONSECUTIVE) {
+            console.log(`🎯 [Balance] Quick confirmation for ${mostCommonValue}`);
+            BalanceSystem.stickyValue = mostCommonValue;
+            resetBalanceVoting();
+            return BalanceSystem.stickyValue;
         }
     }
     
-    // Return nilai saat ini jika belum ada perubahan
-    return stickyValue;
+    return BalanceSystem.stickyValue;
 }
 
 /* ==================== FUNGSI FETCH & UPDATE ==================== */
 
 /**
- * Fetch saldo dari server
- * @returns {Promise<number>} Promise yang mengembalikan saldo
+ * Fetch saldo (simulasi)
  */
-async function fetchBalance() {
-    if (isFetching) {
-        console.log('⏳ [Fetch] Already fetching, skipping...');
+async function fetchBalanceData() {
+    if (BalanceSystem.isFetching) {
+        console.log('⏳ [Balance] Already fetching, skipping...');
         throw new Error('Already fetching');
     }
     
-    isFetching = true;
+    BalanceSystem.isFetching = true;
     
     try {
-        // Simulasi API call - GANTI DENGAN FETCH ASLI
-        // const response = await fetch(BALANCE_ENDPOINT);
-        // if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        // const data = await response.json();
-        // return data.balance;
-        
-        // SIMULASI: Random balance untuk testing
+        // Simulasi API call
         await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 1000));
         
-        const balances = [613000, 1300000, 750000, 200000, 950000];
-        const randomBalance = balances[Math.floor(Math.random() * balances.length)];
+        const testBalances = [613000, 1300000, 750000, 200000, 950000];
+        const randomBalance = testBalances[Math.floor(Math.random() * testBalances.length)];
         
         return randomBalance;
         
-    } catch (error) {
-        console.error('❌ [Fetch] Error fetching balance:', error);
-        throw error;
     } finally {
-        isFetching = false;
+        BalanceSystem.isFetching = false;
     }
 }
 
 /**
- * Update status koneksi
- * @param {boolean} isOnline - Status koneksi
+ * Update status koneksi untuk balance
  */
-function updateConnectionStatus(isOnline) {
+function updateBalanceConnectionStatus(isOnline) {
+    const connectionSignal = document.querySelector('.connection-signal');
+    if (!connectionSignal) return;
+    
     if (isOnline) {
         connectionSignal.classList.remove('offline');
         connectionSignal.innerHTML = `
@@ -297,37 +274,46 @@ function updateConnectionStatus(isOnline) {
 }
 
 /**
- * Handle error state
+ * Handle error state untuk balance
  */
-function handleErrorState() {
-    retryCount++;
+function handleBalanceError() {
+    BalanceSystem.retryCount++;
     
-    if (retryCount >= MAX_RETRIES) {
-        console.error('❌ [Error] Max retries reached');
-        balanceElement.textContent = 'Error';
-        balanceElement.className = 'amount error';
-        statusElement.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Connection Error';
-        updateConnectionStatus(false);
+    if (BalanceSystem.retryCount >= BalanceSystem.MAX_RETRIES) {
+        console.error('❌ [Balance] Max retries reached');
+        const balanceElement = document.getElementById('balance');
+        const statusElement = document.getElementById('balance-status');
+        
+        if (balanceElement) {
+            balanceElement.textContent = 'Error';
+            balanceElement.className = 'amount error';
+        }
+        
+        if (statusElement) {
+            statusElement.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Connection Error';
+        }
+        
+        updateBalanceConnectionStatus(false);
     } else {
-        console.log(`🔄 [Error] Retrying... (${retryCount}/${MAX_RETRIES})`);
+        console.log(`🔄 [Balance] Retrying... (${BalanceSystem.retryCount}/${BalanceSystem.MAX_RETRIES})`);
     }
 }
 
 /**
- * Reset error state saat berhasil
+ * Reset error state untuk balance
  */
-function resetErrorState() {
-    retryCount = 0;
-    updateConnectionStatus(true);
+function resetBalanceError() {
+    BalanceSystem.retryCount = 0;
+    updateBalanceConnectionStatus(true);
 }
 
 /**
- * Update saldo dengan mekanisme voting
+ * Update saldo utama
  */
-async function updateBalance() {
-    if (isFetching) {
+async function updateBalanceMain() {
+    if (BalanceSystem.isFetching) {
         console.log('⏳ [Balance] Already fetching, skipping this cycle');
-        scheduleNextUpdate();
+        scheduleBalanceUpdate();
         return;
     }
     
@@ -335,153 +321,186 @@ async function updateBalance() {
     const startTime = performance.now();
     
     try {
-        const newBalance = await fetchBalance();
+        const newBalance = await fetchBalanceData();
         const fetchTime = performance.now() - startTime;
         console.log(`✅ [Balance] Fetched: ${newBalance} (${Math.round(fetchTime)}ms)`);
         
-        // Reset error state jika berhasil
-        resetErrorState();
+        resetBalanceError();
         
-        // Proses voting
-        const votedValue = processVoting(newBalance);
+        const votedValue = processBalanceVoting(newBalance);
         
-        // Update display jika ada perubahan
-        if (votedValue !== null && votedValue !== lastDisplayedBalance) {
+        if (votedValue !== null && votedValue !== BalanceSystem.lastDisplayedBalance) {
             console.log(`🎨 [Balance] Updating display to: ${votedValue}`);
-            updateDisplay(votedValue);
-            lastDisplayedBalance = votedValue;
-        } else if (votedValue === null && stickyValue !== null) {
-            // Pertama kali atau saat startup
-            console.log(`🔒 [Balance] Using sticky value: ${stickyValue}`);
-            updateDisplay(stickyValue);
-            lastDisplayedBalance = stickyValue;
+            updateBalanceDisplay(votedValue);
+            BalanceSystem.lastDisplayedBalance = votedValue;
+        } else if (votedValue === null && BalanceSystem.stickyValue !== null) {
+            console.log(`🔒 [Balance] Using sticky value: ${BalanceSystem.stickyValue}`);
+            updateBalanceDisplay(BalanceSystem.stickyValue);
+            BalanceSystem.lastDisplayedBalance = BalanceSystem.stickyValue;
         } else {
-            console.log(`⏸️ [Balance] No change needed (display: ${lastDisplayedBalance}, voted: ${votedValue}, sticky: ${stickyValue})`);
+            console.log(`⏸️ [Balance] No change needed (display: ${BalanceSystem.lastDisplayedBalance}, voted: ${votedValue}, sticky: ${BalanceSystem.stickyValue})`);
         }
         
     } catch (error) {
         console.error('❌ [Balance] Error:', error);
-        handleErrorState();
+        handleBalanceError();
     } finally {
-        scheduleNextUpdate();
+        scheduleBalanceUpdate();
     }
 }
 
 /**
  * Jadwalkan update berikutnya
  */
-function scheduleNextUpdate() {
-    if (updateTimer) {
-        clearTimeout(updateTimer);
+function scheduleBalanceUpdate() {
+    if (BalanceSystem.updateTimer) {
+        clearTimeout(BalanceSystem.updateTimer);
     }
     
-    updateTimer = setTimeout(() => {
-        console.log('⏰ [Schedule] Next update');
-        updateBalance();
+    BalanceSystem.updateTimer = setTimeout(() => {
+        console.log('⏰ [Balance] Next update scheduled');
+        updateBalanceMain();
     }, UPDATE_INTERVAL);
-    
-    // Update countdown display (opsional)
-    updateCountdownDisplay(UPDATE_INTERVAL);
+}
+
+/* ==================== FUNGSI DEBUG & TEST ==================== */
+
+/**
+ * Fungsi debug untuk testing
+ */
+function debugBalanceSystem() {
+    console.log('🔧 [Balance Debug] System State:', {
+        stickyValue: BalanceSystem.stickyValue,
+        stickyCounter: BalanceSystem.stickyCounter,
+        readings: BalanceSystem.readings,
+        currentCandidate: BalanceSystem.currentCandidate,
+        lastDisplayedBalance: BalanceSystem.lastDisplayedBalance,
+        retryCount: BalanceSystem.retryCount,
+        isFetching: BalanceSystem.isFetching
+    });
 }
 
 /**
- * Update countdown display (opsional)
- * @param {number} milliseconds - Waktu dalam milidetik
+ * Manual update balance
  */
-function updateCountdownDisplay(milliseconds) {
-    const seconds = Math.round(milliseconds / 1000);
-    // Implementasi countdown display jika diperlukan
+function forceBalanceUpdate() {
+    console.log('🔧 [Balance] Manual update triggered');
+    updateBalanceMain();
+}
+
+/**
+ * Test tema dengan saldo tertentu
+ */
+function testBalanceTheme(balance) {
+    console.log(`🎨 [Balance] Testing theme for balance: ${balance}`);
+    updateBalanceDisplay(balance);
 }
 
 /* ==================== INISIALISASI ==================== */
 
 /**
- * Inisialisasi aplikasi
+ * Inisialisasi balance system
  */
-function initializeApp() {
-    console.log('🚀 [App] Initializing...');
+function initializeBalanceSystem() {
+    console.log('🚀 [Balance] Initializing...');
     
-    // Set initial state
-    updateConnectionStatus(navigator.onLine);
+    // Cek elemen DOM
+    const balanceElement = document.getElementById('balance');
+    if (!balanceElement) {
+        console.error('❌ [Balance] Balance element not found, waiting for DOM...');
+        setTimeout(initializeBalanceSystem, 100);
+        return;
+    }
     
-    // Event listener untuk online/offline
+    // Set initial connection status
+    updateBalanceConnectionStatus(navigator.onLine);
+    
+    // Event listeners untuk koneksi
     window.addEventListener('online', () => {
-        console.log('🌐 [App] Online event');
-        updateConnectionStatus(true);
-        if (retryCount > 0) {
-            console.log('🔄 [App] Reconnecting...');
-            updateBalance();
+        console.log('🌐 [Balance] Online event detected');
+        updateBalanceConnectionStatus(true);
+        if (BalanceSystem.retryCount > 0) {
+            console.log('🔄 [Balance] Reconnecting after offline');
+            updateBalanceMain();
         }
     });
     
     window.addEventListener('offline', () => {
-        console.log('🔌 [App] Offline event');
-        updateConnectionStatus(false);
+        console.log('🔌 [Balance] Offline event detected');
+        updateBalanceConnectionStatus(false);
     });
     
-    // Manual refresh button (opsional)
-    const refreshButton = document.createElement('button');
-    refreshButton.innerHTML = '<i class="fas fa-sync-alt"></i>';
-    refreshButton.className = 'refresh-button';
-    refreshButton.style.cssText = `
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background: var(--primary-color);
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        font-size: 20px;
-        cursor: pointer;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        z-index: 1000;
-        transition: all 0.3s ease;
-    `;
-    refreshButton.addEventListener('click', () => {
-        console.log('🔄 [App] Manual refresh');
-        refreshButton.style.transform = 'rotate(360deg)';
-        setTimeout(() => refreshButton.style.transform = '', 300);
-        updateBalance();
-    });
-    
-    // Tambahkan ke body
-    document.body.appendChild(refreshButton);
+    // Tambahkan button refresh manual (jika belum ada)
+    if (!document.querySelector('.balance-refresh-button')) {
+        const refreshButton = document.createElement('button');
+        refreshButton.className = 'balance-refresh-button';
+        refreshButton.innerHTML = '<i class="fas fa-sync-alt"></i>';
+        refreshButton.style.cssText = `
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        `;
+        
+        refreshButton.addEventListener('mouseenter', () => {
+            refreshButton.style.transform = 'scale(1.1)';
+        });
+        
+        refreshButton.addEventListener('mouseleave', () => {
+            refreshButton.style.transform = 'scale(1)';
+        });
+        
+        refreshButton.addEventListener('click', () => {
+            console.log('🔄 [Balance] Manual refresh');
+            refreshButton.style.transform = 'rotate(360deg)';
+            setTimeout(() => refreshButton.style.transform = '', 300);
+            forceBalanceUpdate();
+        });
+        
+        document.body.appendChild(refreshButton);
+    }
     
     // Start pertama kali
-    console.log('⏳ [App] Starting first update...');
-    updateBalance();
+    console.log('⏳ [Balance] Starting first update...');
+    updateBalanceMain();
     
-    // Tambahkan animasi loading untuk feedback visual
+    // Set loading state
     balanceElement.innerHTML = '<span class="loading-dots-container"><span></span><span></span><span></span></span>';
     balanceElement.className = 'amount';
 }
 
-/* ==================== EXPORT FUNGSI (UNTUK TESTING) ==================== */
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        formatRupiah,
-        processVoting,
-        fetchBalance,
-        updateDisplay,
-        resetVotingState,
-        isSignificantChange
-    };
-}
+/* ==================== EXPORT FUNGSI UNTUK GLOBAL ACCESS ==================== */
+// Buat namespace global untuk balance system
+window.BalanceSystem = {
+    debug: debugBalanceSystem,
+    forceUpdate: forceBalanceUpdate,
+    testTheme: testBalanceTheme,
+    getState: () => BalanceSystem,
+    reset: resetBalanceVoting
+};
 
-/* ==================== START APLIKASI ==================== */
-// Tunggu sampai DOM siap
+/* ==================== START BALANCE SYSTEM ==================== */
+// Tunggu DOM siap
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeApp);
+    document.addEventListener('DOMContentLoaded', initializeBalanceSystem);
 } else {
-    initializeApp();
+    setTimeout(initializeBalanceSystem, 100); // Kasih delay kecil
 }
 
-// Auto-cleanup saat window ditutup
+// Auto-cleanup
 window.addEventListener('beforeunload', () => {
-    if (updateTimer) {
-        clearTimeout(updateTimer);
+    if (BalanceSystem.updateTimer) {
+        clearTimeout(BalanceSystem.updateTimer);
     }
-    console.log('👋 [App] Cleaning up...');
+    console.log('👋 [Balance] Cleaning up...');
 });
