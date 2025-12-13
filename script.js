@@ -348,7 +348,7 @@ function updateConnectionStatus(status) {
         case 'online':
             signalElement.classList.add('online');
             signalText.textContent = 'Online';
-            statusElement.innerHTML = '<i class="fas fa-circle" style="color:#10b981"></i> <span>Terhubung • Data real-time</span>';
+            statusElement.innerHTML = '<i class="fas fa-circle" style="color:#10b981"></i> <span>Terhubung • Data Server</span>';
             statusElement.classList.add('online');
             break;
         case 'connecting':
