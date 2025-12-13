@@ -8,7 +8,6 @@ const BALANCE_REQUIRED_CONSECUTIVE = 2;
 const BALANCE_SIGNIFICANT_CHANGE = 0.5;
 
 /* ==================== VARIABEL STATE ==================== */
-// Gunakan namespace unik untuk menghindari konflik
 const BalanceSystem = {
     stickyValue: null,
     stickyCounter: 0,
@@ -18,7 +17,10 @@ const BalanceSystem = {
     updateTimer: null,
     isFetching: false,
     retryCount: 0,
-    MAX_RETRIES: 3
+    MAX_RETRIES: 3,
+    isInitialized: false, // Flag untuk mencegah multiple initialization
+    initializationAttempts: 0,
+    MAX_INIT_ATTEMPTS: 10
 };
 
 /* ==================== FUNGSI UTILITAS ==================== */
@@ -71,16 +73,23 @@ function updateBalanceDisplay(balance) {
     const balanceElement = document.getElementById('balance');
     const statusElement = document.getElementById('balance-status');
     
-    if (!balanceElement || !statusElement) {
-        console.error('❌ [Display] Balance elements not found');
+    if (!balanceElement) {
+        console.warn('⚠️ [Display] Balance element not found');
         return;
+    }
+    
+    if (!statusElement) {
+        console.warn('⚠️ [Display] Status element not found');
     }
     
     if (typeof balance !== 'number' || isNaN(balance) || balance < 0) {
         console.error('❌ [Display] Invalid balance value:', balance);
         balanceElement.textContent = 'Error';
         balanceElement.className = 'amount error';
-        statusElement.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error loading balance';
+        
+        if (statusElement) {
+            statusElement.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error loading balance';
+        }
         return;
     }
     
@@ -88,16 +97,18 @@ function updateBalanceDisplay(balance) {
     balanceElement.textContent = formattedBalance;
     balanceElement.className = 'amount';
     
-    // Update status
-    if (balance < 50000) {
-        statusElement.innerHTML = '<i class="fas fa-exclamation-circle"></i> Saldo Rendah';
-        statusElement.style.color = 'var(--danger-color)';
-    } else if (balance < 500000) {
-        statusElement.innerHTML = '<i class="fas fa-info-circle"></i> Saldo Menengah';
-        statusElement.style.color = 'var(--warning-color)';
-    } else {
-        statusElement.innerHTML = '<i class="fas fa-check-circle"></i> Saldo Aman';
-        statusElement.style.color = 'var(--success-color)';
+    // Update status jika elemen ada
+    if (statusElement) {
+        if (balance < 50000) {
+            statusElement.innerHTML = '<i class="fas fa-exclamation-circle"></i> Saldo Rendah';
+            statusElement.style.color = 'var(--danger-color)';
+        } else if (balance < 500000) {
+            statusElement.innerHTML = '<i class="fas fa-info-circle"></i> Saldo Menengah';
+            statusElement.style.color = 'var(--warning-color)';
+        } else {
+            statusElement.innerHTML = '<i class="fas fa-check-circle"></i> Saldo Aman';
+            statusElement.style.color = 'var(--success-color)';
+        }
     }
     
     // Update tema
@@ -311,6 +322,11 @@ function resetBalanceError() {
  * Update saldo utama
  */
 async function updateBalanceMain() {
+    if (!BalanceSystem.isInitialized) {
+        console.warn('⚠️ [Balance] System not initialized yet, skipping update');
+        return;
+    }
+    
     if (BalanceSystem.isFetching) {
         console.log('⏳ [Balance] Already fetching, skipping this cycle');
         scheduleBalanceUpdate();
@@ -353,6 +369,8 @@ async function updateBalanceMain() {
  * Jadwalkan update berikutnya
  */
 function scheduleBalanceUpdate() {
+    if (!BalanceSystem.isInitialized) return;
+    
     if (BalanceSystem.updateTimer) {
         clearTimeout(BalanceSystem.updateTimer);
     }
@@ -376,7 +394,8 @@ function debugBalanceSystem() {
         currentCandidate: BalanceSystem.currentCandidate,
         lastDisplayedBalance: BalanceSystem.lastDisplayedBalance,
         retryCount: BalanceSystem.retryCount,
-        isFetching: BalanceSystem.isFetching
+        isFetching: BalanceSystem.isFetching,
+        isInitialized: BalanceSystem.isInitialized
     });
 }
 
@@ -385,7 +404,11 @@ function debugBalanceSystem() {
  */
 function forceBalanceUpdate() {
     console.log('🔧 [Balance] Manual update triggered');
-    updateBalanceMain();
+    if (BalanceSystem.isInitialized) {
+        updateBalanceMain();
+    } else {
+        console.warn('⚠️ [Balance] System not initialized yet');
+    }
 }
 
 /**
@@ -396,21 +419,64 @@ function testBalanceTheme(balance) {
     updateBalanceDisplay(balance);
 }
 
+/**
+ * Cek ketersediaan elemen DOM yang diperlukan
+ */
+function checkRequiredElements() {
+    const requiredElements = ['balance'];
+    const missingElements = [];
+    
+    requiredElements.forEach(id => {
+        if (!document.getElementById(id)) {
+            missingElements.push(id);
+        }
+    });
+    
+    return {
+        allFound: missingElements.length === 0,
+        missing: missingElements
+    };
+}
+
 /* ==================== INISIALISASI ==================== */
 
 /**
  * Inisialisasi balance system
  */
 function initializeBalanceSystem() {
-    console.log('🚀 [Balance] Initializing...');
-    
-    // Cek elemen DOM
-    const balanceElement = document.getElementById('balance');
-    if (!balanceElement) {
-        console.error('❌ [Balance] Balance element not found, waiting for DOM...');
-        setTimeout(initializeBalanceSystem, 100);
+    // Cek jika sudah diinisialisasi
+    if (BalanceSystem.isInitialized) {
+        console.log('⏩ [Balance] Already initialized, skipping...');
         return;
     }
+    
+    // Cek attempt limit
+    BalanceSystem.initializationAttempts++;
+    if (BalanceSystem.initializationAttempts > BalanceSystem.MAX_INIT_ATTEMPTS) {
+        console.error('❌ [Balance] Max initialization attempts reached');
+        return;
+    }
+    
+    console.log(`🚀 [Balance] Initializing (attempt ${BalanceSystem.initializationAttempts}/${BalanceSystem.MAX_INIT_ATTEMPTS})...`);
+    
+    // Cek elemen DOM yang diperlukan
+    const checkResult = checkRequiredElements();
+    
+    if (!checkResult.allFound) {
+        console.warn(`⚠️ [Balance] Required elements not found: ${checkResult.missing.join(', ')}`);
+        
+        // Coba lagi nanti
+        if (BalanceSystem.initializationAttempts < BalanceSystem.MAX_INIT_ATTEMPTS) {
+            console.log(`⏳ [Balance] Retrying in 500ms...`);
+            setTimeout(initializeBalanceSystem, 500);
+        }
+        return;
+    }
+    
+    console.log('✅ [Balance] All required elements found');
+    
+    // Set flag initialized
+    BalanceSystem.isInitialized = true;
     
     // Set initial connection status
     updateBalanceConnectionStatus(navigator.onLine);
@@ -435,6 +501,7 @@ function initializeBalanceSystem() {
         const refreshButton = document.createElement('button');
         refreshButton.className = 'balance-refresh-button';
         refreshButton.innerHTML = '<i class="fas fa-sync-alt"></i>';
+        refreshButton.title = 'Refresh Balance';
         refreshButton.style.cssText = `
             position: fixed;
             bottom: 80px;
@@ -454,13 +521,16 @@ function initializeBalanceSystem() {
         
         refreshButton.addEventListener('mouseenter', () => {
             refreshButton.style.transform = 'scale(1.1)';
+            refreshButton.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
         });
         
         refreshButton.addEventListener('mouseleave', () => {
             refreshButton.style.transform = 'scale(1)';
+            refreshButton.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
         });
         
-        refreshButton.addEventListener('click', () => {
+        refreshButton.addEventListener('click', (e) => {
+            e.preventDefault();
             console.log('🔄 [Balance] Manual refresh');
             refreshButton.style.transform = 'rotate(360deg)';
             setTimeout(() => refreshButton.style.transform = '', 300);
@@ -472,30 +542,56 @@ function initializeBalanceSystem() {
     
     // Start pertama kali
     console.log('⏳ [Balance] Starting first update...');
-    updateBalanceMain();
     
-    // Set loading state
-    balanceElement.innerHTML = '<span class="loading-dots-container"><span></span><span></span><span></span></span>';
-    balanceElement.className = 'amount';
+    // Set initial loading state
+    const balanceElement = document.getElementById('balance');
+    if (balanceElement) {
+        balanceElement.innerHTML = '<span class="loading-dots-container"><span></span><span></span><span></span></span>';
+        balanceElement.className = 'amount';
+    }
+    
+    // Mulai update
+    updateBalanceMain();
 }
 
 /* ==================== EXPORT FUNGSI UNTUK GLOBAL ACCESS ==================== */
-// Buat namespace global untuk balance system
 window.BalanceSystem = {
     debug: debugBalanceSystem,
     forceUpdate: forceBalanceUpdate,
     testTheme: testBalanceTheme,
-    getState: () => BalanceSystem,
-    reset: resetBalanceVoting
+    getState: () => ({ ...BalanceSystem }),
+    reset: resetBalanceVoting,
+    init: initializeBalanceSystem,
+    isInitialized: () => BalanceSystem.isInitialized
 };
 
 /* ==================== START BALANCE SYSTEM ==================== */
-// Tunggu DOM siap
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeBalanceSystem);
-} else {
-    setTimeout(initializeBalanceSystem, 100); // Kasih delay kecil
+// Tunggu DOM siap sepenuhnya
+function startBalanceSystem() {
+    if (document.readyState === 'loading') {
+        // DOM masih loading, tunggu event DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('📄 [Balance] DOMContentLoaded event fired');
+            setTimeout(initializeBalanceSystem, 100); // Kasih delay kecil
+        });
+    } else {
+        // DOM sudah siap, langsung inisialisasi
+        console.log('📄 [Balance] DOM already ready');
+        setTimeout(initializeBalanceSystem, 100);
+    }
 }
+
+// Start sistem
+startBalanceSystem();
+
+// Fallback: Coba inisialisasi setelah window load
+window.addEventListener('load', () => {
+    console.log('🖼️ [Balance] Window load event fired');
+    if (!BalanceSystem.isInitialized) {
+        console.log('🔄 [Balance] Trying initialization from window load...');
+        setTimeout(initializeBalanceSystem, 200);
+    }
+});
 
 // Auto-cleanup
 window.addEventListener('beforeunload', () => {
@@ -503,4 +599,11 @@ window.addEventListener('beforeunload', () => {
         clearTimeout(BalanceSystem.updateTimer);
     }
     console.log('👋 [Balance] Cleaning up...');
+});
+
+// Error handling global
+window.addEventListener('error', (event) => {
+    if (event.message && event.message.includes('balance')) {
+        console.error('🚨 [Balance] Global error caught:', event.error);
+    }
 });
