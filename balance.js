@@ -1,6 +1,10 @@
 // ==================== KONFIGURASI =====================
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbLFk69seIMkTsx5xGSLyOHM4Iou1uTQMNNpTnwSoWX5Yu2JBgs71Lbd9OH2Xdgq6GKR0_OiTo9shV/pub?gid=236846195&range=A100:A100&single=true&output=csv";
 const UPDATE_INTERVAL = 60000; // 1 menit
+const STABILITY_CHECK_COUNT = 3; // 3x fetch per attempt
+const STABILITY_CHECK_DELAY = 1500; // Delay antar check (1.5 detik)
+const MAX_STABILITY_ATTEMPTS = 5; // Maksimal berapa kali coba sampai dapat data stabil
+const RETRY_DELAY = 2000; // Delay sebelum retry (2 detik)
 
 // ==================== VARIABEL GLOBAL ====================
 let currentSaldo = null;
@@ -8,9 +12,7 @@ let lastUpdateTime = null;
 let isUpdating = false;
 let updateTimer = null;
 let isInitialized = false;
-let consecutiveSameValueCount = 0;
-let lastFetchedValue = null;
-let fetchAttempts = 0; // Track jumlah percobaan fetch
+let fetchAttempts = 0;
 
 // ==================== FUNGSI UTAMA ====================
 
@@ -19,15 +21,12 @@ async function fetchAndProcessSaldo() {
         fetchAttempts++;
         console.log(`📡 [Balance] Mengambil dari Google Sheets... (Attempt #${fetchAttempts})`);
         
-        // Gunakan timestamp yang lebih random untuk bypass cache
         const timestamp = Date.now() + Math.random().toString(36).substring(7);
         
-        // HANYA gunakan header yang diizinkan Google Sheets
         const response = await fetch(`${SHEET_URL}&_=${timestamp}`, {
             cache: 'no-store',
             headers: { 
                 'Cache-Control': 'no-cache'
-                // Hapus 'Pragma' dan 'Expires' yang menyebabkan CORS error
             }
         });
         
@@ -38,19 +37,11 @@ async function fetchAndProcessSaldo() {
         const text = await response.text().then(t => t.trim());
         console.log("📄 [Balance] Data mentah:", text);
         
-        // PROSES DATA dengan berbagai format
+        // PROSES DATA
         let cleaned = text;
-        
-        // 1. Hapus "Rp" jika ada
         cleaned = cleaned.replace(/Rp\s*/i, '');
-        
-        // 2. Hapus titik (ribuan separator)
         cleaned = cleaned.replace(/\./g, '');
-        
-        // 3. Ganti koma dengan titik untuk desimal
         cleaned = cleaned.replace(',', '.');
-        
-        // 4. Hapus karakter non-numerik
         cleaned = cleaned.replace(/[^\d.-]/g, '');
         
         console.log("🧹 [Balance] Setelah cleaning:", cleaned);
@@ -76,6 +67,71 @@ async function fetchAndProcessSaldo() {
     }
 }
 
+// FUNGSI: Verifikasi stabilitas data dengan multiple fetch
+async function fetchWithStabilityCheck() {
+    console.log(`🔍 [Balance] Memulai stability check (${STABILITY_CHECK_COUNT}x)...`);
+    
+    const values = [];
+    
+    // Fetch beberapa kali dengan delay
+    for (let i = 0; i < STABILITY_CHECK_COUNT; i++) {
+        if (i > 0) {
+            console.log(`⏳ [Balance] Menunggu ${STABILITY_CHECK_DELAY/1000}s sebelum check ke-${i + 1}...`);
+            await new Promise(resolve => setTimeout(resolve, STABILITY_CHECK_DELAY));
+        }
+        
+        const value = await fetchAndProcessSaldo();
+        if (value !== null) {
+            values.push(value);
+            console.log(`📊 [Balance] Check ${i + 1}/${STABILITY_CHECK_COUNT}: ${value}`);
+        }
+    }
+    
+    if (values.length === 0) {
+        console.error("❌ [Balance] Semua fetch gagal");
+        return { stable: false, value: null, values: [] };
+    }
+    
+    // Cek apakah semua nilai sama (DATA STABIL)
+    const allSame = values.every(v => v === values[0]);
+    
+    if (allSame) {
+        console.log(`✅ [Balance] Data stabil! Nilai konsisten: ${values[0]}`);
+        return { stable: true, value: values[0], values };
+    } else {
+        console.warn(`⚠️ [Balance] Data tidak stabil! Values: [${values.join(', ')}]`);
+        return { stable: false, value: null, values };
+    }
+}
+
+// FUNGSI BARU: Tunggu sampai data stabil
+async function waitForStableData() {
+    console.log(`🎯 [Balance] Menunggu data stabil (max ${MAX_STABILITY_ATTEMPTS} attempts)...`);
+    
+    for (let attempt = 1; attempt <= MAX_STABILITY_ATTEMPTS; attempt++) {
+        console.log(`🔄 [Balance] Stability attempt ${attempt}/${MAX_STABILITY_ATTEMPTS}`);
+        
+        const result = await fetchWithStabilityCheck();
+        
+        if (result.stable) {
+            console.log(`🎉 [Balance] Data stabil ditemukan pada attempt ke-${attempt}!`);
+            return result.value;
+        }
+        
+        // Jika belum stabil dan masih ada attempt tersisa
+        if (attempt < MAX_STABILITY_ATTEMPTS) {
+            console.log(`⏸️ [Balance] Retry dalam ${RETRY_DELAY/1000}s...`);
+            await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+        }
+    }
+    
+    // Jika setelah semua attempt masih tidak stabil, gunakan fallback
+    console.warn(`⚠️ [Balance] Tidak dapat menemukan data stabil setelah ${MAX_STABILITY_ATTEMPTS} attempts`);
+    console.log(`🔧 [Balance] Fallback: Menggunakan single fetch...`);
+    
+    return await fetchAndProcessSaldo();
+}
+
 async function updateSaldo() {
     if (isUpdating) {
         console.log("⏳ [Balance] Update sudah berjalan...");
@@ -86,33 +142,14 @@ async function updateSaldo() {
     console.log("🔄 [Balance] Memulai update...");
     
     try {
-        const newSaldo = await fetchAndProcessSaldo();
+        // TUNGGU sampai data stabil
+        const newSaldo = await waitForStableData();
         
         if (newSaldo !== null) {
-            // DETEKSI CACHE ISSUE
-            if (lastFetchedValue !== null && newSaldo === lastFetchedValue) {
-                consecutiveSameValueCount++;
-                console.log(`🔁 [Balance] Nilai sama ke-${consecutiveSameValueCount}: ${newSaldo}`);
-                
-                // Jika nilai sama muncul 2x berturut-turut DAN berbeda dengan current
-                if (consecutiveSameValueCount >= 2 && currentSaldo !== null && currentSaldo !== newSaldo) {
-                    console.warn(`⚠️ [Balance] Kemungkinan cache terdeteksi! Skip update.`);
-                    console.log(`   Current: ${currentSaldo}, Fetched: ${newSaldo}`);
-                    isUpdating = false;
-                    return;
-                }
-            } else {
-                // Nilai berubah, reset counter
-                consecutiveSameValueCount = 0;
-            }
-            
-            lastFetchedValue = newSaldo;
-            
             // Cek apakah nilai benar-benar berubah
             const isValueChanged = currentSaldo !== newSaldo;
             
             if (isValueChanged || currentSaldo === null) {
-                // Simpan ke variabel global
                 const previousSaldo = currentSaldo;
                 currentSaldo = newSaldo;
                 lastUpdateTime = new Date().toISOString();
@@ -158,13 +195,11 @@ async function initialize() {
     console.log("🚀 [Balance] Inisialisasi sistem...");
     
     try {
-        // Tunggu DOM siap
         if (document.readyState !== 'loading') {
             await initBalance();
         } else {
             document.addEventListener('DOMContentLoaded', initBalance);
         }
-        
     } catch (error) {
         console.error("❌ [Balance] Error inisialisasi:", error);
     }
@@ -180,28 +215,23 @@ async function initBalance() {
     updateTimer = setInterval(updateSaldo, UPDATE_INTERVAL);
     console.log(`⏰ [Balance] Auto-update diatur (${UPDATE_INTERVAL/60000} menit)`);
     
-    // 3. Update saat tab aktif (dengan delay untuk menghindari race condition)
-    document.addEventListener('visibilitychange', () => {
-        if (!document.hidden) {
-            console.log("👁️ [Balance] Tab aktif, refresh dalam 2 detik...");
-            setTimeout(() => {
-                updateSaldo();
-            }, 2000);
-        }
-    });
+    // 3. Update saat tab aktif - DISABLED untuk mencegah looping
+    // document.addEventListener('visibilitychange', () => {
+    //     if (!document.hidden) {
+    //         console.log("👁️ [Balance] Tab aktif, refresh...");
+    //         setTimeout(updateSaldo, 2000);
+    //     }
+    // });
     
-    // 4. Update saat online (dengan delay)
+    // 4. Update saat online
     window.addEventListener('online', () => {
-        console.log("🌐 [Balance] Online, refresh dalam 2 detik...");
-        setTimeout(() => {
-            updateSaldo();
-        }, 2000);
+        console.log("🌐 [Balance] Online, refresh dalam 5 detik...");
+        setTimeout(updateSaldo, 5000);
     });
     
     isInitialized = true;
     console.log("✅ [Balance] Sistem siap!");
     
-    // Kirim event bahwa balance.js siap
     const readyEvent = new CustomEvent('balanceReady');
     window.dispatchEvent(readyEvent);
 }
@@ -216,14 +246,11 @@ window.BalanceSystem = {
     // Data
     getCurrentSaldo: () => currentSaldo,
     getLastUpdateTime: () => lastUpdateTime,
-    getLastFetchedValue: () => lastFetchedValue,
     
     // Actions
     refresh: updateSaldo,
     forceRefresh: () => {
-        console.log("🔧 [Balance] Manual refresh (reset cache detection)");
-        consecutiveSameValueCount = 0;
-        lastFetchedValue = null;
+        console.log("🔧 [Balance] Manual refresh");
         updateSaldo();
     },
     
@@ -232,8 +259,6 @@ window.BalanceSystem = {
         console.log("🔄 [Balance] Reset sistem...");
         currentSaldo = null;
         lastUpdateTime = null;
-        consecutiveSameValueCount = 0;
-        lastFetchedValue = null;
         fetchAttempts = 0;
         console.log("✅ [Balance] Reset selesai");
     },
@@ -245,20 +270,38 @@ window.BalanceSystem = {
             lastUpdateTime,
             isUpdating,
             isInitialized,
-            consecutiveSameValueCount,
-            lastFetchedValue,
             fetchAttempts,
-            updateInterval: `${UPDATE_INTERVAL/1000}s`
+            updateInterval: `${UPDATE_INTERVAL/1000}s`,
+            stabilityChecks: STABILITY_CHECK_COUNT,
+            stabilityDelay: `${STABILITY_CHECK_DELAY/1000}s`,
+            maxAttempts: MAX_STABILITY_ATTEMPTS,
+            retryDelay: `${RETRY_DELAY/1000}s`
         };
         console.table(debugInfo);
         return debugInfo;
     },
     
-    // Manual fetch (untuk testing)
+    // Manual fetch untuk testing
     manualFetch: async () => {
-        console.log("🧪 [Balance] Manual fetch untuk testing...");
+        console.log("🧪 [Balance] Manual single fetch...");
         const result = await fetchAndProcessSaldo();
-        console.log("🧪 [Balance] Hasil manual fetch:", result);
+        console.log("🧪 [Balance] Hasil:", result);
+        return result;
+    },
+    
+    // Test stability check
+    testStability: async () => {
+        console.log("🧪 [Balance] Testing stability check...");
+        const result = await fetchWithStabilityCheck();
+        console.log("🧪 [Balance] Hasil:", result);
+        return result;
+    },
+    
+    // Test wait for stable data
+    testWaitStable: async () => {
+        console.log("🧪 [Balance] Testing wait for stable data...");
+        const result = await waitForStableData();
+        console.log("🧪 [Balance] Hasil:", result);
         return result;
     }
 };
